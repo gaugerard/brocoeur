@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class TestPlzTest {
+class AnalyticsServiceTest {
 
     @InjectMocks
     private AnalyticsService analyticsService;
@@ -14,7 +14,7 @@ class TestPlzTest {
     @Test
     void shouldTestAnalyse() {
         // Given
-        var content = "analyse";
+        var content = "test";
 
         // When
         analyticsService.analyse(content);
