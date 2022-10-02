@@ -1,7 +1,7 @@
 package broker.example;
 
 public class AnalyticsService {
-    public void analyse() {
-        System.out.println("Analysing.");
+    public void analyse(final String content) {
+        System.out.println(content);
     }
 }

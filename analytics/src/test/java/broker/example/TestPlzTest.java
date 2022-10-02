@@ -13,8 +13,11 @@ class TestPlzTest {
 
     @Test
     void shouldTestAnalyse() {
-        // Given - When
-        analyticsService.analyse();
+        // Given
+        var content = "analyse";
+
+        // When
+        analyticsService.analyse(content);
         // Then
     }
 
