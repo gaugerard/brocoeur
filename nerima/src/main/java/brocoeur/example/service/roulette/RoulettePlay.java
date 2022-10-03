@@ -1,6 +1,6 @@
-package nerima.example.roulette;
+package brocoeur.example.service.roulette;
 
-import nerima.example.GamePlay;
+import brocoeur.example.service.GamePlay;
 
 public enum RoulettePlay implements GamePlay {
     RED,

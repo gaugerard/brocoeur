@@ -1,4 +1,4 @@
-package nerima.example;
+package brocoeur.example;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;

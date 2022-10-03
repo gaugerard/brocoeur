@@ -1,5 +1,6 @@
-package brocoeur.example;
+package brocoeur.example.service;
 
+import brocoeur.example.service.GameStrategy;
 import brocoeur.example.service.cointoss.strategy.RandomCoinToss;
 import brocoeur.example.service.roulette.strategy.RouletteRiskyStrategy;
 import brocoeur.example.service.roulette.strategy.RouletteSafeStrategy;

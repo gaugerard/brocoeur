@@ -1,4 +1,4 @@
-package brocoeur.example;
+package brocoeur.example.service;
 
 public interface GamePlay {
 }

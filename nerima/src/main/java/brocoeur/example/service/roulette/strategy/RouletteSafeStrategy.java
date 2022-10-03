@@ -1,7 +1,7 @@
-package nerima.example.roulette.strategy;
+package brocoeur.example.service.roulette.strategy;
 
-import nerima.example.GameStrategy;
-import nerima.example.roulette.RoulettePlay;
+import brocoeur.example.service.GameStrategy;
+import brocoeur.example.service.roulette.RoulettePlay;
 
 public class RouletteSafeStrategy implements GameStrategy {
     @Override

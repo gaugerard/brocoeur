@@ -1,7 +1,7 @@
-package nerima.example.cointoss.strategy;
+package brocoeur.example.service.cointoss.strategy;
 
-import nerima.example.GameStrategy;
-import nerima.example.cointoss.CoinTossPlay;
+import brocoeur.example.service.GameStrategy;
+import brocoeur.example.service.cointoss.CoinTossPlay;
 
 import java.util.Arrays;
 import java.util.Random;

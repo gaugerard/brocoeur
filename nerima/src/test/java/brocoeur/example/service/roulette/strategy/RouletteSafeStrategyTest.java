@@ -1,4 +1,4 @@
-package nerima.roulette.strategy;
+package brocoeur.example.service.roulette.strategy;
 
 import brocoeur.example.service.roulette.strategy.RouletteSafeStrategy;
 import org.junit.jupiter.api.Assertions;

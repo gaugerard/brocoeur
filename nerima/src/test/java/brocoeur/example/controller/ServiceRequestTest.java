@@ -1,6 +1,6 @@
-package brocoeur.example;
+package brocoeur.example.controller;
 
-import brocoeur.example.repository.ServiceRequest;
+import brocoeur.example.controller.ServiceRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

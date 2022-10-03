@@ -1,4 +1,4 @@
-package nerima.example;
+package brocoeur.example;
 
 public class AnalyticsService {
     public String analyse(final String content) {

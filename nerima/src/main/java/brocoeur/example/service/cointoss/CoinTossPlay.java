@@ -1,6 +1,6 @@
-package nerima.example.cointoss;
+package brocoeur.example.service.cointoss;
 
-import nerima.example.GamePlay;
+import brocoeur.example.service.GamePlay;
 
 public enum CoinTossPlay implements GamePlay {
     HEAD,

@@ -1,4 +1,4 @@
-package brocoeur.example.repository;
+package brocoeur.example.controller;
 
 import brocoeur.example.service.GameStrategyTypes;
 

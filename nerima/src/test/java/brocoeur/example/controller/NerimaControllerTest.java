@@ -1,7 +1,7 @@
-package brocoeur.example;
+package brocoeur.example.controller;
 
 import brocoeur.example.controller.NerimaController;
-import brocoeur.example.repository.ServiceRequest;
+import brocoeur.example.controller.ServiceRequest;
 import brocoeur.example.service.GameStrategyTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
