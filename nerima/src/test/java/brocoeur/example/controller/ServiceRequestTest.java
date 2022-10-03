@@ -1,5 +1,6 @@
-package nerima.example;
+package brocoeur.example;
 
+import brocoeur.example.repository.ServiceRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -8,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static nerima.example.GameStrategyTypes.COIN_TOSS_RANDOM;
-import static nerima.example.GameStrategyTypes.ROULETTE_RISKY;
+import static brocoeur.example.service.GameStrategyTypes.COIN_TOSS_RANDOM;
+import static brocoeur.example.service.GameStrategyTypes.ROULETTE_RISKY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.util.AssertionErrors.assertTrue;

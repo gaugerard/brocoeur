@@ -1,8 +1,8 @@
-package nerima.example;
+package brocoeur.example;
 
-import nerima.example.cointoss.strategy.RandomCoinToss;
-import nerima.example.roulette.strategy.RouletteRiskyStrategy;
-import nerima.example.roulette.strategy.RouletteSafeStrategy;
+import brocoeur.example.service.cointoss.strategy.RandomCoinToss;
+import brocoeur.example.service.roulette.strategy.RouletteRiskyStrategy;
+import brocoeur.example.service.roulette.strategy.RouletteSafeStrategy;
 
 public enum GameStrategyTypes {
     // Roulette

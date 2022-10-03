@@ -1,5 +1,8 @@
-package nerima.example;
+package brocoeur.example;
 
+import brocoeur.example.controller.NerimaController;
+import brocoeur.example.repository.ServiceRequest;
+import brocoeur.example.service.GameStrategyTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,36 +11,37 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.util.stream.Stream;
 
-import static nerima.example.GameStrategyTypes.*;
+import static brocoeur.example.service.GameStrategyTypes.*;
 
 @ExtendWith(MockitoExtension.class)
-class NerimaServiceTest {
+class NerimaControllerTest {
 
     @InjectMocks
-    private NerimaService nerimaService;
+    private NerimaController nerimaController;
 
     public static Stream<Arguments> getInputForRoulette() {
         return Stream.of(
-                Arguments.of("Test - Roulette Risky", ROULETTE_RISKY, "12345 used strategy: RouletteRiskyStrategy and will play: GREEN"),
-                Arguments.of("Test - Roulette Safe", ROULETTE_SAFE, "12345 used strategy: RouletteSafeStrategy and will play: RED")
+                Arguments.of("Test - Roulette Risky", ROULETTE_RISKY),
+                Arguments.of("Test - Roulette Safe", ROULETTE_SAFE)
         );
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getInputForRoulette")
-    void shouldTestRouletteRiskyStrategy(final String testName, final GameStrategyTypes rouletteStrategyType, final String expected) {
+    void shouldTestRouletteRiskyStrategy(final String testName, final GameStrategyTypes rouletteStrategyType) {
         // Given
         var userId = "12345";
         var serviceRequest = new ServiceRequest(userId, rouletteStrategyType);
 
         // When
-        var actual = nerimaService.play(serviceRequest);
+        var actual = nerimaController.postPlay(serviceRequest);
 
         // Then
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertEquals(HttpStatus.OK, actual);
     }
 
     @Test
@@ -47,11 +51,10 @@ class NerimaServiceTest {
         var serviceRequest = new ServiceRequest(userId, COIN_TOSS_RANDOM);
 
         // When
-        var actual = nerimaService.play(serviceRequest);
+        var actual = nerimaController.postPlay(serviceRequest);
 
         // Then
         var expectedStart = "67890 used strategy: RandomCoinToss and will play: ";
-        Assertions.assertTrue(actual.startsWith(expectedStart));
-        Assertions.assertTrue(actual.endsWith("TAIL") || actual.endsWith("HEAD"));
+        Assertions.assertEquals(HttpStatus.OK,actual);
     }
 }
