@@ -53,7 +53,7 @@ class NerimaControllerTest {
         var actual = nerimaController.postPlay(serviceRequest);
 
         // Then
-        var expectedStart = "67890 used strategy: RandomCoinToss and will play: ";
+
         Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK),actual);
     }
     @Test
