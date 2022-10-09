@@ -9,7 +9,7 @@ on:
     pull_request:
       branches:
         - main
-      types: [opened, synchronize]
+      types: [ opened, synchronize ]
 jobs:
   build:
     runs-on: windows-latest
