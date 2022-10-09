@@ -1,8 +1,8 @@
 name: Maven Run Tests when push to Main branch and newly created PRs.
 
 on:
-  # Trigger the workflow on push for the main branch
-  # and pull request for main and card-* prefix branches
+  # Trigger the workflow on pull request for main branch
+  # and for subsequent commits pushed to this PR.
   push:
     pull_request:
       branches:
