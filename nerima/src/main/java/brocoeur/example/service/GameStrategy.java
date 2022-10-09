@@ -4,6 +4,6 @@ import brocoeur.example.service.GamePlay;
 
 public interface GameStrategy {
 
-    public GamePlay play();
+    public GamePlay getStrategyPlay();
 
 }

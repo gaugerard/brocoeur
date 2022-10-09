@@ -18,7 +18,7 @@ class RouletteSafeStrategyTest {
     @Test
     void shouldGetREDWithSafeRouletteStrategy() {
         // Given - When
-        var actualPlay = rouletteSafeStrategy.play();
+        var actualPlay = rouletteSafeStrategy.getStrategyPlay();
 
         // Then
         Assertions.assertEquals(RED, actualPlay);

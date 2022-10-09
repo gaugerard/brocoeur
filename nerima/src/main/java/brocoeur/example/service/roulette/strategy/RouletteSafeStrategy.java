@@ -5,7 +5,7 @@ import brocoeur.example.service.roulette.RoulettePlay;
 
 public class RouletteSafeStrategy implements GameStrategy {
     @Override
-    public RoulettePlay play() {
+    public RoulettePlay getStrategyPlay() {
         return RoulettePlay.RED;
     }
 

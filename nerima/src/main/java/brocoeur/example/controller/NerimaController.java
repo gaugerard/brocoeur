@@ -20,7 +20,7 @@ public class NerimaController {
         final GameStrategyTypes gameStrategyTypes = serviceRequest.gameStrategyTypes();
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
 
-        final GamePlay gamePlay = gameStrategy.play();
+        final GamePlay gamePlay = gameStrategy.getStrategyPlay();
         System.out.println(userId + " used strategy: " + gameStrategy + " and will play: " + gamePlay);
         return new ResponseEntity<>(serviceRequest, HttpStatus.OK);
     }
