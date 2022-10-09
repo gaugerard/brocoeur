@@ -40,7 +40,7 @@ class NerimaControllerTest {
         var actual = nerimaController.postPlay(serviceRequest);
 
         // Then
-        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.BAD_REQUEST), actual);
+        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actual);
     }
 
     @Test
