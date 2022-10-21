@@ -1,5 +1,6 @@
 package brocoeur.example;
 
+import brocoeur.example.analytics.AnalyticsService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

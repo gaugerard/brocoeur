@@ -1,4 +1,4 @@
-package brocoeur.example.controller;
+package brocoeur.example.nerima.controller;
 
 import brocoeur.example.service.GamePlay;
 import brocoeur.example.service.GameStrategy;
