@@ -15,28 +15,28 @@ public class PlayerController {
     @Autowired
     PlayerRepository playerRepository;
 
-    @GetMapping("/users")
+    @GetMapping("/player")
     ResponseEntity<Player> getAllPlayers(){
         return new ResponseEntity(playerRepository.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/Players/{id}")
+    @GetMapping("/players/{id}")
     ResponseEntity<Player> getPlayerById(@PathVariable(value = "id") Long id){
         return new ResponseEntity(playerRepository.findById(id),HttpStatus.OK);
     }
 
-    @GetMapping("/Players/id")
+    @GetMapping("/players/id")
     ResponseEntity<Player> getPlayerById(@RequestBody List<Long> ids){
         return new ResponseEntity(playerRepository.findAllById(ids),HttpStatus.OK);
     }
 
-    @PostMapping("/Players")
+    @PostMapping("/players")
     ResponseEntity createPlayer(@RequestBody Player player){
         return new ResponseEntity(playerRepository.save(player),HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/Players/{id}")
-    ResponseEntity updatePlayer(@PathVariable(value = "id") Long id){
+    @DeleteMapping("/players/{id}")
+    ResponseEntity deletePlayer(@PathVariable(value = "id") Long id){
         playerRepository.deleteById(id);
         return new ResponseEntity(null,HttpStatus.OK) ;
     }

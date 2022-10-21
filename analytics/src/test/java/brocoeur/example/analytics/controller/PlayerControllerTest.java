@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 
 @SpringBootTest
-public class PlayerControllerTest {
+class PlayerControllerTest {
 
     @Autowired
     private PlayerController playerController;
