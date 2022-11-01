@@ -5,9 +5,10 @@ import brocoeur.example.nerima.service.GamePlay;
 import brocoeur.example.nerima.service.GameTypes;
 import brocoeur.example.games.service.cointoss.CoinTossService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GameService {
-
     @Autowired
     private CoinTossService coinTossService;
     @Autowired
