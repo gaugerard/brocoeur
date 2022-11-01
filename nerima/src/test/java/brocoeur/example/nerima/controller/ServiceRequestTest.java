@@ -12,10 +12,10 @@ import java.nio.file.Files;
 import static brocoeur.example.nerima.service.GameStrategyTypes.COIN_TOSS_RANDOM;
 import static brocoeur.example.nerima.service.GameStrategyTypes.ROULETTE_RISKY;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-public class ServiceRequestTest {
+class ServiceRequestTest {
 
     @TempDir
     private File tempDir;
@@ -44,6 +44,6 @@ public class ServiceRequestTest {
 
         // Then
         var expected = new ServiceRequest("67890", COIN_TOSS_RANDOM);
-        assertThat(actual, equalTo(expected));
+        assertThat(actual, samePropertyValuesAs(expected));
     }
 }
