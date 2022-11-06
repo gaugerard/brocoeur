@@ -1,53 +1,53 @@
 package brocoeur.example.games.controller;
 
 import brocoeur.example.games.service.GameService;
-import brocoeur.example.nerima.service.GamePlay;
-import brocoeur.example.nerima.service.GameTypes;
-import brocoeur.example.nerima.service.cointoss.CoinTossPlay;
+import brocoeur.example.nerima.controller.ServiceRequest;
 import brocoeur.example.nerima.service.roulette.RoulettePlay;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import java.util.stream.Stream;
+import static brocoeur.example.nerima.service.GameStrategyTypes.ROULETTE_RISKY;
 
 
 @ExtendWith(MockitoExtension.class)
-public class GamesControllerTest {
+class GamesControllerTest {
 
     @Mock
     private GameService gameServiceMock;
     @InjectMocks
     private GamesController gamesController;
 
-    public static Stream<Arguments> getInputForGameResult() {
-        return Stream.of(
-                Arguments.of("Test - CoinToss game result", GameTypes.COIN_TOSS, CoinTossPlay.HEAD),
-                Arguments.of("Test - Roulette game result", GameTypes.ROULETTE, RoulettePlay.RED)
-        );
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("getInputForGameResult")
-    void shouldTestCoinTossGames(final String testName, final GameTypes gameTypes, final GamePlay gamePlay){
+    @Test
+    void shouldTestGetMsgForWinningUser() {
         // Given
-        Mockito.when(gameServiceMock.play(gameTypes)).thenReturn(gamePlay);
+        var serviceRequest = new ServiceRequest("12345", ROULETTE_RISKY);
+
+        Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(RoulettePlay.GREEN);
 
         // When
-        var actualGameResult = gamesController.getGameResult(gameTypes);
+        var actualGameResult = gamesController.getMsg(serviceRequest);
 
         // Then
-        var expectedGameResult = new ResponseEntity<>(gamePlay, HttpStatus.OK);
-        MatcherAssert.assertThat(actualGameResult, Matchers.equalTo(expectedGameResult));
+        MatcherAssert.assertThat(actualGameResult, Matchers.equalTo("User WON !"));
     }
 
+    @Test
+    void shouldTestGetMsgForLosingUser() {
+        // Given
+        var serviceRequest = new ServiceRequest("12345", ROULETTE_RISKY);
+
+        Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(RoulettePlay.RED);
+
+        // When
+        var actualGameResult = gamesController.getMsg(serviceRequest);
+
+        // Then
+        MatcherAssert.assertThat(actualGameResult, Matchers.equalTo("User LOST !"));
+    }
 }
