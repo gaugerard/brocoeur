@@ -1,5 +1,6 @@
 package brocoeur.example.games.controller;
 
+import brocoeur.example.ConfigProperties;
 import brocoeur.example.games.service.GameService;
 import brocoeur.example.nerima.controller.ServiceRequest;
 import brocoeur.example.nerima.service.GamePlay;
@@ -18,8 +19,10 @@ public class GamesController {
 
     @Autowired
     private GameService gameService;
+    @Autowired
+    private ConfigProperties configProperties;
 
-    @RabbitListener(queues = {"MyQ1"})
+    @RabbitListener(queues = "#{configProperties.queueName}")
     public String getMsg(final ServiceRequest serviceRequest) {
 
         final String userId = serviceRequest.getUserId();

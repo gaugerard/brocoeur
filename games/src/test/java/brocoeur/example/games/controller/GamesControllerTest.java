@@ -1,5 +1,6 @@
 package brocoeur.example.games.controller;
 
+import brocoeur.example.ConfigProperties;
 import brocoeur.example.games.service.GameService;
 import brocoeur.example.nerima.controller.ServiceRequest;
 import brocoeur.example.nerima.service.roulette.RoulettePlay;
@@ -20,6 +21,8 @@ class GamesControllerTest {
 
     @Mock
     private GameService gameServiceMock;
+    @Mock
+    private ConfigProperties configPropertiesMock;
     @InjectMocks
     private GamesController gamesController;
 

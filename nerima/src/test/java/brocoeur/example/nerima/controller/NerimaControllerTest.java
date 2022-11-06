@@ -1,5 +1,6 @@
 package brocoeur.example.nerima.controller;
 
+import brocoeur.example.ConfigProperties;
 import brocoeur.example.nerima.service.GameStrategyTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,9 @@ class NerimaControllerTest {
 
     @Mock
     private RabbitTemplate rabbitTemplateMock;
+    @Mock
+    private ConfigProperties configPropertiesMock;
+
     @InjectMocks
     private NerimaController nerimaController;
 
@@ -40,6 +44,9 @@ class NerimaControllerTest {
         // Given
         var userId = "12345";
         var serviceRequest = new ServiceRequest(userId, rouletteStrategyType);
+
+        Mockito.when(configPropertiesMock.getExchangeName()).thenReturn("myexchange1");
+        Mockito.when(configPropertiesMock.getRoutingKey()).thenReturn("");
 
         // When
         var actual = nerimaController.postPlay(serviceRequest);
