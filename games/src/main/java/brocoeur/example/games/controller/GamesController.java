@@ -8,9 +8,15 @@ import brocoeur.example.nerima.service.GameStrategy;
 import brocoeur.example.nerima.service.GameStrategyTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+
+import static brocoeur.example.ConfigRabbitAdmin.*;
 
 @RestController
 public class GamesController {
@@ -21,9 +27,12 @@ public class GamesController {
     private GameService gameService;
     @Autowired
     private ConfigProperties configProperties;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = "#{configProperties.queueName}")
-    public String getMsg(final ServiceRequest serviceRequest) {
+    //@RabbitListener(queues = "#{configProperties.queueName}")
+    @RabbitListener(queues = RPC_MESSAGE_QUEUE)
+    public void getMsg(final ServiceRequest serviceRequest) {
 
         final String userId = serviceRequest.getUserId();
         final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
@@ -36,10 +45,14 @@ public class GamesController {
 
         if (gamePlayFromUser.equals(gamePlayFromService)) {
             LOGGER.info("User WON !");
-            return "User WON !";
+            CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
+            ServiceRequest build = new ServiceRequest("WON", null);
+            rabbitTemplate.convertSendAndReceive(RPC_EXCHANGE, RPC_REPLY_MESSAGE_QUEUE, build, correlationData);
         } else {
             LOGGER.info("User LOST !");
-            return "User LOST !";
+            CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
+            ServiceRequest build = new ServiceRequest("LOST", null);
+            rabbitTemplate.convertSendAndReceive(RPC_EXCHANGE, RPC_REPLY_MESSAGE_QUEUE, build, correlationData);
         }
     }
 }
