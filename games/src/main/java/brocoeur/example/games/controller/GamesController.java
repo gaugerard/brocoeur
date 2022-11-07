@@ -1,22 +1,19 @@
 package brocoeur.example.games.controller;
 
-import brocoeur.example.ConfigProperties;
+import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import brocoeur.example.nerima.controller.ServiceRequest;
+import brocoeur.example.nerima.controller.ServiceResponse;
 import brocoeur.example.nerima.service.GamePlay;
 import brocoeur.example.nerima.service.GameStrategy;
 import brocoeur.example.nerima.service.GameStrategyTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-
-import static brocoeur.example.ConfigRabbitAdmin.*;
 
 @RestController
 public class GamesController {
@@ -26,12 +23,11 @@ public class GamesController {
     @Autowired
     private GameService gameService;
     @Autowired
-    private ConfigProperties configProperties;
+    private GamesConfigProperties gamesConfigProperties;
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    //@RabbitListener(queues = "#{configProperties.queueName}")
-    @RabbitListener(queues = RPC_MESSAGE_QUEUE)
+    @RabbitListener(queues = "#{gamesConfigProperties.getRpcMessageQueue()}")
     public void getMsg(final ServiceRequest serviceRequest) {
 
         final String userId = serviceRequest.getUserId();
@@ -46,13 +42,13 @@ public class GamesController {
         if (gamePlayFromUser.equals(gamePlayFromService)) {
             LOGGER.info("User WON !");
             CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
-            ServiceRequest build = new ServiceRequest("WON", null);
-            rabbitTemplate.convertSendAndReceive(RPC_EXCHANGE, RPC_REPLY_MESSAGE_QUEUE, build, correlationData);
+            ServiceResponse build = new ServiceResponse(userId, true);
+            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), build, correlationData);
         } else {
             LOGGER.info("User LOST !");
             CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
-            ServiceRequest build = new ServiceRequest("LOST", null);
-            rabbitTemplate.convertSendAndReceive(RPC_EXCHANGE, RPC_REPLY_MESSAGE_QUEUE, build, correlationData);
+            ServiceResponse build = new ServiceResponse(userId, false);
+            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), build, correlationData);
         }
     }
 }
