@@ -1,6 +1,6 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.ConfigProperties;
+import brocoeur.example.nerima.NerimaConfigProperties;
 import brocoeur.example.nerima.service.GameStrategyTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,7 @@ class NerimaControllerTest {
     @Mock
     private RabbitTemplate rabbitTemplateMock;
     @Mock
-    private ConfigProperties configPropertiesMock;
+    private NerimaConfigProperties nerimaConfigPropertiesMock;
 
     @InjectMocks
     private NerimaController nerimaController;
@@ -44,15 +44,16 @@ class NerimaControllerTest {
         // Given
         var userId = "12345";
         var serviceRequest = new ServiceRequest(userId, rouletteStrategyType);
+        var serviceResponse = new ServiceResponse(userId, true);
 
-        Mockito.when(configPropertiesMock.getExchangeName()).thenReturn("myexchange1");
-        Mockito.when(configPropertiesMock.getRoutingKey()).thenReturn("");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyQ1");
+        Mockito.when(rabbitTemplateMock.convertSendAndReceive("myexchange1", "MyQ1", serviceRequest)).thenReturn(serviceResponse);
 
         // When
-        var actual = nerimaController.postPlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postPlay(serviceRequest);
 
         // Then
-        Mockito.verify(rabbitTemplateMock).convertSendAndReceive("myexchange1", "", serviceRequest);
-        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actual);
+        Assertions.assertEquals(new ResponseEntity<>(serviceResponse, HttpStatus.OK), actualServiceResponse);
     }
 }

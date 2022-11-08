@@ -1,6 +1,6 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.ConfigProperties;
+import brocoeur.example.nerima.NerimaConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 public class NerimaController {
 
@@ -19,16 +18,20 @@ public class NerimaController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
     @Autowired
-
-    private ConfigProperties configProperties;
+    private NerimaConfigProperties nerimaConfigProperties;
 
     @PostMapping("/api/nerima/play")
-    public ResponseEntity<ServiceRequest> postPlay(@RequestBody final ServiceRequest serviceRequest) {
+    public ResponseEntity<ServiceResponse> postPlay(@RequestBody final ServiceRequest serviceRequest) {
 
-        LOGGER.info("serviceRequest: " + serviceRequest);
+        LOGGER.info("==> REQUEST: " + serviceRequest);
 
-        rabbitTemplate.convertSendAndReceive(configProperties.getExchangeName(), configProperties.getRoutingKey(), serviceRequest);
+        ServiceResponse result = (ServiceResponse) rabbitTemplate.convertSendAndReceive(
+                nerimaConfigProperties.getRpcExchange(),
+                nerimaConfigProperties.getRpcMessageQueue(),
+                serviceRequest);
 
-        return new ResponseEntity<>(serviceRequest, HttpStatus.OK);
+        LOGGER.info("==> RESPONSE: " + result);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
