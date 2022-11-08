@@ -1,13 +1,10 @@
 package brocoeur.example.nerima.controller;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
 @Component
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@userId", scope = ServiceResponse.class)
 public class ServiceResponse implements Serializable {
     private String userId;
     private boolean isWinner;
@@ -42,5 +39,20 @@ public class ServiceResponse implements Serializable {
                 "userId='" + userId + '\'' +
                 ", isWinner='" + isWinner + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof ServiceResponse)) {
+            return false;
+        }
+
+        ServiceResponse c = (ServiceResponse) obj;
+
+        return userId.equals(c.userId) && Boolean.compare(isWinner, c.isWinner) == 0;
     }
 }

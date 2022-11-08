@@ -25,7 +25,10 @@ public class NerimaController {
 
         LOGGER.info("==> REQUEST: " + serviceRequest);
 
-        ServiceResponse result = (ServiceResponse) rabbitTemplate.convertSendAndReceive(nerimaConfigProperties.getRpcExchange(), nerimaConfigProperties.getRpcMessageQueue(), serviceRequest);
+        ServiceResponse result = (ServiceResponse) rabbitTemplate.convertSendAndReceive(
+                nerimaConfigProperties.getRpcExchange(),
+                nerimaConfigProperties.getRpcMessageQueue(),
+                serviceRequest);
 
         LOGGER.info("==> RESPONSE: " + result);
 

@@ -44,15 +44,16 @@ class NerimaControllerTest {
         // Given
         var userId = "12345";
         var serviceRequest = new ServiceRequest(userId, rouletteStrategyType);
+        var serviceResponse = new ServiceResponse(userId, true);
 
-        Mockito.when(nerimaConfigPropertiesMock.getExchangeName()).thenReturn("myexchange1");
-        Mockito.when(nerimaConfigPropertiesMock.getRoutingKey()).thenReturn("");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyQ1");
+        Mockito.when(rabbitTemplateMock.convertSendAndReceive("myexchange1", "MyQ1", serviceRequest)).thenReturn(serviceResponse);
 
         // When
-        var actual = nerimaController.postPlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postPlay(serviceRequest);
 
         // Then
-        Mockito.verify(rabbitTemplateMock).convertSendAndReceive("myexchange1", "", serviceRequest);
-        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actual);
+        Assertions.assertEquals(new ResponseEntity<>(serviceResponse, HttpStatus.OK), actualServiceResponse);
     }
 }

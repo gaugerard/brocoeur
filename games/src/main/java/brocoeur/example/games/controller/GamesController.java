@@ -39,16 +39,16 @@ public class GamesController {
         final GamePlay gamePlayFromService = gameService.play(serviceRequest.getGameStrategyTypes().getGameTypes());
         LOGGER.info("Servive Games Result is... : " + gamePlayFromService);
 
+        CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
+
         if (gamePlayFromUser.equals(gamePlayFromService)) {
             LOGGER.info("User WON !");
-            CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
-            ServiceResponse build = new ServiceResponse(userId, true);
-            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), build, correlationData);
+            ServiceResponse serviceResponseWin = new ServiceResponse(userId, true);
+            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), serviceResponseWin, correlationData);
         } else {
             LOGGER.info("User LOST !");
-            CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
-            ServiceResponse build = new ServiceResponse(userId, false);
-            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), build, correlationData);
+            ServiceResponse serviceResponseLost = new ServiceResponse(userId, false);
+            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), serviceResponseLost, correlationData);
         }
     }
 }

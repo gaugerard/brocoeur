@@ -1,14 +1,11 @@
 package brocoeur.example.nerima.controller;
 
 import brocoeur.example.nerima.service.GameStrategyTypes;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
 @Component
-@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@userId", scope = ServiceRequest.class)
 public class ServiceRequest implements Serializable {
     private String userId;
     private GameStrategyTypes gameStrategyTypes;

@@ -1,6 +1,5 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.nerima.controller.ServiceRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
