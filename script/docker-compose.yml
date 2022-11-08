@@ -1,0 +1,8 @@
+services:
+  rabbitmq-demo:
+    image: rabbitmq:3-management
+    environment:
+      - TCP_PORTS=15672, 5672
+    ports:
+      - 15672:15672
+      - 5672:5672
