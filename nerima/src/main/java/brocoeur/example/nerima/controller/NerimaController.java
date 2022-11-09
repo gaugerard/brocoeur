@@ -23,14 +23,29 @@ public class NerimaController {
     @PostMapping("/api/nerima/play")
     public ResponseEntity<ServiceResponse> postPlay(@RequestBody final ServiceRequest serviceRequest) {
 
-        LOGGER.info("==> REQUEST: " + serviceRequest);
+        LOGGER.info("==> DIRECT REQUEST: " + serviceRequest);
 
         ServiceResponse result = (ServiceResponse) rabbitTemplate.convertSendAndReceive(
                 nerimaConfigProperties.getRpcExchange(),
                 nerimaConfigProperties.getRpcMessageQueue(),
                 serviceRequest);
 
-        LOGGER.info("==> RESPONSE: " + result);
+        LOGGER.info("==> DIRECT RESPONSE: " + result);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/nerima/offline/play")
+    public ResponseEntity<OfflineServiceResponse> postPlay(@RequestBody final OfflineServiceRequest offlineserviceRequest) {
+
+        LOGGER.info("==> OFFLINE REQUEST: " + offlineserviceRequest);
+
+        OfflineServiceResponse result = (OfflineServiceResponse) rabbitTemplate.convertSendAndReceive(
+                nerimaConfigProperties.getOfflineRpcExchange(),
+                nerimaConfigProperties.getOfflineRpcMessageQueue(),
+                offlineserviceRequest);
+
+        LOGGER.info("==> OFFLINE RESPONSE: " + result);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
