@@ -16,7 +16,7 @@ public class NerimaConfigProperties {
         return rpcMessageQueue;
     }
 
-    public void setRpcMessageQueue(String rpcMessageQueue) {
+    public void setRpcMessageQueue(final String rpcMessageQueue) {
         this.rpcMessageQueue = rpcMessageQueue;
     }
 
@@ -24,7 +24,7 @@ public class NerimaConfigProperties {
         return rpcReplyMessageQueue;
     }
 
-    public void setRpcReplyMessageQueue(String rpcReplyMessageQueue) {
+    public void setRpcReplyMessageQueue(final String rpcReplyMessageQueue) {
         this.rpcReplyMessageQueue = rpcReplyMessageQueue;
     }
 
@@ -32,7 +32,7 @@ public class NerimaConfigProperties {
         return routingKey;
     }
 
-    public void setRoutingKey(String routingKey) {
+    public void setRoutingKey(final String routingKey) {
         this.routingKey = routingKey;
     }
 
@@ -40,7 +40,7 @@ public class NerimaConfigProperties {
         return rpcExchange;
     }
 
-    public void setRpcExchange(String rpcExchange) {
+    public void setRpcExchange(final String rpcExchange) {
         this.rpcExchange = rpcExchange;
     }
 }

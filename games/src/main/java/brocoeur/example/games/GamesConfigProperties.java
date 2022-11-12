@@ -15,7 +15,7 @@ public class GamesConfigProperties {
         return rpcMessageQueue;
     }
 
-    public void setRpcMessageQueue(String rpcMessageQueue) {
+    public void setRpcMessageQueue(final String rpcMessageQueue) {
         this.rpcMessageQueue = rpcMessageQueue;
     }
 
@@ -23,7 +23,7 @@ public class GamesConfigProperties {
         return rpcReplyMessageQueue;
     }
 
-    public void setRpcReplyMessageQueue(String rpcReplyMessageQueue) {
+    public void setRpcReplyMessageQueue(final String rpcReplyMessageQueue) {
         this.rpcReplyMessageQueue = rpcReplyMessageQueue;
     }
 
@@ -31,7 +31,7 @@ public class GamesConfigProperties {
         return rpcExchange;
     }
 
-    public void setRpcExchange(String rpcExchange) {
+    public void setRpcExchange(final String rpcExchange) {
         this.rpcExchange = rpcExchange;
     }
 }

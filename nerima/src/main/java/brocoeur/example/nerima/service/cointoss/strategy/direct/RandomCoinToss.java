@@ -1,4 +1,4 @@
-package brocoeur.example.nerima.service.cointoss.strategy;
+package brocoeur.example.nerima.service.cointoss.strategy.direct;
 
 import brocoeur.example.nerima.service.cointoss.CoinTossPlay;
 import brocoeur.example.nerima.service.GameStrategy;

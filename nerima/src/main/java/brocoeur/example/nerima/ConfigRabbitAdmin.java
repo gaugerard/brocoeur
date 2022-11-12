@@ -28,12 +28,13 @@ public class ConfigRabbitAdmin {
     }
 
     /**
+     * <h1><u>This section concerning the DIRECT game request:</u></h1>
+     * <p>
      * Set sending RPCQueue message
      * Configure the Send Message Queue
      */
     @Bean
     Queue msgQueue() {
-
         return new Queue(nerimaConfigProperties.getRpcMessageQueue(), false, false, true);
     }
 
@@ -77,7 +78,7 @@ public class ConfigRabbitAdmin {
      * And set callback queue address
      */
     @Bean
-    RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
 
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setReplyAddress(nerimaConfigProperties.getRpcReplyMessageQueue());
@@ -89,7 +90,7 @@ public class ConfigRabbitAdmin {
      * Configure listener for return queue
      */
     @Bean
-    SimpleMessageListenerContainer replyContainer(ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer replyContainer(final ConnectionFactory connectionFactory) {
 
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
