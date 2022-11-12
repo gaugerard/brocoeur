@@ -3,15 +3,24 @@ package brocoeur.example.nerima.controller;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Component
 public class ServiceResponse implements Serializable {
-    private String userId;
-    private boolean isWinner;
 
-    public ServiceResponse(String userId, boolean isWinner) {
+    private String userId;
+    private List<Boolean> listOfIsWinner;
+
+    public ServiceResponse(final String userId,
+                           final List<Boolean> listOfIsWinner) {
         this.userId = userId;
-        this.isWinner = isWinner;
+        this.listOfIsWinner = List.copyOf(listOfIsWinner);
+    }
+
+    public ServiceResponse(final String userId,
+                           final boolean isWinner) {
+        this.userId = userId;
+        this.listOfIsWinner = List.of(isWinner);
     }
 
     public ServiceResponse() {
@@ -21,23 +30,23 @@ public class ServiceResponse implements Serializable {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(final String userId) {
         this.userId = userId;
     }
 
-    public boolean getIsWinner() {
-        return isWinner;
+    public List<Boolean> getListOfIsWinner() {
+        return listOfIsWinner;
     }
 
-    public void setIsWinner(boolean isWinner) {
-        this.isWinner = isWinner;
+    public void setListOfIsWinner(final List<Boolean> listOfIsWinner) {
+        this.listOfIsWinner = listOfIsWinner;
     }
 
     @Override
     public String toString() {
         return "ServiceResponse{" +
                 "userId='" + userId + '\'' +
-                ", isWinner='" + isWinner + '\'' +
+                ", listOfIsWinner='" + listOfIsWinner + '\'' +
                 '}';
     }
 
@@ -53,6 +62,6 @@ public class ServiceResponse implements Serializable {
 
         ServiceResponse c = (ServiceResponse) obj;
 
-        return userId.equals(c.userId) && Boolean.compare(isWinner, c.isWinner) == 0;
+        return userId.equals(c.userId) && listOfIsWinner.equals(c.listOfIsWinner);
     }
 }

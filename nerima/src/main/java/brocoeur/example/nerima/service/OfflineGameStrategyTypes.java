@@ -1,6 +1,5 @@
-package brocoeur.example.nerima.service.offline;
+package brocoeur.example.nerima.service;
 
-import brocoeur.example.nerima.service.GameTypes;
 import brocoeur.example.nerima.service.cointoss.strategy.offline.OfflineRandomCoinToss;
 
 public enum OfflineGameStrategyTypes {

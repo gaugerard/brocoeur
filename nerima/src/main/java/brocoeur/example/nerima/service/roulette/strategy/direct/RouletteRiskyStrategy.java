@@ -1,4 +1,4 @@
-package brocoeur.example.nerima.service.roulette.strategy;
+package brocoeur.example.nerima.service.roulette.strategy.direct;
 
 import brocoeur.example.nerima.service.GameStrategy;
 import brocoeur.example.nerima.service.roulette.RoulettePlay;

@@ -1,6 +1,6 @@
 package brocoeur.example.nerima.strategy;
 
-import brocoeur.example.nerima.service.roulette.strategy.RouletteRiskyStrategy;
+import brocoeur.example.nerima.service.roulette.strategy.direct.RouletteRiskyStrategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

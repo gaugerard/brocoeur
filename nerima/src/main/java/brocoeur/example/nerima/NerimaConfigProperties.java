@@ -12,15 +12,11 @@ public class NerimaConfigProperties {
     private String routingKey;
     private String rpcExchange;
 
-    private String offlineRpcMessageQueue;
-    private String offlineRpcReplyMessageQueue;
-    private String offlineRpcExchange;
-
     public String getRpcMessageQueue() {
         return rpcMessageQueue;
     }
 
-    public void setRpcMessageQueue(String rpcMessageQueue) {
+    public void setRpcMessageQueue(final String rpcMessageQueue) {
         this.rpcMessageQueue = rpcMessageQueue;
     }
 
@@ -28,7 +24,7 @@ public class NerimaConfigProperties {
         return rpcReplyMessageQueue;
     }
 
-    public void setRpcReplyMessageQueue(String rpcReplyMessageQueue) {
+    public void setRpcReplyMessageQueue(final String rpcReplyMessageQueue) {
         this.rpcReplyMessageQueue = rpcReplyMessageQueue;
     }
 
@@ -36,7 +32,7 @@ public class NerimaConfigProperties {
         return routingKey;
     }
 
-    public void setRoutingKey(String routingKey) {
+    public void setRoutingKey(final String routingKey) {
         this.routingKey = routingKey;
     }
 
@@ -44,31 +40,7 @@ public class NerimaConfigProperties {
         return rpcExchange;
     }
 
-    public void setRpcExchange(String rpcExchange) {
+    public void setRpcExchange(final String rpcExchange) {
         this.rpcExchange = rpcExchange;
-    }
-
-    public String getOfflineRpcMessageQueue() {
-        return offlineRpcMessageQueue;
-    }
-
-    public void setOfflineRpcMessageQueue(String offlineRpcMessageQueue) {
-        this.offlineRpcMessageQueue = offlineRpcMessageQueue;
-    }
-
-    public String getOfflineRpcReplyMessageQueue() {
-        return offlineRpcReplyMessageQueue;
-    }
-
-    public void setOfflineRpcReplyMessageQueue(String offlineRpcReplyMessageQueue) {
-        this.offlineRpcReplyMessageQueue = offlineRpcReplyMessageQueue;
-    }
-
-    public String getOfflineRpcExchange() {
-        return offlineRpcExchange;
-    }
-
-    public void setOfflineRpcExchange(String offlineRpcExchange) {
-        this.offlineRpcExchange = offlineRpcExchange;
     }
 }

@@ -1,7 +1,7 @@
 package brocoeur.example.nerima.service.cointoss.strategy.offline;
 
 import brocoeur.example.nerima.service.GamePlay;
-import brocoeur.example.nerima.service.offline.OfflineGameStrategy;
+import brocoeur.example.nerima.service.OfflineGameStrategy;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import static brocoeur.example.nerima.service.cointoss.CoinTossPlay.TAIL;
 public class OfflineRandomCoinToss implements OfflineGameStrategy {
 
     @Override
-    public GamePlay getOfflineStrategyPlay(final List<GamePlay> listOfPreviousGameResul) {
-        return (listOfPreviousGameResul.size() % 2 == 0) ? HEAD : TAIL;
+    public GamePlay getOfflineStrategyPlay(final List<GamePlay> listOfPreviousGameResult) {
+        return (listOfPreviousGameResult.size() % 2 == 0) ? HEAD : TAIL;
     }
 
     @Override
