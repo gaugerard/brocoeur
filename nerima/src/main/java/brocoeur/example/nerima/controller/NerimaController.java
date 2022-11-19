@@ -1,7 +1,9 @@
 package brocoeur.example.nerima.controller;
 
+import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.nerima.NerimaConfigProperties;
-import brocoeur.example.nerima.service.ServiceRequestTypes;
+import brocoeur.example.broker.common.ServiceRequestTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -12,8 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static brocoeur.example.nerima.service.ServiceRequestTypes.DIRECT;
-import static brocoeur.example.nerima.service.ServiceRequestTypes.OFFLINE;
+import static brocoeur.example.broker.common.ServiceRequestTypes.DIRECT;
+import static brocoeur.example.broker.common.ServiceRequestTypes.OFFLINE;
 
 @RestController
 public class NerimaController {

@@ -1,8 +1,8 @@
 package brocoeur.example.games.service.roulette;
 
-import brocoeur.example.nerima.service.GamePlay;
+import brocoeur.example.broker.common.GamePlay;
+import brocoeur.example.broker.common.roulette.RoulettePlay;
 import brocoeur.example.games.service.GameRound;
-import brocoeur.example.nerima.service.roulette.RoulettePlay;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;

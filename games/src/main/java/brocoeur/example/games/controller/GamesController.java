@@ -1,15 +1,11 @@
 package brocoeur.example.games.controller;
 
+import brocoeur.example.broker.common.*;
+import brocoeur.example.broker.common.request.AnalyticServiceRequest;
+import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
-import brocoeur.example.nerima.controller.ServiceRequest;
-import brocoeur.example.nerima.controller.ServiceResponse;
-import brocoeur.example.nerima.service.GamePlay;
-import brocoeur.example.nerima.service.GameStrategy;
-import brocoeur.example.nerima.service.GameStrategyTypes;
-import brocoeur.example.nerima.service.ServiceRequestTypes;
-import brocoeur.example.nerima.service.OfflineGameStrategy;
-import brocoeur.example.nerima.service.OfflineGameStrategyTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -42,6 +38,12 @@ public class GamesController {
         }
     }
 
+    public void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final boolean isWinner) {
+        final int gameId = (gameTypes == GameTypes.ROULETTE) ? 123 : 324;
+        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(gameId, userId, isWinner);
+        rabbitTemplate.convertAndSend("analyticDirectExchange", "analyticInput", analyticServiceRequest);
+    }
+
     private void processDirectMsg(final ServiceRequest serviceRequest) {
         final String userId = serviceRequest.getUserId();
         final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
@@ -55,10 +57,12 @@ public class GamesController {
 
         if (gamePlayFromUser.equals(gamePlayFromService)) {
             LOGGER.info("User WON !");
+            sendAnalyticMessage(Integer.parseInt(userId), gameStrategyTypes.getGameTypes(), true);
             ServiceResponse serviceResponseWin = new ServiceResponse(userId, true);
             rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), serviceResponseWin, correlationData);
         } else {
             LOGGER.info("User LOST !");
+            sendAnalyticMessage(Integer.parseInt(userId), gameStrategyTypes.getGameTypes(), false);
             ServiceResponse serviceResponseLost = new ServiceResponse(userId, false);
             rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), serviceResponseLost, correlationData);
         }
