@@ -21,3 +21,15 @@ In order to test the application features using a real RabbitMq queueing system,
 
 6) You can see that the `ServiceRequest` is correctly send from `nerima` to `games` and you can also see if the specified user won or lost in the logs of the services.
 
+
+
+For Cassandra:
+1) Execute the `docker-compose up` command in the `script\docker\cassandra` folder.
+2) Run `docker-compose exec cassandra1 /bin/bash;`.
+3) Run `cqlsh`.
+4) Run `cqlsh> CREATE KEYSPACE brocoeurkeyspace   WITH REPLICATION = {     'class' : 'SimpleStrategy', 'replication_factor' : 1    } ;`.
+5) Run `cqlsh> USE brocoeurkeyspace ;`.
+6) Run `cqlsh:brocoeurkeyspace> CREATE TABLE Game( gameid int PRIMARY KEY, gamename text);`.
+7) Run `cqlsh:brocoeurkeyspace> CREATE TABLE User( userid int PRIMARY KEY, pseudo text);`.
+8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserWinLossByGame( game_id int, user_id int, gamename text, pseudo text, numberofwin int, numberofloss int, PRIMARY KEY ((game_id, user_id)));`.
+9) Run `analytics` main method using a mvn configuration (analytics will add dummy data in Cassandra (TODO: Make keyspace and table creation automatic)).
