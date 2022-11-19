@@ -1,9 +1,9 @@
 package brocoeur.example.games.service.cointoss;
 
 
+import brocoeur.example.broker.common.GamePlay;
+import brocoeur.example.broker.common.cointoss.CoinTossPlay;
 import brocoeur.example.games.service.GameRound;
-import brocoeur.example.nerima.service.GamePlay;
-import brocoeur.example.nerima.service.cointoss.CoinTossPlay;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;

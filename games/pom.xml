@@ -9,12 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>games</artifactId>
-
     <dependencies>
         <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+        </dependency>
+        <dependency>
             <groupId>broker.example</groupId>
-            <artifactId>nerima</artifactId>
+            <artifactId>broker</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

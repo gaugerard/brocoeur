@@ -2,6 +2,7 @@ package brocoeur.example.analytics.controller;
 
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.service.UserWinLossByGameService;
+import brocoeur.example.broker.common.request.AnalyticServiceRequest;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,7 @@ public class UserWinLossByGameController {
 
     @GetMapping("/list")
     public Flux<UserWinLossByGame> getAllUserWinLossByGame() {
-        Flux<UserWinLossByGame> userWinLossByGames = userWinLossByGameService.getAllUserWinLossByGame();
-        return userWinLossByGames;
+        return userWinLossByGameService.getAllUserWinLossByGame();
     }
 
     @GetMapping("/{gameid}")

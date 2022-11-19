@@ -1,9 +1,9 @@
 package brocoeur.example.games.service;
 
-import brocoeur.example.nerima.service.GameTypes;
-import brocoeur.example.nerima.service.cointoss.CoinTossPlay;
+import brocoeur.example.broker.common.GameTypes;
+import brocoeur.example.broker.common.cointoss.CoinTossPlay;
+import brocoeur.example.broker.common.roulette.RoulettePlay;
 import brocoeur.example.games.service.cointoss.CoinTossService;
-import brocoeur.example.nerima.service.roulette.RoulettePlay;
 import brocoeur.example.games.service.roulette.RouletteService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

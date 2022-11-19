@@ -11,14 +11,6 @@
 
     <artifactId>broker</artifactId>
 
-    <dependencies>
-        <dependency>
-            <groupId>broker.example</groupId>
-            <artifactId>nerima</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
-
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>

@@ -1,9 +1,7 @@
 package brocoeur.example.analytics.controller;
 
-import brocoeur.example.analytics.model.Game;
 import brocoeur.example.analytics.model.User;
 import brocoeur.example.analytics.service.UserService;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,9 +31,7 @@ public class UserController {
 
     @GetMapping("/list")
     public Flux<User> getAllUsers() {
-        Flux<User> users = userService.getAllUsers();
-        System.out.println(users);
-        return users;
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")

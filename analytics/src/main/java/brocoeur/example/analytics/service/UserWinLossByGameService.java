@@ -1,8 +1,8 @@
 package brocoeur.example.analytics.service;
 
-import brocoeur.example.analytics.controller.AnalyticServiceRequest;
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.repository.UserWinLossByGameRepository;
+import brocoeur.example.broker.common.request.AnalyticServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,10 @@
 package brocoeur.example.games.controller;
 
+import brocoeur.example.broker.common.request.AnalyticServiceRequest;
+import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
-import brocoeur.example.nerima.controller.ServiceRequest;
-import brocoeur.example.nerima.controller.ServiceResponse;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,11 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import static brocoeur.example.nerima.service.GameStrategyTypes.ROULETTE_RISKY;
-import static brocoeur.example.nerima.service.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
-import static brocoeur.example.nerima.service.cointoss.CoinTossPlay.HEAD;
-import static brocoeur.example.nerima.service.roulette.RoulettePlay.GREEN;
-import static brocoeur.example.nerima.service.roulette.RoulettePlay.RED;
+import static brocoeur.example.broker.common.GameStrategyTypes.ROULETTE_RISKY;
+import static brocoeur.example.broker.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.broker.common.cointoss.CoinTossPlay.HEAD;
+import static brocoeur.example.broker.common.roulette.RoulettePlay.GREEN;
+import static brocoeur.example.broker.common.roulette.RoulettePlay.RED;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.*;
 
@@ -28,6 +29,8 @@ class GamesControllerTest {
 
     @Captor
     ArgumentCaptor<ServiceResponse> serviceResponseCaptor;
+    @Captor
+    ArgumentCaptor<AnalyticServiceRequest> analyticServiceRequestCaptor;
     @Captor
     ArgumentCaptor<CorrelationData> correlationDataCaptor;
 
@@ -58,10 +61,13 @@ class GamesControllerTest {
 
             // Then
             Mockito.verify(rabbitTemplateMock).convertSendAndReceive(eq("exchange1"), eq("MyQ2"), serviceResponseCaptor.capture(), correlationDataCaptor.capture());
+            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
             var serviceResponse = new ServiceResponse(userId, true);
             MatcherAssert.assertThat(serviceResponseCaptor.getValue(), equalTo(serviceResponse));
+            var analyticServiceRequest = new AnalyticServiceRequest(123, 12345, true);
+            MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
             MatcherAssert.assertThat(correlationDataCaptor.getValue().getId(), equalTo(userId));
         }
 
@@ -80,10 +86,13 @@ class GamesControllerTest {
 
             // Then
             Mockito.verify(rabbitTemplateMock).convertSendAndReceive(eq("exchange1"), eq("MyQ2"), serviceResponseCaptor.capture(), correlationDataCaptor.capture());
+            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
             var serviceResponse = new ServiceResponse(userId, false);
             MatcherAssert.assertThat(serviceResponseCaptor.getValue(), equalTo(serviceResponse));
+            var analyticServiceRequest = new AnalyticServiceRequest(123, 12345, false);
+            MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
             MatcherAssert.assertThat(correlationDataCaptor.getValue().getId(), equalTo(userId));
         }
     }
