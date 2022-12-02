@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 
 import static brocoeur.example.broker.common.cointoss.CoinTossPlay.HEAD;
-import static brocoeur.example.broker.common.roulette.RoulettePlay.GREEN;
 
 @ExtendWith(MockitoExtension.class)
 class OfflineHeadOnlyCoinTossTest {
