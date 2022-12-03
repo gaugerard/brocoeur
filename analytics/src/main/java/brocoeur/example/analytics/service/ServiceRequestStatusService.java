@@ -4,6 +4,7 @@ import brocoeur.example.analytics.model.ServiceRequestStatus;
 import brocoeur.example.analytics.model.UserMoney;
 import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.repository.UserMoneyRepository;
+import brocoeur.example.analytics.service.utils.RandomService;
 import brocoeur.example.broker.common.ServiceRequestTypes;
 import brocoeur.example.broker.common.request.ServiceRequest;
 import org.slf4j.Logger;
@@ -25,12 +26,14 @@ public class ServiceRequestStatusService {
     private static final String DONE_WIN = "DONE_WIN";
     private static final String DONE_LOSS = "DONE_LOSS";
     private static final String REJECTED = "REJECTED"; // When not enough money.
-    private static final int WIN_MULTIPLIER = 2; // When not enough money.
+    private static final int WIN_MULTIPLIER = 2;
 
     @Autowired
     private ServiceRequestStatusRepository serviceRequestStatusRepository;
     @Autowired
     private UserMoneyRepository userMoneyRepository;
+    @Autowired
+    private RandomService randomService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
@@ -49,14 +52,6 @@ public class ServiceRequestStatusService {
 
     public void deleteAllServiceRequestStatus() {
         serviceRequestStatusRepository.deleteAll().subscribe();
-    }
-
-    private int getCurrentTimeInMilliseconds() {
-        return (int) java.time.Instant.now().getEpochSecond();
-    }
-
-    private int getRandomJobId() {
-        return (int) (Math.random() * 100000);
     }
 
     /**
@@ -92,13 +87,13 @@ public class ServiceRequestStatusService {
      * @param serviceRequest
      */
     public void addServiceRequestStatus(final ServiceRequest serviceRequest) {
-        final int jobId = getRandomJobId();
+        final int jobId = randomService.getRandomJobId();
         final int userId = Integer.parseInt(serviceRequest.getUserId());
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
         final int amountToGamble = serviceRequest.getAmountToGamble();
         final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequest.getServiceRequestTypes(), serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
-        final int currentTimeInMilliseconds = getCurrentTimeInMilliseconds();
+        final int currentTimeInMilliseconds = randomService.getCurrentTimeInSeconds();
         final String gameStrategyTypes = getGameStrategyTypes(serviceRequest);
 
         if (amountOfMoneyToBlock <= totalAmountOfMoneyAvailable) {
@@ -156,11 +151,11 @@ public class ServiceRequestStatusService {
      * @param isWinner
      * @param amountGambled
      */
-    public void updateServiceRequestStatusByJobId(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
+    public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
         final ServiceRequestStatus serviceRequestStatus = serviceRequestStatusRepository.findById(jobId).block();
         final int userId = serviceRequestStatus.getUserId();
 
-        serviceRequestStatus.setAckTimeMilliSecond(getCurrentTimeInMilliseconds());
+        serviceRequestStatus.setAckTimeMilliSecond(randomService.getCurrentTimeInSeconds());
 
         final int amountBlocked = serviceRequestStatus.getAmountBlocked();
         final int totalAmountWon = getAmountOfMoneyWon(listOfIsWinner, amountGambled);
@@ -169,7 +164,6 @@ public class ServiceRequestStatusService {
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
 
         if (totalAmountWon > amountBlocked) {
-
             serviceRequestStatus.setStatus(DONE_WIN);
         } else {
             serviceRequestStatus.setStatus(DONE_LOSS);

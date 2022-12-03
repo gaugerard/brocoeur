@@ -48,6 +48,6 @@ public class UserWinLossByGameController {
 
     @RabbitListener(queues = "analyticInput")
     public void getMsg(final AnalyticServiceRequest analyticServiceRequest) {
-        userWinLossByGameService.updateWinLossNumber(analyticServiceRequest);
+        userWinLossByGameService.updateAnalyticAccordingToWinOrLoss(analyticServiceRequest);
     }
 }

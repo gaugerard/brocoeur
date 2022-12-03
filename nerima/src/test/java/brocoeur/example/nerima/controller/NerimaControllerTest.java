@@ -2,7 +2,6 @@ package brocoeur.example.nerima.controller;
 
 import brocoeur.example.broker.common.GameStrategyTypes;
 import brocoeur.example.broker.common.request.ServiceRequest;
-import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static brocoeur.example.broker.common.GameStrategyTypes.*;

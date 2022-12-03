@@ -38,7 +38,7 @@ public class UserWinLossByGameService {
         userWinLossByGameRepository.deleteAll().subscribe();
     }
 
-    public void updateWinLossNumber(final AnalyticServiceRequest analyticServiceRequest) {
+    public void updateAnalyticAccordingToWinOrLoss(final AnalyticServiceRequest analyticServiceRequest) {
         final UserWinLossByGame userWinLossByGame = userWinLossByGameRepository.findByGameIdAndUserId(analyticServiceRequest.getGameId(), analyticServiceRequest.getUserId()).blockFirst();
 
         final List<Boolean> listOfIsWinner = analyticServiceRequest.getListOfIsWinner();
@@ -61,7 +61,8 @@ public class UserWinLossByGameService {
                 updatedNumberOfWin,
                 updatedNumberOfLoss);
 
-        userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("==> " + userWinLossByGame + " UPDATED TO: " + updated));
-        serviceRequestStatusService.updateServiceRequestStatusByJobId(analyticServiceRequest.getLinkedJobId(), listOfIsWinner, analyticServiceRequest.getAmount());
+        userWinLossByGameRepository.save(newUserWinLossByGame)
+                .subscribe(updated -> LOGGER.info("==> " + userWinLossByGame + " UPDATED TO: " + updated));
+        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(analyticServiceRequest.getLinkedJobId(), listOfIsWinner, analyticServiceRequest.getAmount());
     }
 }
