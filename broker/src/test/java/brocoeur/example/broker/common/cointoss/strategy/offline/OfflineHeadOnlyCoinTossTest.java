@@ -1,6 +1,5 @@
 package brocoeur.example.broker.common.cointoss.strategy.offline;
 
-import brocoeur.example.broker.common.roulette.strategy.direct.RouletteRiskyStrategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
