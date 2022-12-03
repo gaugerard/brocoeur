@@ -10,12 +10,24 @@ In order to test the application features using a real RabbitMq queueing system,
 2) Run `nerima` main method using a mvn configuration (nerima will create the necessary exchange and queues for RabbitMq).
 3) Run `games` main method using a mvn configuration (both `nerima` and `games` needs to be running in parallel).
 4) Go on `http://localhost:15672/` to see information about rabbitMq (which is available when the docker container for rabbitMq is up and running thanks to the docker-compose up command).
-5) Using `PostMan` you can post `ServiceRequest` to the following endpoint : `http://localhost:9080/api/nerima/play`.
+5) Using `PostMan` you can post `ServiceRequest` to the following endpoint : `http://localhost:9080/api/nerima/gamble`.
 
+#### DIRECT ServiceRequest
 ```json
 {
-  "userId": "1",
-  "gameStrategyTypes": "COIN_TOSS_RANDOM"
+   "userId": "8",
+   "gameStrategyTypes": "COIN_TOSS_RANDOM",
+   "amountToGamble": 100
+}
+```
+
+#### OFFLINE ServiceRequest
+```json
+{
+   "userId": "8",
+   "offlineGameStrategyTypes": "OFFLINE_COIN_TOSS_RANDOM",
+   "timeToLive": 50,
+   "amountToGamble": 100
 }
 ```
 
@@ -32,4 +44,6 @@ For Cassandra:
 6) Run `cqlsh:brocoeurkeyspace> CREATE TABLE Game( gameid int PRIMARY KEY, gamename text);`.
 7) Run `cqlsh:brocoeurkeyspace> CREATE TABLE User( userid int PRIMARY KEY, pseudo text);`.
 8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserWinLossByGame( game_id int, user_id int, gamename text, pseudo text, numberofwin int, numberofloss int, PRIMARY KEY ((game_id, user_id)));`.
+8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserMoney( userId int PRIMARY KEY, money int);`.
+8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE ServiceRequestStatus( jobId int PRIMARY KEY, status text, amountBlocked int, userId int, strategy text, insertionTimeMilliSecond int, ackTimeMilliSecond int);`.
 9) Run `analytics` main method using a mvn configuration (analytics will add dummy data in Cassandra (TODO: Make keyspace and table creation automatic)).
