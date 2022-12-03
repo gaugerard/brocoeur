@@ -23,6 +23,10 @@ public class GameController {
 
     @PostConstruct
     public void saveGames() {
+        // Clean-up
+        gameService.deleteAllGames();
+
+        // Initialization
         List<Game> games = new ArrayList<>();
         games.add(new Game(123, "Roulette"));
         games.add(new Game(324, "Coin Toss"));

@@ -24,10 +24,15 @@ public class UserWinLossByGameController {
 
     @PostConstruct
     public void saveUsers() {
+        // Clean-up
+        userWinLossByGameService.deleteAllWinLossByGame();
+
+        // Initialization
         List<UserWinLossByGame> userWinLossByGameServices = new ArrayList<>();
         userWinLossByGameServices.add(new UserWinLossByGame(123, 5, "Roulette", "MeatAlive", 0, 0));
         userWinLossByGameServices.add(new UserWinLossByGame(324, 5, "Coin Toss", "MeatAlive", 0, 0));
         userWinLossByGameServices.add(new UserWinLossByGame(123, 8, "Roulette", "Baba", 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(324, 8, "Coin Toss", "Baba", 0, 0));
         userWinLossByGameService.initializeUserWinLossByGame(userWinLossByGameServices);
     }
 

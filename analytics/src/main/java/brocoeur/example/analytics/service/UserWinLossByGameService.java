@@ -18,6 +18,8 @@ public class UserWinLossByGameService {
 
     @Autowired
     private UserWinLossByGameRepository userWinLossByGameRepository;
+    @Autowired
+    private ServiceRequestStatusService serviceRequestStatusService;
 
     public void initializeUserWinLossByGame(List<UserWinLossByGame> userWinLossByGames) {
         Flux<UserWinLossByGame> savedUserWinLossByGame = userWinLossByGameRepository.saveAll(userWinLossByGames);
@@ -30,6 +32,10 @@ public class UserWinLossByGameService {
 
     public Flux<UserWinLossByGame> getUserWinLossByGameByGameIdAndUserId(final int gameId, final int userId) {
         return userWinLossByGameRepository.findByGameIdAndUserId(gameId, userId);
+    }
+
+    public void deleteAllWinLossByGame() {
+        userWinLossByGameRepository.deleteAll();
     }
 
     public void updateWinLossNumber(final AnalyticServiceRequest analyticServiceRequest) {
@@ -46,5 +52,6 @@ public class UserWinLossByGameService {
                 updatedNumberOfLoss);
 
         userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("==> " + userWinLossByGame + " UPDATED TO: " + updated));
+        serviceRequestStatusService.updateServiceRequestStatusByJobId(analyticServiceRequest.getLinkedJobId(), analyticServiceRequest.isWinner(), analyticServiceRequest.getAmount());
     }
 }

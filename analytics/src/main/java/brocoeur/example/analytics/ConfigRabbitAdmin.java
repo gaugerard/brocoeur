@@ -1,7 +1,10 @@
 package brocoeur.example.analytics;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,6 +23,9 @@ public class ConfigRabbitAdmin {
         return new RabbitAdmin(connectionFactory);
     }
 
+    /**
+     * For AnalyticRequests
+     */
     @Bean
     Queue msgQueue() {
         return new Queue("analyticInput", false, false, true);
@@ -33,6 +39,24 @@ public class ConfigRabbitAdmin {
     @Bean
     Binding msgBinding() {
         return BindingBuilder.bind(msgQueue()).to(exchange()).with("analyticInput");
+    }
+
+    /**
+     * For GamblingRequests
+     */
+    @Bean
+    Queue msgAQueue() {
+        return new Queue("MyA1", false, false, true);
+    }
+
+    @Bean
+    DirectExchange exchangeA() {
+        return new DirectExchange("A1DirectExchange", false, true);
+    }
+
+    @Bean
+    Binding msgBindingA() {
+        return BindingBuilder.bind(msgAQueue()).to(exchangeA()).with("MyA1");
     }
 
     @Bean
