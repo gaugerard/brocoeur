@@ -49,17 +49,16 @@ class NerimaControllerTest {
         // Given
         var userId = "12345";
         var serviceRequest = new ServiceRequest(userId, rouletteStrategyType, 5, 123456);
-        var serviceResponse = new ServiceResponse(userId, true);
 
-        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
-        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyQ1");
-        Mockito.when(rabbitTemplateMock.convertSendAndReceive("myexchange1", "MyQ1", serviceRequest)).thenReturn(serviceResponse);
+        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
 
         // When
-        var actualServiceResponse = nerimaController.postDirectPlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postDirectGamblePlay(serviceRequest);
 
         // Then
-        Assertions.assertEquals(new ResponseEntity<>(serviceResponse, HttpStatus.OK), actualServiceResponse);
+        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
+        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actualServiceResponse);
     }
 
     @Test
@@ -68,16 +67,15 @@ class NerimaControllerTest {
         var userId = "12345";
         var timeToLive = 3;
         var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, timeToLive);
-        var serviceResponse = new ServiceResponse(userId, List.of(true, false, false));
 
-        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
-        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyQ1");
-        Mockito.when(rabbitTemplateMock.convertSendAndReceive("myexchange1", "MyQ1", serviceRequest)).thenReturn(serviceResponse);
+        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
 
         // When
-        var actualServiceResponse = nerimaController.postOfflinePlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postOfflineGamblePlay(serviceRequest);
 
         // Then
-        Assertions.assertEquals(new ResponseEntity<>(serviceResponse, HttpStatus.OK), actualServiceResponse);
+        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
+        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actualServiceResponse);
     }
 }

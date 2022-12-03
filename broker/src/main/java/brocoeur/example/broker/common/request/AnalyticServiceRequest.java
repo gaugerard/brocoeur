@@ -4,6 +4,7 @@ import brocoeur.example.broker.common.AnalyticServiceRequestTypes;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Component
 public class AnalyticServiceRequest implements Serializable {
@@ -11,9 +12,23 @@ public class AnalyticServiceRequest implements Serializable {
     private AnalyticServiceRequestTypes analyticServiceRequestTypes;
     private int gameId;
     private int userId;
-    private boolean isWinner;
+    private List<Boolean> listOfIsWinner;
     private int amount;
     private int linkedJobId;
+
+    public AnalyticServiceRequest(final AnalyticServiceRequestTypes analyticServiceRequestTypes,
+                                  final int gameId,
+                                  final int userId,
+                                  final List<Boolean> listOfIsWinner,
+                                  final int amount,
+                                  final int linkedJobId) {
+        this.analyticServiceRequestTypes = analyticServiceRequestTypes;
+        this.gameId = gameId;
+        this.userId = userId;
+        this.listOfIsWinner = List.copyOf(listOfIsWinner);
+        this.amount = amount;
+        this.linkedJobId = linkedJobId;
+    }
 
     public AnalyticServiceRequest(final AnalyticServiceRequestTypes analyticServiceRequestTypes,
                                   final int gameId,
@@ -24,7 +39,7 @@ public class AnalyticServiceRequest implements Serializable {
         this.analyticServiceRequestTypes = analyticServiceRequestTypes;
         this.gameId = gameId;
         this.userId = userId;
-        this.isWinner = isWinner;
+        this.listOfIsWinner = List.of(isWinner);
         this.amount = amount;
         this.linkedJobId = linkedJobId;
     }
@@ -56,12 +71,12 @@ public class AnalyticServiceRequest implements Serializable {
         this.userId = userId;
     }
 
-    public boolean isWinner() {
-        return isWinner;
+    public List<Boolean> getListOfIsWinner() {
+        return listOfIsWinner;
     }
 
-    public void setWinner(boolean winner) {
-        isWinner = winner;
+    public void setListOfIsWinner(final List<Boolean> listOfIsWinner) {
+        this.listOfIsWinner = listOfIsWinner;
     }
 
     public int getAmount() {
@@ -86,7 +101,7 @@ public class AnalyticServiceRequest implements Serializable {
                 "analyticServiceRequestTypes=" + analyticServiceRequestTypes +
                 ", gameId=" + gameId +
                 ", userId=" + userId +
-                ", isWinner=" + isWinner +
+                ", listOfIsWinner=" + listOfIsWinner +
                 ", amount=" + amount +
                 ", linkedJobId=" + linkedJobId +
                 '}';
@@ -107,7 +122,7 @@ public class AnalyticServiceRequest implements Serializable {
         return analyticServiceRequestTypes.equals(c.analyticServiceRequestTypes) &&
                 gameId == c.gameId
                 && userId == c.userId
-                && isWinner == c.isWinner
+                && listOfIsWinner.equals(c.listOfIsWinner)
                 && amount == c.amount
                 && linkedJobId == c.linkedJobId;
     }

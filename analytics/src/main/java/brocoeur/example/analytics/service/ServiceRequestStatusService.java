@@ -4,6 +4,7 @@ import brocoeur.example.analytics.model.ServiceRequestStatus;
 import brocoeur.example.analytics.model.UserMoney;
 import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.repository.UserMoneyRepository;
+import brocoeur.example.broker.common.ServiceRequestTypes;
 import brocoeur.example.broker.common.request.ServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,29 @@ public class ServiceRequestStatusService {
     }
 
     /**
+     * <p>We only manage fixed amount gambles. This means that each game round, the same amount of money will be gambled.</p>
+     * <p>In the case of 'Offline' game, we need to multiply the amount of money to be blocked by the number of games the user wants to take part in.</p>
+     *
+     * @param serviceRequestType
+     * @param timeToLive
+     * @param amountToGamble
+     * @return
+     */
+    private int getAmountOfMoneyToBlock(final ServiceRequestTypes serviceRequestType, final Integer timeToLive, final int amountToGamble) {
+        return switch (serviceRequestType) {
+            case DIRECT -> amountToGamble;
+            case OFFLINE -> amountToGamble * timeToLive;
+        };
+    }
+
+    private String getGameStrategyTypes(final ServiceRequest serviceRequest) {
+        return switch (serviceRequest.getServiceRequestTypes()) {
+            case DIRECT -> serviceRequest.getGameStrategyTypes().toString();
+            case OFFLINE -> serviceRequest.getOfflineGameStrategyTypes().toString();
+        };
+    }
+
+    /**
      * <p>This method checks if user has enough money to play the requested 'ServiceRequest'.</p>
      * <ul>
      *     <li>If YES: It blocks the requested amount of money from the user, add a line in 'serviceRequestStatus' Cassandra table (with status <b>IN_PROGRESS</b>) and sends the 'ServiceRequest'.</li>
@@ -68,26 +92,26 @@ public class ServiceRequestStatusService {
      * @param serviceRequest
      */
     public void addServiceRequestStatus(final ServiceRequest serviceRequest) {
-
         final int jobId = getRandomJobId();
         final int userId = Integer.parseInt(serviceRequest.getUserId());
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
         final int amountToGamble = serviceRequest.getAmountToGamble();
+        final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequest.getServiceRequestTypes(), serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
         final int currentTimeInMilliseconds = getCurrentTimeInMilliseconds();
-        final String gameStrategyTypes = serviceRequest.getGameStrategyTypes().toString();
+        final String gameStrategyTypes = getGameStrategyTypes(serviceRequest);
 
-        if (amountToGamble <= totalAmountOfMoneyAvailable) {
+        if (amountOfMoneyToBlock <= totalAmountOfMoneyAvailable) {
 
             // Update total amount of money available for the user.
-            userMoney.setMoney(totalAmountOfMoneyAvailable - amountToGamble);
+            userMoney.setMoney(totalAmountOfMoneyAvailable - amountOfMoneyToBlock);
             userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
 
             // Insert new line in 'serviceRequestStatus' table.
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
                     IN_PROGRESS,
-                    amountToGamble,
+                    amountOfMoneyToBlock,
                     userId,
                     gameStrategyTypes,
                     currentTimeInMilliseconds,
@@ -103,7 +127,7 @@ public class ServiceRequestStatusService {
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
                     REJECTED,
-                    amountToGamble,
+                    amountOfMoneyToBlock,
                     userId,
                     gameStrategyTypes,
                     currentTimeInMilliseconds,
@@ -114,33 +138,45 @@ public class ServiceRequestStatusService {
 
     }
 
+    private int getAmountOfMoneyWon(final List<Boolean> listOfIsWinner, final int amountGambled) {
+        int totalAmountWon = 0;
+        for (var i = 0; i < listOfIsWinner.size(); i++) {
+            if (Boolean.TRUE.equals(listOfIsWinner.get(i))) {
+                totalAmountWon += amountGambled * WIN_MULTIPLIER;
+            }
+        }
+        return totalAmountWon;
+    }
+
     /**
      * <p>This method update the status of the selected 'serviceRequestStatus' line in Cassandra and give money to the user if he/she won the game.</p>
-     * <p>For now, when a user wins, the amount gambled is <b>DOUBLED</b>.</p>
+     * <p>For now, when a user wins a game round, the amount gambled is <b>DOUBLED</b> for the said round.</p>
      *
      * @param jobId
      * @param isWinner
      * @param amountGambled
      */
-    public void updateServiceRequestStatusByJobId(final int jobId, final boolean isWinner, final int amountGambled) {
+    public void updateServiceRequestStatusByJobId(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
         final ServiceRequestStatus serviceRequestStatus = serviceRequestStatusRepository.findById(jobId).block();
         final int userId = serviceRequestStatus.getUserId();
 
         serviceRequestStatus.setAckTimeMilliSecond(getCurrentTimeInMilliseconds());
 
-        if (isWinner) {
-            // Increment amount by (amountGambled * 2)
-            final UserMoney userMoney = userMoneyRepository.findById(userId).block();
-            final int totalAmountOfMoneyAvailable = userMoney.getMoney();
-            final int amountToAdd = amountGambled * WIN_MULTIPLIER;
-            userMoney.setMoney(totalAmountOfMoneyAvailable + amountToAdd);
-            userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
+        final int amountBlocked = serviceRequestStatus.getAmountBlocked();
+        final int totalAmountWon = getAmountOfMoneyWon(listOfIsWinner, amountGambled);
+
+        final UserMoney userMoney = userMoneyRepository.findById(userId).block();
+        final int totalAmountOfMoneyAvailable = userMoney.getMoney();
+
+        if (totalAmountWon > amountBlocked) {
 
             serviceRequestStatus.setStatus(DONE_WIN);
         } else {
             serviceRequestStatus.setStatus(DONE_LOSS);
         }
 
+        userMoney.setMoney(totalAmountOfMoneyAvailable + totalAmountWon);
+        userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
         serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> " + serviceRequestStatus + " UPDATED TO: " + updated));
     }
 }

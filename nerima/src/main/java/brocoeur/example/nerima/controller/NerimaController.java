@@ -2,7 +2,6 @@ package brocoeur.example.nerima.controller;
 
 import brocoeur.example.broker.common.ServiceRequestTypes;
 import brocoeur.example.broker.common.request.ServiceRequest;
-import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,53 +27,34 @@ public class NerimaController {
     @Autowired
     private NerimaConfigProperties nerimaConfigProperties;
 
-    @PostMapping("/api/nerima/play")
-    public ResponseEntity<ServiceResponse> postDirectPlay(@RequestBody final ServiceRequest directServiceRequest) {
-
-        directServiceRequest.setServiceRequestTypes(DIRECT);
-
-        final ServiceResponse directServiceResponse = post(directServiceRequest);
-
-        return new ResponseEntity<>(directServiceResponse, HttpStatus.OK);
-    }
-
     @PostMapping("/api/nerima/gamble")
     public ResponseEntity<ServiceRequest> postDirectGamblePlay(@RequestBody final ServiceRequest directGambleServiceRequest) {
-
-        // Convert ServiceRequest to Analytic
-
+        // normalize
         directGambleServiceRequest.setServiceRequestTypes(DIRECT);
 
-        LOGGER.info("==> " + directGambleServiceRequest + " GAMBLE REQUEST: " + directGambleServiceRequest);
-        rabbitTemplate.convertAndSend(
-                "A1DirectExchange",
-                "MyA1",
-                directGambleServiceRequest);
+        post(directGambleServiceRequest);
 
         return new ResponseEntity<>(directGambleServiceRequest, HttpStatus.OK);
     }
 
-    @PostMapping("/api/nerima/offline/play")
-    public ResponseEntity<ServiceResponse> postOfflinePlay(@RequestBody final ServiceRequest offlineServiceRequest) {
+    @PostMapping("/api/nerima/offline/gamble")
+    public ResponseEntity<ServiceRequest> postOfflineGamblePlay(@RequestBody final ServiceRequest offlineGambleServiceRequest) {
+        // normalize
+        offlineGambleServiceRequest.setServiceRequestTypes(OFFLINE);
+        offlineGambleServiceRequest.setTimeToLive(Integer.min(offlineGambleServiceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
 
-        offlineServiceRequest.setServiceRequestTypes(OFFLINE);
-        offlineServiceRequest.setTimeToLive(Integer.min(offlineServiceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
+        post(offlineGambleServiceRequest);
 
-        final ServiceResponse offlineServiceResponse = post(offlineServiceRequest);
-
-        return new ResponseEntity<>(offlineServiceResponse, HttpStatus.OK);
+        return new ResponseEntity<>(offlineGambleServiceRequest, HttpStatus.OK);
     }
 
-    private ServiceResponse post(final ServiceRequest serviceRequest) {
+    private void post(final ServiceRequest serviceRequest) {
         final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
 
         LOGGER.info("==> " + serviceRequestTypes + " REQUEST: " + serviceRequest);
-        ServiceResponse serviceResponse = (ServiceResponse) rabbitTemplate.convertSendAndReceive(
+        rabbitTemplate.convertAndSend(
                 nerimaConfigProperties.getRpcExchange(),
                 nerimaConfigProperties.getRpcMessageQueue(),
                 serviceRequest);
-        LOGGER.info("==> " + serviceRequestTypes + " RESPONSE: " + serviceResponse);
-
-        return serviceResponse;
     }
 }
