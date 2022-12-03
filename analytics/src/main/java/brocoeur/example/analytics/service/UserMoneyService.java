@@ -28,6 +28,6 @@ public class UserMoneyService {
     }
 
     public void deleteAllUserMoney() {
-        userMoneyRepository.deleteAll();
+        userMoneyRepository.deleteAll().subscribe();
     }
 }

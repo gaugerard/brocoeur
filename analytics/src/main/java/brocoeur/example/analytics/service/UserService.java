@@ -29,6 +29,6 @@ public class UserService {
     }
 
     public void deleteAllUsers() {
-        userRepository.deleteAll();
+        userRepository.deleteAll().subscribe();
     }
 }

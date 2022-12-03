@@ -47,7 +47,7 @@ public class ServiceRequestStatusService {
     }
 
     public void deleteAllServiceRequestStatus() {
-        serviceRequestStatusRepository.deleteAll();
+        serviceRequestStatusRepository.deleteAll().subscribe();
     }
 
     private int getCurrentTimeInMilliseconds() {

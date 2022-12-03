@@ -35,7 +35,7 @@ public class UserWinLossByGameService {
     }
 
     public void deleteAllWinLossByGame() {
-        userWinLossByGameRepository.deleteAll();
+        userWinLossByGameRepository.deleteAll().subscribe();
     }
 
     public void updateWinLossNumber(final AnalyticServiceRequest analyticServiceRequest) {

@@ -28,7 +28,7 @@ public class UserMoneyController {
 
         // Initialization
         List<UserMoney> userMoneyList = new ArrayList<>();
-        userMoneyList.add(new UserMoney(5, 1000));
+        userMoneyList.add(new UserMoney(5, 300));
         userMoneyList.add(new UserMoney(8, 1000));
         userMoneyService.initializeUserMoney(userMoneyList);
     }
