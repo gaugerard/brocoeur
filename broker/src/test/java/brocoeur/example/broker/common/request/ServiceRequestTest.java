@@ -23,7 +23,7 @@ class ServiceRequestTest {
     void shouldCreateJsonFromServiceRequest() throws IOException {
         // Given
         var objectMapper = new ObjectMapper();
-        var serviceRequest = new ServiceRequest("12345", ROULETTE_RISKY);
+        var serviceRequest = new ServiceRequest("12345", ROULETTE_RISKY, 5, 123456);
         var serviceRequestFile = new File(tempDir, "serviceRequest.json");
 
         // When
@@ -42,7 +42,7 @@ class ServiceRequestTest {
         var actual = objectMapper.readValue(new File("src/test/resources/serviceRequestCoinTossRandom.json"), ServiceRequest.class);
 
         // Then
-        var expected = new ServiceRequest("67890", COIN_TOSS_RANDOM);
+        var expected = new ServiceRequest("67890", COIN_TOSS_RANDOM, 0, 0);
         assertThat(actual, samePropertyValuesAs(expected));
     }
 }

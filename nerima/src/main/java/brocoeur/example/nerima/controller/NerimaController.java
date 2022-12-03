@@ -1,9 +1,9 @@
 package brocoeur.example.nerima.controller;
 
+import brocoeur.example.broker.common.ServiceRequestTypes;
 import brocoeur.example.broker.common.request.ServiceRequest;
 import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.nerima.NerimaConfigProperties;
-import brocoeur.example.broker.common.ServiceRequestTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -36,6 +36,22 @@ public class NerimaController {
         final ServiceResponse directServiceResponse = post(directServiceRequest);
 
         return new ResponseEntity<>(directServiceResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/nerima/gamble")
+    public ResponseEntity<ServiceRequest> postDirectGamblePlay(@RequestBody final ServiceRequest directGambleServiceRequest) {
+
+        // Convert ServiceRequest to Analytic
+
+        directGambleServiceRequest.setServiceRequestTypes(DIRECT);
+
+        LOGGER.info("==> " + directGambleServiceRequest + " GAMBLE REQUEST: " + directGambleServiceRequest);
+        rabbitTemplate.convertAndSend(
+                "A1DirectExchange",
+                "MyA1",
+                directGambleServiceRequest);
+
+        return new ResponseEntity<>(directGambleServiceRequest, HttpStatus.OK);
     }
 
     @PostMapping("/api/nerima/offline/play")

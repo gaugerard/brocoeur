@@ -39,13 +39,15 @@ public class ServiceRequest implements Serializable {
 
     public ServiceRequest(final String userId,
                           final GameStrategyTypes gameStrategyTypes,
-                          final int amountToGamble) {
+                          final int amountToGamble,
+                          final int linkedJobId) {
         this.serviceRequestTypes = DIRECT;
         this.userId = userId;
         this.gameStrategyTypes = gameStrategyTypes;
         this.offlineGameStrategyTypes = null;
         this.timeToLive = null;
         this.amountToGamble = amountToGamble;
+        this.linkedJobId = linkedJobId;
     }
 
     public ServiceRequest(final String userId,
@@ -56,6 +58,8 @@ public class ServiceRequest implements Serializable {
         this.gameStrategyTypes = null;
         this.offlineGameStrategyTypes = offlineGameStrategyTypes;
         this.timeToLive = timeToLive;
+        this.amountToGamble = 0;
+        this.linkedJobId = 0;
     }
 
     public ServiceRequest() {

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+import static brocoeur.example.broker.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
+
 @RestController
 public class GamesController {
 
@@ -38,9 +40,9 @@ public class GamesController {
         }
     }
 
-    public void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final boolean isWinner) {
+    public void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final boolean isWinner, final int amountToGamble, final int linkedJobId) {
         final int gameId = (gameTypes == GameTypes.ROULETTE) ? 123 : 324;
-        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(gameId, userId, isWinner);
+        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, gameId, userId, isWinner, amountToGamble, linkedJobId);
         rabbitTemplate.convertAndSend("analyticDirectExchange", "analyticInput", analyticServiceRequest);
     }
 
@@ -53,18 +55,12 @@ public class GamesController {
         final GamePlay gamePlayFromService = gameService.play(gameStrategyTypes.getGameTypes());
         LOGGER.info("[DIRECT] - USER plays: '" + gamePlayFromUser + "' and SERVICE plays: '" + gamePlayFromService + "'.");
 
-        CorrelationData correlationData = new CorrelationData(serviceRequest.getUserId());
-
         if (gamePlayFromUser.equals(gamePlayFromService)) {
             LOGGER.info("User WON !");
-            sendAnalyticMessage(Integer.parseInt(userId), gameStrategyTypes.getGameTypes(), true);
-            ServiceResponse serviceResponseWin = new ServiceResponse(userId, true);
-            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), serviceResponseWin, correlationData);
+            sendAnalyticMessage(Integer.parseInt(userId), gameStrategyTypes.getGameTypes(), true, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
         } else {
             LOGGER.info("User LOST !");
-            sendAnalyticMessage(Integer.parseInt(userId), gameStrategyTypes.getGameTypes(), false);
-            ServiceResponse serviceResponseLost = new ServiceResponse(userId, false);
-            rabbitTemplate.convertSendAndReceive(gamesConfigProperties.getRpcExchange(), gamesConfigProperties.getRpcReplyMessageQueue(), serviceResponseLost, correlationData);
+            sendAnalyticMessage(Integer.parseInt(userId), gameStrategyTypes.getGameTypes(), false, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
         }
     }
 

@@ -1,5 +1,6 @@
 package brocoeur.example.games.controller;
 
+import brocoeur.example.broker.common.AnalyticServiceRequestTypes;
 import brocoeur.example.broker.common.request.AnalyticServiceRequest;
 import brocoeur.example.broker.common.request.ServiceRequest;
 import brocoeur.example.broker.common.response.ServiceResponse;
@@ -21,7 +22,7 @@ import static brocoeur.example.broker.common.cointoss.CoinTossPlay.HEAD;
 import static brocoeur.example.broker.common.roulette.RoulettePlay.GREEN;
 import static brocoeur.example.broker.common.roulette.RoulettePlay.RED;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -50,50 +51,38 @@ class GamesControllerTest {
         void shouldProcessDirectMsgForWinningUser() {
             // Given
             var userId = "12345";
-            var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY);
+            var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, 123456);
 
             Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(GREEN);
-            Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("exchange1");
-            Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("MyQ2");
 
             // When
             gamesController.getMsg(serviceRequest);
 
             // Then
-            Mockito.verify(rabbitTemplateMock).convertSendAndReceive(eq("exchange1"), eq("MyQ2"), serviceResponseCaptor.capture(), correlationDataCaptor.capture());
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var serviceResponse = new ServiceResponse(userId, true);
-            MatcherAssert.assertThat(serviceResponseCaptor.getValue(), equalTo(serviceResponse));
-            var analyticServiceRequest = new AnalyticServiceRequest(123, 12345, true);
+            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, 123, 12345, true, 5, 123456);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
-            MatcherAssert.assertThat(correlationDataCaptor.getValue().getId(), equalTo(userId));
         }
 
         @Test
         void shouldProcessDirectMsgForLosingUser() {
             // Given
             var userId = "12345";
-            var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY);
+            var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 8, 123456);
 
             Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(RED);
-            Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("exchange1");
-            Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("MyQ2");
 
             // When
             gamesController.getMsg(serviceRequest);
 
             // Then
-            Mockito.verify(rabbitTemplateMock).convertSendAndReceive(eq("exchange1"), eq("MyQ2"), serviceResponseCaptor.capture(), correlationDataCaptor.capture());
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var serviceResponse = new ServiceResponse(userId, false);
-            MatcherAssert.assertThat(serviceResponseCaptor.getValue(), equalTo(serviceResponse));
-            var analyticServiceRequest = new AnalyticServiceRequest(123, 12345, false);
+            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, 123, 12345, false, 8, 123456);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
-            MatcherAssert.assertThat(correlationDataCaptor.getValue().getId(), equalTo(userId));
         }
     }
 

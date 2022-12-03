@@ -1,9 +1,9 @@
 package brocoeur.example.nerima.controller;
 
+import brocoeur.example.broker.common.GameStrategyTypes;
 import brocoeur.example.broker.common.request.ServiceRequest;
 import brocoeur.example.broker.common.response.ServiceResponse;
 import brocoeur.example.nerima.NerimaConfigProperties;
-import brocoeur.example.broker.common.GameStrategyTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +48,7 @@ class NerimaControllerTest {
     void shouldPostDirectPlayAndGetHttpStatusOK(final String testName, final GameStrategyTypes rouletteStrategyType) {
         // Given
         var userId = "12345";
-        var serviceRequest = new ServiceRequest(userId, rouletteStrategyType);
+        var serviceRequest = new ServiceRequest(userId, rouletteStrategyType, 5, 123456);
         var serviceResponse = new ServiceResponse(userId, true);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
