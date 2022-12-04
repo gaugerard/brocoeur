@@ -23,9 +23,6 @@ public class ConfigRabbitAdmin {
         return new RabbitAdmin(connectionFactory);
     }
 
-    /**
-     * For AnalyticRequests
-     */
     @Bean
     Queue msgQueue() {
         return new Queue("analyticInput", false, false, true);
@@ -41,9 +38,6 @@ public class ConfigRabbitAdmin {
         return BindingBuilder.bind(msgQueue()).to(exchange()).with("analyticInput");
     }
 
-    /**
-     * For GamblingRequests
-     */
     @Bean
     Queue msgAQueue() {
         return new Queue("MyA1", false, false, true);

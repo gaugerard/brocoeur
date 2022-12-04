@@ -1,7 +1,7 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.broker.common.ServiceRequestTypes;
-import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.common.ServiceRequestTypes;
+import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static brocoeur.example.broker.common.ServiceRequestTypes.DIRECT;
-import static brocoeur.example.broker.common.ServiceRequestTypes.OFFLINE;
+import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
+import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
 
 @RestController
 public class NerimaController {

@@ -2,7 +2,7 @@ package brocoeur.example.analytics.controller;
 
 import brocoeur.example.analytics.model.ServiceRequestStatus;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
-import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.common.request.ServiceRequest;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

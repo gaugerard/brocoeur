@@ -1,9 +1,9 @@
 package brocoeur.example.games.controller;
 
-import brocoeur.example.broker.common.AnalyticServiceRequestTypes;
-import brocoeur.example.broker.common.request.AnalyticServiceRequest;
-import brocoeur.example.broker.common.request.ServiceRequest;
-import brocoeur.example.broker.common.response.ServiceResponse;
+import brocoeur.example.common.AnalyticServiceRequestTypes;
+import brocoeur.example.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.ServiceRequest;
+import brocoeur.example.common.response.ServiceResponse;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import org.hamcrest.MatcherAssert;
@@ -18,11 +18,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.List;
 
-import static brocoeur.example.broker.common.GameStrategyTypes.ROULETTE_RISKY;
-import static brocoeur.example.broker.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
-import static brocoeur.example.broker.common.cointoss.CoinTossPlay.HEAD;
-import static brocoeur.example.broker.common.roulette.RoulettePlay.GREEN;
-import static brocoeur.example.broker.common.roulette.RoulettePlay.RED;
+import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
+import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.cointoss.CoinTossPlay.HEAD;
+import static brocoeur.example.common.roulette.RoulettePlay.GREEN;
+import static brocoeur.example.common.roulette.RoulettePlay.RED;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.eq;
 

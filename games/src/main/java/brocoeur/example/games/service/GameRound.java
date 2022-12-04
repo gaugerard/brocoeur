@@ -1,6 +1,6 @@
 package brocoeur.example.games.service;
 
-import brocoeur.example.broker.common.GamePlay;
+import brocoeur.example.common.GamePlay;
 
 public interface GameRound {
 
