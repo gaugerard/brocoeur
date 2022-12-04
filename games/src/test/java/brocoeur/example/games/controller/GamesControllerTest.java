@@ -3,7 +3,6 @@ package brocoeur.example.games.controller;
 import brocoeur.example.common.AnalyticServiceRequestTypes;
 import brocoeur.example.common.request.AnalyticServiceRequest;
 import brocoeur.example.common.request.ServiceRequest;
-import brocoeur.example.common.response.ServiceResponse;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import org.hamcrest.MatcherAssert;
@@ -30,8 +29,6 @@ import static org.mockito.ArgumentMatchers.eq;
 @ExtendWith(MockitoExtension.class)
 class GamesControllerTest {
 
-    @Captor
-    ArgumentCaptor<ServiceResponse> serviceResponseCaptor;
     @Captor
     ArgumentCaptor<AnalyticServiceRequest> analyticServiceRequestCaptor;
     @Captor
