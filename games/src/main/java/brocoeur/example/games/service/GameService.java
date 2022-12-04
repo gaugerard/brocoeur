@@ -20,12 +20,4 @@ public class GameService {
             case ROULETTE -> rouletteService.play();
         };
     }
-
-    public String sonarQubeTest(){
-        var a = 1;
-        var b = 2;
-        var c = "sonarQubeTest";
-        System.out.println(c);
-        return c;
-    }
 }
