@@ -1,8 +1,8 @@
 package brocoeur.example.games.controller;
 
-import brocoeur.example.broker.common.*;
-import brocoeur.example.broker.common.request.AnalyticServiceRequest;
-import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.common.*;
+import brocoeur.example.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-import static brocoeur.example.broker.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
+import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
 
 @RestController
 public class GamesController {

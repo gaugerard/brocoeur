@@ -2,7 +2,7 @@ package brocoeur.example.analytics.controller;
 
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.service.UserWinLossByGameService;
-import brocoeur.example.broker.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.AnalyticServiceRequest;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

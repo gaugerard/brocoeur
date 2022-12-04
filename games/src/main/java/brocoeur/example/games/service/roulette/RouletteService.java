@@ -1,7 +1,7 @@
 package brocoeur.example.games.service.roulette;
 
-import brocoeur.example.broker.common.GamePlay;
-import brocoeur.example.broker.common.roulette.RoulettePlay;
+import brocoeur.example.common.GamePlay;
+import brocoeur.example.common.roulette.RoulettePlay;
 import brocoeur.example.games.service.GameRound;
 import org.springframework.stereotype.Component;
 

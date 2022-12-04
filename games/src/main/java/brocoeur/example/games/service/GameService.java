@@ -1,7 +1,7 @@
 package brocoeur.example.games.service;
 
-import brocoeur.example.broker.common.GamePlay;
-import brocoeur.example.broker.common.GameTypes;
+import brocoeur.example.common.GamePlay;
+import brocoeur.example.common.GameTypes;
 import brocoeur.example.games.service.roulette.RouletteService;
 import brocoeur.example.games.service.cointoss.CoinTossService;
 import org.springframework.beans.factory.annotation.Autowired;

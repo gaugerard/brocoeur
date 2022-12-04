@@ -2,18 +2,19 @@ package brocoeur.example.analytics.service;
 
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.repository.UserWinLossByGameRepository;
-import brocoeur.example.broker.common.AnalyticServiceRequestTypes;
-import brocoeur.example.broker.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.AnalyticServiceRequestTypes;
+import brocoeur.example.common.request.AnalyticServiceRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserWinLossByGameServiceTest {
@@ -45,18 +46,18 @@ class UserWinLossByGameServiceTest {
         var userWinLossByGame = new UserWinLossByGame(gameId, userId, "Roulette", "Baba", 0, 0);
         var userWinLossByGameUpdated = new UserWinLossByGame(gameId, userId, "Roulette", "Baba", 1, 2);
 
-        Flux<UserWinLossByGame> fluxFindByGameIdAndUserId = Flux.just(userWinLossByGame);
-        Mono<UserWinLossByGame> monoSave = Mono.just(userWinLossByGame);
-        Mockito.when(userWinLossByGameRepositoryMock.findByGameIdAndUserId(gameId, userId)).thenReturn(fluxFindByGameIdAndUserId);
-        Mockito.when(userWinLossByGameRepositoryMock.save(userWinLossByGameUpdated)).thenReturn(monoSave);
+        var fluxFindByGameIdAndUserId = Flux.just(userWinLossByGame);
+        var monoSave = Mono.just(userWinLossByGame);
+        when(userWinLossByGameRepositoryMock.findByGameIdAndUserId(gameId, userId)).thenReturn(fluxFindByGameIdAndUserId);
+        when(userWinLossByGameRepositoryMock.save(userWinLossByGameUpdated)).thenReturn(monoSave);
 
         // When
         userWinLossByGameService.updateAnalyticAccordingToWinOrLoss(analyticServiceRequest);
 
         // Then
-        Mockito.verify(userWinLossByGameRepositoryMock).save(userWinLossByGameUpdated);
-        Mockito.verifyNoMoreInteractions(userWinLossByGameRepositoryMock);
-        Mockito.verify(serviceRequestStatusServiceMock).updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(linkedJobId, listOfIsWinner, amount);
-        Mockito.verifyNoMoreInteractions(serviceRequestStatusServiceMock);
+        verify(userWinLossByGameRepositoryMock).save(userWinLossByGameUpdated);
+        verifyNoMoreInteractions(userWinLossByGameRepositoryMock);
+        verify(serviceRequestStatusServiceMock).updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(linkedJobId, listOfIsWinner, amount);
+        verifyNoMoreInteractions(serviceRequestStatusServiceMock);
     }
 }

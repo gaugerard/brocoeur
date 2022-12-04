@@ -1,7 +1,7 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.broker.common.GameStrategyTypes;
-import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.common.GameStrategyTypes;
+import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.stream.Stream;
 
-import static brocoeur.example.broker.common.GameStrategyTypes.*;
-import static brocoeur.example.broker.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.GameStrategyTypes.*;
+import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 
 @ExtendWith(MockitoExtension.class)
 class NerimaControllerTest {

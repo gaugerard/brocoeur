@@ -23,39 +23,22 @@ public class ConfigRabbitAdmin {
         return new RabbitAdmin(connectionFactory);
     }
 
-    /**
-     * <h1><u>This section concerning the DIRECT game request:</u></h1>
-     * <p>
-     * Set sending RPCQueue message
-     * Configure the Send Message Queue
-     */
     @Bean
     Queue msgQueue() {
         return new Queue("MyQ1", false, false, true);
     }
 
-    /**
-     * Switch setting
-     */
     @Bean
     TopicExchange exchange() {
-
         return new TopicExchange("myexchange1");
     }
 
-    /**
-     * Queuing and Switch Link Request
-     */
     @Bean
     Binding msgBinding() {
 
         return BindingBuilder.bind(msgQueue()).to(exchange()).with("MyQ1");
     }
 
-    /**
-     * Use RabbitTemplate Send and receive messages
-     * And set callback queue address
-     */
     @Bean
     RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
         return new RabbitTemplate(connectionFactory);

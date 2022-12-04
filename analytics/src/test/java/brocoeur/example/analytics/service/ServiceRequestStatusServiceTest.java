@@ -5,7 +5,7 @@ import brocoeur.example.analytics.model.UserMoney;
 import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.repository.UserMoneyRepository;
 import brocoeur.example.analytics.service.utils.RandomService;
-import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.common.request.ServiceRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static brocoeur.example.broker.common.GameStrategyTypes.COIN_TOSS_RANDOM;
-import static brocoeur.example.broker.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.GameStrategyTypes.COIN_TOSS_RANDOM;
+import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceRequestStatusServiceTest {
@@ -67,11 +68,11 @@ class ServiceRequestStatusServiceTest {
             var monoSaveUserMoney = Mono.just(userMoneyUpdated);
             var monoSaveServiceRequestStatus = Mono.just(serviceRequestStatus);
 
-            Mockito.when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
-            Mockito.when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
-            Mockito.when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
-            Mockito.when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
-            Mockito.when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
+            when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
+            when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
+            when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
+            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
             // When
             serviceRequestStatusService.addServiceRequestStatus(directServiceRequest);
@@ -83,12 +84,12 @@ class ServiceRequestStatusServiceTest {
                     50,
                     jobId
             );
-            Mockito.verify(userMoneyRepositoryMock).save(userMoneyUpdated);
-            Mockito.verifyNoMoreInteractions(userMoneyRepositoryMock);
-            Mockito.verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
-            Mockito.verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
-            Mockito.verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedDirectServiceRequest);
-            Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
+            verify(userMoneyRepositoryMock).save(userMoneyUpdated);
+            verifyNoMoreInteractions(userMoneyRepositoryMock);
+            verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
+            verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
+            verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedDirectServiceRequest);
+            verifyNoMoreInteractions(rabbitTemplateMock);
         }
 
         @Test
@@ -115,19 +116,19 @@ class ServiceRequestStatusServiceTest {
             var monoFindById = Mono.just(userMoney);
             var monoSaveServiceRequestStatus = Mono.just(serviceRequestStatus);
 
-            Mockito.when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
-            Mockito.when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
-            Mockito.when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
-            Mockito.when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
+            when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
+            when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
+            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
             // When
             serviceRequestStatusService.addServiceRequestStatus(directServiceRequest);
 
             // Then
-            Mockito.verifyNoMoreInteractions(userMoneyRepositoryMock);
-            Mockito.verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
-            Mockito.verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
-            Mockito.verifyNoInteractions(rabbitTemplateMock);
+            verifyNoMoreInteractions(userMoneyRepositoryMock);
+            verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
+            verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
+            verifyNoInteractions(rabbitTemplateMock);
         }
 
         @Test
@@ -140,30 +141,30 @@ class ServiceRequestStatusServiceTest {
 
             var serviceRequestStatus = new ServiceRequestStatus(jobId, "IN_PROGESS", 80, userId, COIN_TOSS_RANDOM.toString(), 12340, 0);
             var monoFindById = Mono.just(serviceRequestStatus);
-            Mockito.when(serviceRequestStatusRepositoryMock.findById(jobId)).thenReturn(monoFindById);
-            Mockito.when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(13245);
+            when(serviceRequestStatusRepositoryMock.findById(jobId)).thenReturn(monoFindById);
+            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(13245);
 
             var userMoney = new UserMoney(userId, 100);
             var monoFindByIdUser = Mono.just(userMoney);
-            Mockito.when(userMoneyRepositoryMock.findById(userId)).thenReturn(monoFindByIdUser);
+            when(userMoneyRepositoryMock.findById(userId)).thenReturn(monoFindByIdUser);
 
             var userMoneySave = new UserMoney(userId, 260);
             var monoSaveUpdated = Mono.just(userMoney);
-            Mockito.when(userMoneyRepositoryMock.save(userMoneySave)).thenReturn(monoSaveUpdated);
+            when(userMoneyRepositoryMock.save(userMoneySave)).thenReturn(monoSaveUpdated);
 
             var serviceRequestStatusDoneWin = new ServiceRequestStatus(jobId, "DONE_WIN", 80, userId, COIN_TOSS_RANDOM.toString(), 12340, 13245);
             var monoSaveDoneWin = Mono.just(serviceRequestStatus);
-            Mockito.when(serviceRequestStatusRepositoryMock.save(serviceRequestStatusDoneWin)).thenReturn(monoSaveDoneWin);
+            when(serviceRequestStatusRepositoryMock.save(serviceRequestStatusDoneWin)).thenReturn(monoSaveDoneWin);
 
             // When
             serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, listOfIsWinner, amountGambled);
 
             // Then
-            Mockito.verify(userMoneyRepositoryMock).save(userMoneySave);
-            Mockito.verifyNoMoreInteractions(randomServiceMock);
-            Mockito.verifyNoMoreInteractions(userMoneyRepositoryMock);
-            Mockito.verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatusDoneWin);
-            Mockito.verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
+            verify(userMoneyRepositoryMock).save(userMoneySave);
+            verifyNoMoreInteractions(randomServiceMock);
+            verifyNoMoreInteractions(userMoneyRepositoryMock);
+            verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatusDoneWin);
+            verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
             Mockito.verifyNoInteractions(rabbitTemplateMock);
         }
     }
@@ -199,11 +200,11 @@ class ServiceRequestStatusServiceTest {
             var monoSaveUserMoney = Mono.just(userMoneyUpdated);
             var monoSaveServiceRequestStatus = Mono.just(serviceRequestStatus);
 
-            Mockito.when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
-            Mockito.when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
-            Mockito.when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
-            Mockito.when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
-            Mockito.when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
+            when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
+            when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
+            when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
+            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
 
             // When
@@ -217,12 +218,12 @@ class ServiceRequestStatusServiceTest {
                     50,
                     jobId
             );
-            Mockito.verify(userMoneyRepositoryMock).save(userMoneyUpdated);
-            Mockito.verifyNoMoreInteractions(userMoneyRepositoryMock);
-            Mockito.verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
-            Mockito.verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
-            Mockito.verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedOfflineServiceRequest);
-            Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
+            verify(userMoneyRepositoryMock).save(userMoneyUpdated);
+            verifyNoMoreInteractions(userMoneyRepositoryMock);
+            verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
+            verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
+            verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedOfflineServiceRequest);
+            verifyNoMoreInteractions(rabbitTemplateMock);
         }
     }
 }

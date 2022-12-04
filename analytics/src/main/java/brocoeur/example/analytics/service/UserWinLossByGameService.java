@@ -2,7 +2,7 @@ package brocoeur.example.analytics.service;
 
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.repository.UserWinLossByGameRepository;
-import brocoeur.example.broker.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.AnalyticServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +45,8 @@ public class UserWinLossByGameService {
 
         int updatedNumberOfWin = userWinLossByGame.getNumberOfWin();
         int updatedNumberOfLoss = userWinLossByGame.getNumberOfLoss();
-        for (var i = 0; i < listOfIsWinner.size(); i++) {
-            if (Boolean.TRUE.equals(listOfIsWinner.get(i))) {
+        for (Boolean aBoolean : listOfIsWinner) {
+            if (Boolean.TRUE.equals(aBoolean)) {
                 updatedNumberOfWin += 1;
             } else {
                 updatedNumberOfLoss += 1;
