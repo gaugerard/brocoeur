@@ -27,4 +27,8 @@ public class UserService {
     public Mono<User> getUserById(int id) {
         return userRepository.findById(id);
     }
+
+    public void deleteAllUsers() {
+        userRepository.deleteAll().subscribe();
+    }
 }

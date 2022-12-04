@@ -27,4 +27,8 @@ public class GameService {
     public Mono<Game> getGameById(int id) {
         return gameRepository.findById(id);
     }
+
+    public void deleteAllGames() {
+        gameRepository.deleteAll().subscribe();
+    }
 }

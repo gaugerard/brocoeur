@@ -18,6 +18,8 @@ public class UserWinLossByGameService {
 
     @Autowired
     private UserWinLossByGameRepository userWinLossByGameRepository;
+    @Autowired
+    private ServiceRequestStatusService serviceRequestStatusService;
 
     public void initializeUserWinLossByGame(List<UserWinLossByGame> userWinLossByGames) {
         Flux<UserWinLossByGame> savedUserWinLossByGame = userWinLossByGameRepository.saveAll(userWinLossByGames);
@@ -32,10 +34,24 @@ public class UserWinLossByGameService {
         return userWinLossByGameRepository.findByGameIdAndUserId(gameId, userId);
     }
 
-    public void updateWinLossNumber(final AnalyticServiceRequest analyticServiceRequest) {
+    public void deleteAllWinLossByGame() {
+        userWinLossByGameRepository.deleteAll().subscribe();
+    }
+
+    public void updateAnalyticAccordingToWinOrLoss(final AnalyticServiceRequest analyticServiceRequest) {
         final UserWinLossByGame userWinLossByGame = userWinLossByGameRepository.findByGameIdAndUserId(analyticServiceRequest.getGameId(), analyticServiceRequest.getUserId()).blockFirst();
-        final int updatedNumberOfWin = analyticServiceRequest.isWinner() ? userWinLossByGame.getNumberOfWin() + 1 : userWinLossByGame.getNumberOfWin();
-        final int updatedNumberOfLoss = analyticServiceRequest.isWinner() ? userWinLossByGame.getNumberOfLoss() : userWinLossByGame.getNumberOfLoss() + 1;
+
+        final List<Boolean> listOfIsWinner = analyticServiceRequest.getListOfIsWinner();
+
+        int updatedNumberOfWin = userWinLossByGame.getNumberOfWin();
+        int updatedNumberOfLoss = userWinLossByGame.getNumberOfLoss();
+        for (var i = 0; i < listOfIsWinner.size(); i++) {
+            if (Boolean.TRUE.equals(listOfIsWinner.get(i))) {
+                updatedNumberOfWin += 1;
+            } else {
+                updatedNumberOfLoss += 1;
+            }
+        }
 
         final UserWinLossByGame newUserWinLossByGame = new UserWinLossByGame(
                 analyticServiceRequest.getGameId(),
@@ -45,6 +61,8 @@ public class UserWinLossByGameService {
                 updatedNumberOfWin,
                 updatedNumberOfLoss);
 
-        userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("==> " + userWinLossByGame + " UPDATED TO: " + updated));
+        userWinLossByGameRepository.save(newUserWinLossByGame)
+                .subscribe(updated -> LOGGER.info("==> " + userWinLossByGame + " UPDATED TO: " + updated));
+        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(analyticServiceRequest.getLinkedJobId(), listOfIsWinner, analyticServiceRequest.getAmount());
     }
 }

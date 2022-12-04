@@ -9,7 +9,6 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,9 +17,6 @@ import org.springframework.context.annotation.Configuration;
 public class ConfigRabbitAdmin {
 
     private final ConnectionFactory connectionFactory;
-
-    @Autowired
-    private final NerimaConfigProperties nerimaConfigProperties;
 
     @Bean
     public RabbitAdmin admin() {
@@ -35,15 +31,7 @@ public class ConfigRabbitAdmin {
      */
     @Bean
     Queue msgQueue() {
-        return new Queue(nerimaConfigProperties.getRpcMessageQueue(), false, false, true);
-    }
-
-    /**
-     * Return Queue Configuration
-     */
-    @Bean
-    Queue replyQueue() {
-        return new Queue(nerimaConfigProperties.getRpcReplyMessageQueue(), false, false, true);
+        return new Queue("MyQ1", false, false, true);
     }
 
     /**
@@ -52,7 +40,7 @@ public class ConfigRabbitAdmin {
     @Bean
     TopicExchange exchange() {
 
-        return new TopicExchange(nerimaConfigProperties.getRpcExchange());
+        return new TopicExchange("myexchange1");
     }
 
     /**
@@ -61,16 +49,7 @@ public class ConfigRabbitAdmin {
     @Bean
     Binding msgBinding() {
 
-        return BindingBuilder.bind(msgQueue()).to(exchange()).with(nerimaConfigProperties.getRpcMessageQueue());
-    }
-
-    /**
-     * Back to Queue and Switch Link
-     */
-    @Bean
-    Binding replyBinding() {
-
-        return BindingBuilder.bind(replyQueue()).to(exchange()).with(nerimaConfigProperties.getRpcReplyMessageQueue());
+        return BindingBuilder.bind(msgQueue()).to(exchange()).with("MyQ1");
     }
 
     /**
@@ -79,23 +58,14 @@ public class ConfigRabbitAdmin {
      */
     @Bean
     RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
-
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setReplyAddress(nerimaConfigProperties.getRpcReplyMessageQueue());
-        template.setReplyTimeout(6000);
-        return template;
+        return new RabbitTemplate(connectionFactory);
     }
 
-    /**
-     * Configure listener for return queue
-     */
+    // This generates the exchange and queue at module start.
     @Bean
     SimpleMessageListenerContainer replyContainer(final ConnectionFactory connectionFactory) {
-
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(nerimaConfigProperties.getRpcReplyMessageQueue());
-        container.setMessageListener(rabbitTemplate(connectionFactory));
         return container;
     }
 }

@@ -23,6 +23,10 @@ public class UserController {
 
     @PostConstruct
     public void saveUsers() {
+        // Clean-up
+        userService.deleteAllUsers();
+
+        // Initialization
         List<User> users = new ArrayList<>();
         users.add(new User(5, "MeatAlive"));
         users.add(new User(8, "Baba"));

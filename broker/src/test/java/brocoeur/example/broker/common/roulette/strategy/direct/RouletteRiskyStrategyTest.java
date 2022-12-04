@@ -15,7 +15,7 @@ class RouletteRiskyStrategyTest {
     private RouletteRiskyStrategy rouletteRiskyStrategy;
 
     @Test
-    void shouldGetGreenWithRiskyRouletteStrategy(){
+    void shouldGetGreenWithRiskyRouletteStrategy() {
         // Given - When
         var actualPlay = rouletteRiskyStrategy.getStrategyPlay();
 

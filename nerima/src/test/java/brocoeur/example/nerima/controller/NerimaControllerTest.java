@@ -1,9 +1,8 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.broker.common.request.ServiceRequest;
-import brocoeur.example.broker.common.response.ServiceResponse;
-import brocoeur.example.nerima.NerimaConfigProperties;
 import brocoeur.example.broker.common.GameStrategyTypes;
+import brocoeur.example.broker.common.request.ServiceRequest;
+import brocoeur.example.nerima.NerimaConfigProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static brocoeur.example.broker.common.GameStrategyTypes.*;
@@ -48,18 +46,17 @@ class NerimaControllerTest {
     void shouldPostDirectPlayAndGetHttpStatusOK(final String testName, final GameStrategyTypes rouletteStrategyType) {
         // Given
         var userId = "12345";
-        var serviceRequest = new ServiceRequest(userId, rouletteStrategyType);
-        var serviceResponse = new ServiceResponse(userId, true);
+        var serviceRequest = new ServiceRequest(userId, rouletteStrategyType, 5, 123456);
 
-        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
-        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyQ1");
-        Mockito.when(rabbitTemplateMock.convertSendAndReceive("myexchange1", "MyQ1", serviceRequest)).thenReturn(serviceResponse);
+        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
 
         // When
-        var actualServiceResponse = nerimaController.postDirectPlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postDirectGamblePlay(serviceRequest);
 
         // Then
-        Assertions.assertEquals(new ResponseEntity<>(serviceResponse, HttpStatus.OK), actualServiceResponse);
+        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
+        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actualServiceResponse);
     }
 
     @Test
@@ -68,16 +65,15 @@ class NerimaControllerTest {
         var userId = "12345";
         var timeToLive = 3;
         var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, timeToLive);
-        var serviceResponse = new ServiceResponse(userId, List.of(true, false, false));
 
-        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("myexchange1");
-        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyQ1");
-        Mockito.when(rabbitTemplateMock.convertSendAndReceive("myexchange1", "MyQ1", serviceRequest)).thenReturn(serviceResponse);
+        Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
+        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
 
         // When
-        var actualServiceResponse = nerimaController.postOfflinePlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postOfflineGamblePlay(serviceRequest);
 
         // Then
-        Assertions.assertEquals(new ResponseEntity<>(serviceResponse, HttpStatus.OK), actualServiceResponse);
+        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
+        Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actualServiceResponse);
     }
 }

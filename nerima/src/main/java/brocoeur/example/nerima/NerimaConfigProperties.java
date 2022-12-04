@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 public class NerimaConfigProperties {
 
     private String rpcMessageQueue;
-    private String rpcReplyMessageQueue;
     private String routingKey;
     private String rpcExchange;
 
@@ -18,14 +17,6 @@ public class NerimaConfigProperties {
 
     public void setRpcMessageQueue(final String rpcMessageQueue) {
         this.rpcMessageQueue = rpcMessageQueue;
-    }
-
-    public String getRpcReplyMessageQueue() {
-        return rpcReplyMessageQueue;
-    }
-
-    public void setRpcReplyMessageQueue(final String rpcReplyMessageQueue) {
-        this.rpcReplyMessageQueue = rpcReplyMessageQueue;
     }
 
     public String getRoutingKey() {
