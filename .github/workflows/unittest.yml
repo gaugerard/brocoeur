@@ -1,4 +1,4 @@
-name: Maven Run Tests when push to Main branch and newly created PRs.
+name: Maven Run Unit-Tests
 
 on:
   # Trigger the workflow on pull request for main branch
@@ -8,9 +8,10 @@ on:
       branches:
         - main
       types: [opened, synchronize]
+
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 19

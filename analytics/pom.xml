@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>broker.example</groupId>
-            <artifactId>broker</artifactId>
+            <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
