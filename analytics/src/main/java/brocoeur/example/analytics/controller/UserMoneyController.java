@@ -35,9 +35,7 @@ public class UserMoneyController {
 
     @GetMapping("/list")
     public Flux<UserMoney> getAllUserMoney() {
-        Flux<UserMoney> UserMoneys = userMoneyService.getAllUserMoney();
-        System.out.println(UserMoneys);
-        return UserMoneys;
+        return userMoneyService.getAllUserMoney();
     }
 
     @GetMapping("/{id}")

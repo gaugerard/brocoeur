@@ -100,7 +100,7 @@ public class ServiceRequestStatusService {
 
             // Update total amount of money available for the user.
             userMoney.setMoney(totalAmountOfMoneyAvailable - amountOfMoneyToBlock);
-            userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
+            userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
 
             // Insert new line in 'serviceRequestStatus' table.
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
@@ -113,7 +113,7 @@ public class ServiceRequestStatusService {
                     0
             );
 
-            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> SAVED: " + updated));
+            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Saved : {}", updated));
 
             // Send 'ServiceRequest' to Game module.
             serviceRequest.setLinkedJobId(jobId);
@@ -128,7 +128,7 @@ public class ServiceRequestStatusService {
                     currentTimeInMilliseconds,
                     currentTimeInMilliseconds
             );
-            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> SAVED: " + updated));
+            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Saved : {}", updated));
         }
 
     }
@@ -170,7 +170,7 @@ public class ServiceRequestStatusService {
         }
 
         userMoney.setMoney(totalAmountOfMoneyAvailable + totalAmountWon);
-        userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
-        serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> " + serviceRequestStatus + " UPDATED TO: " + updated));
+        userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
+        serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
     }
 }

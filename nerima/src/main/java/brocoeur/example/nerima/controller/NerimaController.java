@@ -1,6 +1,5 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.common.ServiceRequestTypes;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.slf4j.Logger;
@@ -49,9 +48,7 @@ public class NerimaController {
     }
 
     private void post(final ServiceRequest serviceRequest) {
-        final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
-
-        LOGGER.info("==> " + serviceRequestTypes + " REQUEST: " + serviceRequest);
+        LOGGER.info("Received request : {}", serviceRequest);
         rabbitTemplate.convertAndSend(
                 nerimaConfigProperties.getRpcExchange(),
                 nerimaConfigProperties.getRpcMessageQueue(),

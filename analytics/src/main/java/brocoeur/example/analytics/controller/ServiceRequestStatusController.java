@@ -29,9 +29,7 @@ public class ServiceRequestStatusController {
 
     @GetMapping("/list")
     public Flux<ServiceRequestStatus> getAllServiceRequestStatus() {
-        Flux<ServiceRequestStatus> serviceRequestStatusFlux = serviceRequestStatusService.getAllServiceRequestStatus();
-        System.out.println(serviceRequestStatusFlux);
-        return serviceRequestStatusFlux;
+        return serviceRequestStatusService.getAllServiceRequestStatus();
     }
 
     @GetMapping("/{id}")

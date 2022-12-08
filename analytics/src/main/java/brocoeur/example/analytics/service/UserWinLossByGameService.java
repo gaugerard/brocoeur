@@ -61,8 +61,7 @@ public class UserWinLossByGameService {
                 updatedNumberOfWin,
                 updatedNumberOfLoss);
 
-        userWinLossByGameRepository.save(newUserWinLossByGame)
-                .subscribe(updated -> LOGGER.info("==> " + userWinLossByGame + " UPDATED TO: " + updated));
+        userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("Updated : {}", updated));
         serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(analyticServiceRequest.getLinkedJobId(), listOfIsWinner, analyticServiceRequest.getAmount());
     }
 }
