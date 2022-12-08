@@ -87,12 +87,8 @@ public class GamesController {
             LOGGER.info("[OFFLINE] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
 
             listOfPreviousGameResult.add(gamePlayFromService);
-
-            if (gamePlayFromUser.equals(gamePlayFromService)) {
-                listOfIsWinner.add(true);
-            } else {
-                listOfIsWinner.add(false);
-            }
+            final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
+            listOfIsWinner.add(isWinner);
         }
         sendAnalyticMessage(userId, gameTypes, listOfIsWinner, offlineServiceRequest.getAmountToGamble(), offlineServiceRequest.getLinkedJobId());
     }
