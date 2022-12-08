@@ -56,11 +56,23 @@ public class GamesController {
         final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
 
-        final GamePlay gamePlayFromUser = gameStrategy.getStrategyPlay();
-        final GamePlay gamePlayFromService = gameService.play(gameStrategyTypes.getGameTypes());
-        LOGGER.info("[DIRECT] - USER plays: '" + gamePlayFromUser + "' and SERVICE plays: '" + gamePlayFromService + "'.");
+        GamePlay gamePlayFromUser = gameStrategy.getStrategy();
 
-        if (gamePlayFromUser.equals(gamePlayFromService)) {
+        final GamePlay gamePlayFromService = gameService.play(gameStrategyTypes.getGameTypes());
+
+        //all the cases which are about user giving strategies and not value to compare ↓
+        switch (gameStrategyTypes.getGameTypes()){
+            case BLACK_JACK :
+                gamePlayFromUser = gameService.play(gameStrategyTypes.getGameTypes(),gameStrategy);
+
+
+            //more cases to come in the future games
+
+        }
+
+        LOGGER.info("[DIRECT] - USER's play: '" + gamePlayFromUser + "' and SERVICE' play: '" + gamePlayFromService + "'.");
+
+        if (gameService.didPlayerWin(gameStrategyTypes.getGameTypes(),gamePlayFromUser,gamePlayFromService)) {
             LOGGER.info("User WON !");
             sendAnalyticMessage(userId, gameStrategyTypes.getGameTypes(), true, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
         } else {
@@ -96,4 +108,5 @@ public class GamesController {
         }
         sendAnalyticMessage(userId, offlineGameStrategyTypes.getGameTypes(), listOfIsWinner, offlineServiceRequest.getAmountToGamble(), offlineServiceRequest.getLinkedJobId());
     }
+
 }

@@ -1,11 +1,11 @@
-package brocoeur.example.common.blackJack.strategy;
+package brocoeur.example.common.blackjack.strategy;
 
 import brocoeur.example.common.GameStrategy;
-import brocoeur.example.common.blackJack.BlackJackPlay;
+import brocoeur.example.common.blackjack.BlackJackPlay;
 
 public class BlackJackRisky implements GameStrategy {
     @Override
-    public BlackJackPlay getStrategyPlay(){ return BlackJackPlay.STOP_LIMIT_20;}
+    public BlackJackPlay getStrategy(){ return BlackJackPlay.STOP_LIMIT_20;}
 
     @Override
     public String toString() {return "BlackJackRisky";}

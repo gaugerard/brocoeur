@@ -1,4 +1,4 @@
-package brocoeur.example.common.blackJack;
+package brocoeur.example.common.blackjack;
 
 import brocoeur.example.common.GamePlay;
 

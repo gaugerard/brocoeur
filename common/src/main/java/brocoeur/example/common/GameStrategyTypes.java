@@ -1,7 +1,7 @@
 package brocoeur.example.common;
 
-import brocoeur.example.common.blackJack.strategy.BlackJackRisky;
-import brocoeur.example.common.blackJack.strategy.BlackJackSafe;
+import brocoeur.example.common.blackjack.strategy.BlackJackRisky;
+import brocoeur.example.common.blackjack.strategy.BlackJackSafe;
 import brocoeur.example.common.cointoss.strategy.direct.RandomCoinToss;
 import brocoeur.example.common.roulette.strategy.direct.RouletteRiskyStrategy;
 import brocoeur.example.common.roulette.strategy.direct.RouletteSafeStrategy;
