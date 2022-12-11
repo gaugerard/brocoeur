@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: 19
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -DskipTests -B package --file pom.xml
       - name: Test with Maven
         run: mvn -Dtest=Integration* -DfailIfNoTests=false -DskipTests=false -B test --file pom.xml
       - name: Stop containers
