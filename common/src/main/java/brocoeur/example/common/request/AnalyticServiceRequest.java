@@ -47,6 +47,15 @@ public class AnalyticServiceRequest implements Serializable {
     public AnalyticServiceRequest() {
     }
 
+    public AnalyticServiceRequest(final AnalyticServiceRequest analyticServiceRequest) {
+        this.analyticServiceRequestTypes = analyticServiceRequest.analyticServiceRequestTypes;
+        this.gameId = analyticServiceRequest.gameId;
+        this.userId = analyticServiceRequest.userId;
+        this.listOfIsWinner = List.copyOf(listOfIsWinner);
+        this.amount = analyticServiceRequest.amount;
+        this.linkedJobId = analyticServiceRequest.linkedJobId;
+    }
+
     public AnalyticServiceRequestTypes getAnalyticServiceRequestTypes() {
         return analyticServiceRequestTypes;
     }

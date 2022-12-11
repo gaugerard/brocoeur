@@ -29,7 +29,7 @@ public class GamesController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = "#{gamesConfigProperties.getRpcMessageQueue()}")
+    @RabbitListener(id = "game-controller-lister-id", queues = "#{gamesConfigProperties.getRpcMessageQueue()}", autoStartup = "#{gamesConfigProperties.getAutoStartup()}")
     public void getMsg(final ServiceRequest serviceRequest) {
         final ServiceRequestTypes serviceRequestType = serviceRequest.getServiceRequestTypes();
         switch (serviceRequestType) {

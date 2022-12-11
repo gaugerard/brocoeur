@@ -20,7 +20,7 @@ public class ServiceRequest implements Serializable {
     private OfflineGameStrategyTypes offlineGameStrategyTypes;
     private Integer timeToLive;
     private int amountToGamble;
-    private int linkedJobId;
+    private Integer linkedJobId;
 
     public ServiceRequest(final ServiceRequestTypes serviceRequestTypes,
                           final String userId,
@@ -28,7 +28,7 @@ public class ServiceRequest implements Serializable {
                           final OfflineGameStrategyTypes offlineGameStrategyTypes,
                           final Integer timeToLive,
                           final int amountToGamble,
-                          final int linkedJobId) {
+                          final Integer linkedJobId) {
         this.serviceRequestTypes = serviceRequestTypes;
         this.userId = userId;
         this.gameStrategyTypes = gameStrategyTypes;
@@ -41,7 +41,7 @@ public class ServiceRequest implements Serializable {
     public ServiceRequest(final String userId,
                           final GameStrategyTypes gameStrategyTypes,
                           final int amountToGamble,
-                          final int linkedJobId) {
+                          final Integer linkedJobId) {
         this.serviceRequestTypes = DIRECT;
         this.userId = userId;
         this.gameStrategyTypes = gameStrategyTypes;
@@ -60,14 +60,14 @@ public class ServiceRequest implements Serializable {
         this.offlineGameStrategyTypes = offlineGameStrategyTypes;
         this.timeToLive = timeToLive;
         this.amountToGamble = 0;
-        this.linkedJobId = 0;
+        this.linkedJobId = null;
     }
 
     public ServiceRequest(final String userId,
                           final OfflineGameStrategyTypes offlineGameStrategyTypes,
                           final Integer timeToLive,
                           final int amountToGamble,
-                          final int linkedJobId) {
+                          final Integer linkedJobId) {
         this.serviceRequestTypes = OFFLINE;
         this.userId = userId;
         this.gameStrategyTypes = null;
@@ -78,6 +78,16 @@ public class ServiceRequest implements Serializable {
     }
 
     public ServiceRequest() {
+    }
+
+    public ServiceRequest(final ServiceRequest serviceRequest) {
+        this.serviceRequestTypes = serviceRequest.serviceRequestTypes;
+        this.userId = serviceRequest.userId;
+        this.gameStrategyTypes = serviceRequest.gameStrategyTypes;
+        this.offlineGameStrategyTypes = serviceRequest.offlineGameStrategyTypes;
+        this.timeToLive = serviceRequest.timeToLive;
+        this.amountToGamble = serviceRequest.amountToGamble;
+        this.linkedJobId = serviceRequest.linkedJobId;
     }
 
     public ServiceRequestTypes getServiceRequestTypes() {
@@ -132,7 +142,7 @@ public class ServiceRequest implements Serializable {
         return linkedJobId;
     }
 
-    public void setLinkedJobId(int linkedJobId) {
+    public void setLinkedJobId(Integer linkedJobId) {
         this.linkedJobId = linkedJobId;
     }
 
@@ -167,6 +177,6 @@ public class ServiceRequest implements Serializable {
                 && offlineGameStrategyTypes == c.offlineGameStrategyTypes
                 && Objects.equals(timeToLive, c.timeToLive)
                 && amountToGamble == c.amountToGamble
-                && linkedJobId == c.linkedJobId;
+                && Objects.equals(linkedJobId, c.linkedJobId);
     }
 }
