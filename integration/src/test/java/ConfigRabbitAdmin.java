@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @RequiredArgsConstructor
 @Profile("dev")
-public class ConfigRabbitAdminTest {
+public class ConfigRabbitAdmin {
     private final ConnectionFactory connectionFactory;
 
     @Bean
