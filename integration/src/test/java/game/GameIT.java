@@ -28,7 +28,7 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest(classes = Main.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("dev")
-class IntegrationTest {
+class GameIT {
 
     @Autowired
     private GamesController gamesController;

@@ -1,4 +1,4 @@
-name: My Test Single Project
+name: SonarCloud-Analysis
 on:
   push:
     pull_request:
