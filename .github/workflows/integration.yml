@@ -20,7 +20,7 @@ jobs:
       - name: Start containers 1
         run: cd script/docker/rabbitmq/ && ls
       - name: Start containers 2
-        run: docker-compose up -d
+        run: docker-compose -f "docker-compose.yml" up -d --build
       - name: Test with Maven
         run: mvn -DskipTests=false -B test --file pom.xml
 
