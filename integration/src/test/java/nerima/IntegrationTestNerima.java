@@ -23,7 +23,7 @@ import static org.awaitility.Awaitility.await;
 @SpringBootTest(classes = Main.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("dev")
-class IntegrationTest {
+class IntegrationTestNerima {
 
     @Autowired
     private NerimaController nerimaController;

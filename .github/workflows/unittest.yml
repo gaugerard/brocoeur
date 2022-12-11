@@ -1,4 +1,4 @@
-name: Maven Run Unit-Tests
+name: Unit-Tests
 
 on:
   # Trigger the workflow on pull request for main branch
