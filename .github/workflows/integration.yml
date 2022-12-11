@@ -18,7 +18,7 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Start containers 1
-        run: cd script/docker/rabbitmq/
+        run: cd script/docker/rabbitmq/ && ls
       - name: Start containers 2
         run: docker-compose up -d
       - name: Test with Maven
