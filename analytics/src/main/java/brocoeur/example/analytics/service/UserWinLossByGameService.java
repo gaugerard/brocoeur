@@ -26,20 +26,18 @@ public class UserWinLossByGameService {
         savedUserWinLossByGame.subscribe();
     }
 
-    public Flux<UserWinLossByGame> getAllUserWinLossByGame() {
-        return userWinLossByGameRepository.findAll();
-    }
-
-    public Flux<UserWinLossByGame> getUserWinLossByGameByGameIdAndUserId(final int gameId, final int userId) {
-        return userWinLossByGameRepository.findByGameIdAndUserId(gameId, userId);
-    }
-
     public void deleteAllWinLossByGame() {
         userWinLossByGameRepository.deleteAll().subscribe();
     }
 
     public void updateAnalyticAccordingToWinOrLoss(final AnalyticServiceRequest analyticServiceRequest) {
-        final UserWinLossByGame userWinLossByGame = userWinLossByGameRepository.findByGameIdAndUserId(analyticServiceRequest.getGameId(), analyticServiceRequest.getUserId()).blockFirst();
+        final int gameId = analyticServiceRequest.getGameId();
+        final int userId = analyticServiceRequest.getUserId();
+        final UserWinLossByGame userWinLossByGame = userWinLossByGameRepository.findByGameIdAndUserId(gameId, userId).block();
+
+        if (userWinLossByGame == null) {
+            throw new IllegalStateException("UserWinLossByGame with gameId : " + gameId + " and userId : " + userId + " do not exists.");
+        }
 
         final List<Boolean> listOfIsWinner = analyticServiceRequest.getListOfIsWinner();
 
@@ -54,7 +52,7 @@ public class UserWinLossByGameService {
         }
 
         final UserWinLossByGame newUserWinLossByGame = new UserWinLossByGame(
-                analyticServiceRequest.getGameId(),
+                gameId,
                 analyticServiceRequest.getUserId(),
                 userWinLossByGame.getGameName(),
                 userWinLossByGame.getPseudo(),
