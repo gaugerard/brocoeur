@@ -1,0 +1,25 @@
+name: Integration Tests
+on:
+  push:
+    pull_request:
+      branches:
+        - main
+      types: [opened, synchronize, reopened]
+
+jobs:
+  docker:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Start containers
+        run: cd .. && cd .. && cd script/docker/rabbitmq docker-compose -f "docker-compose.yml" up -d --build
+
+      - name: Test with Maven
+        run: mvn -DskipTests=false -B test --file pom.xml
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
