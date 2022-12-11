@@ -17,8 +17,10 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - name: Start containers
-        run: cd script\docker\rabbitmq\ && docker-compose up -d
+      - name: Start containers 1
+        run: cd script/docker/rabbitmq/
+      - name: Start containers 2
+        run: docker-compose up -d
       - name: Test with Maven
         run: mvn -DskipTests=false -B test --file pom.xml
 
