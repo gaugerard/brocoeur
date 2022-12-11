@@ -17,7 +17,7 @@ jobs:
       - name: Show dir
         run: pwd
       - name: Start containers
-        run: cd ..\..\script\docker\rabbitmq\ && docker-compose up -d
+        run: cd script\docker\rabbitmq\ && docker-compose up -d
       - name: Test with Maven
         run: mvn -DskipTests=false -B test --file pom.xml
 
