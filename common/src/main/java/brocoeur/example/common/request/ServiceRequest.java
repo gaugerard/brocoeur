@@ -167,7 +167,7 @@ public class ServiceRequest implements Serializable , Cloneable{
                 && offlineGameStrategyTypes == c.offlineGameStrategyTypes
                 && Objects.equals(timeToLive, c.timeToLive)
                 && amountToGamble == c.amountToGamble
-                && linkedJobId == c.linkedJobId;
+                && Objects.equals(linkedJobId, c.linkedJobId);
     }
 
     @Override
