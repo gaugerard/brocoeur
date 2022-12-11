@@ -22,7 +22,7 @@ jobs:
           java-version: 19
       - name: Build with Maven (skips unit tests).
         run: mvn -DskipTests -B package --file pom.xml
-      - name: Test with Maven (class with following regex 'Integration*')
+      - name: Test with Maven (class with following regex '*IT')
         run: mvn -Dtest=*IT -DfailIfNoTests=false -DskipTests=false -B test --file pom.xml
       - name: Stop containers
         if: always()
