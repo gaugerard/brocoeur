@@ -20,10 +20,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 19
-      - name: Build with Maven (skip unit tests).
+      - name: Build with Maven (skips unit tests).
         run: mvn -DskipTests -B package --file pom.xml
       - name: Test with Maven (class with following regex 'Integration*')
-        run: mvn -Dtest=Integration* -DfailIfNoTests=false -DskipTests=false -B test --file pom.xml
+        run: mvn -Dtest=*IT -DfailIfNoTests=false -DskipTests=false -B test --file pom.xml
       - name: Stop containers
         if: always()
         run: docker-compose -f "script/docker/rabbitmq/docker-compose.yml" down

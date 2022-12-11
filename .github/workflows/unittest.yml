@@ -20,5 +20,5 @@ jobs:
           java-version: 19
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-      - name: Test with Maven
+      - name: Test with Maven (skips integration tests).
         run: mvn -B test --file pom.xml
