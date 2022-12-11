@@ -23,7 +23,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Test with Maven
-        run: mvn -DskipTests=false -B test --file pom.xml
+        run: mvn -DskipTests=false -B test -Dtest=IntegrationTest --file pom.xml
       - name: Stop containers
         if: always()
         run: docker-compose -f "script/docker/rabbitmq/docker-compose.yml" down
