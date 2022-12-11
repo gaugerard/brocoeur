@@ -8,36 +8,29 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>nerima</artifactId>
 
+    <artifactId>integration</artifactId>
     <dependencies>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.13.4</version>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>broker.example</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>nerima</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>broker.example</groupId>
+            <artifactId>games</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Component
-public class AnalyticServiceRequest implements Serializable {
+public class AnalyticServiceRequest implements Serializable, Cloneable {
 
     private AnalyticServiceRequestTypes analyticServiceRequestTypes;
     private int gameId;
@@ -125,5 +125,15 @@ public class AnalyticServiceRequest implements Serializable {
                 && listOfIsWinner.equals(c.listOfIsWinner)
                 && amount == c.amount
                 && linkedJobId == c.linkedJobId;
+    }
+
+
+    @Override
+    public AnalyticServiceRequest clone() {
+        try {
+            return (AnalyticServiceRequest) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

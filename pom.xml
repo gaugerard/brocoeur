@@ -8,6 +8,7 @@
         <module>games</module>
         <module>analytics</module>
         <module>nerima</module>
+        <module>integration</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

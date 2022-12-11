@@ -12,7 +12,7 @@ import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
 import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
 
 @Component
-public class ServiceRequest implements Serializable {
+public class ServiceRequest implements Serializable , Cloneable{
 
     private ServiceRequestTypes serviceRequestTypes;
     private String userId;
@@ -20,7 +20,7 @@ public class ServiceRequest implements Serializable {
     private OfflineGameStrategyTypes offlineGameStrategyTypes;
     private Integer timeToLive;
     private int amountToGamble;
-    private int linkedJobId;
+    private Integer linkedJobId;
 
     public ServiceRequest(final ServiceRequestTypes serviceRequestTypes,
                           final String userId,
@@ -28,7 +28,7 @@ public class ServiceRequest implements Serializable {
                           final OfflineGameStrategyTypes offlineGameStrategyTypes,
                           final Integer timeToLive,
                           final int amountToGamble,
-                          final int linkedJobId) {
+                          final Integer linkedJobId) {
         this.serviceRequestTypes = serviceRequestTypes;
         this.userId = userId;
         this.gameStrategyTypes = gameStrategyTypes;
@@ -41,7 +41,7 @@ public class ServiceRequest implements Serializable {
     public ServiceRequest(final String userId,
                           final GameStrategyTypes gameStrategyTypes,
                           final int amountToGamble,
-                          final int linkedJobId) {
+                          final Integer linkedJobId) {
         this.serviceRequestTypes = DIRECT;
         this.userId = userId;
         this.gameStrategyTypes = gameStrategyTypes;
@@ -60,14 +60,14 @@ public class ServiceRequest implements Serializable {
         this.offlineGameStrategyTypes = offlineGameStrategyTypes;
         this.timeToLive = timeToLive;
         this.amountToGamble = 0;
-        this.linkedJobId = 0;
+        this.linkedJobId = null;
     }
 
     public ServiceRequest(final String userId,
                           final OfflineGameStrategyTypes offlineGameStrategyTypes,
                           final Integer timeToLive,
                           final int amountToGamble,
-                          final int linkedJobId) {
+                          final Integer linkedJobId) {
         this.serviceRequestTypes = OFFLINE;
         this.userId = userId;
         this.gameStrategyTypes = null;
@@ -132,7 +132,7 @@ public class ServiceRequest implements Serializable {
         return linkedJobId;
     }
 
-    public void setLinkedJobId(int linkedJobId) {
+    public void setLinkedJobId(Integer linkedJobId) {
         this.linkedJobId = linkedJobId;
     }
 
@@ -168,5 +168,14 @@ public class ServiceRequest implements Serializable {
                 && Objects.equals(timeToLive, c.timeToLive)
                 && amountToGamble == c.amountToGamble
                 && linkedJobId == c.linkedJobId;
+    }
+
+    @Override
+    public ServiceRequest clone() {
+        try {
+            return (ServiceRequest) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
