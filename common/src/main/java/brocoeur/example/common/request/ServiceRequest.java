@@ -12,7 +12,7 @@ import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
 import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
 
 @Component
-public class ServiceRequest implements Serializable , Cloneable{
+public class ServiceRequest implements Serializable {
 
     private ServiceRequestTypes serviceRequestTypes;
     private String userId;
@@ -78,6 +78,16 @@ public class ServiceRequest implements Serializable , Cloneable{
     }
 
     public ServiceRequest() {
+    }
+
+    public ServiceRequest(final ServiceRequest serviceRequest) {
+        this.serviceRequestTypes = serviceRequest.serviceRequestTypes;
+        this.userId = serviceRequest.userId;
+        this.gameStrategyTypes = serviceRequest.gameStrategyTypes;
+        this.offlineGameStrategyTypes = serviceRequest.offlineGameStrategyTypes;
+        this.timeToLive = serviceRequest.timeToLive;
+        this.amountToGamble = serviceRequest.amountToGamble;
+        this.linkedJobId = serviceRequest.linkedJobId;
     }
 
     public ServiceRequestTypes getServiceRequestTypes() {
@@ -168,14 +178,5 @@ public class ServiceRequest implements Serializable , Cloneable{
                 && Objects.equals(timeToLive, c.timeToLive)
                 && amountToGamble == c.amountToGamble
                 && Objects.equals(linkedJobId, c.linkedJobId);
-    }
-
-    @Override
-    public ServiceRequest clone() {
-        try {
-            return (ServiceRequest) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
     }
 }

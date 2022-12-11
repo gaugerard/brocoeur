@@ -13,13 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(classes = Main.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("dev")
-public class IntegrationTest {
+class IntegrationTest {
 
     @Autowired
     private NerimaController nerimaController;
@@ -42,7 +46,7 @@ public class IntegrationTest {
     }
 
     @AfterAll
-    void afterAll(){
+    void afterAll() {
         rabbitAdmin.deleteQueue("MyA1");
         rabbitAdmin.deleteExchange("A1DirectExchange");
     }
@@ -53,12 +57,12 @@ public class IntegrationTest {
         var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, null);
 
         nerimaController.postDirectGamblePlay(serviceRequest);
-        Thread.sleep(2000);
+        await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var queueInfo = rabbitAdmin.getQueueInfo("MyA1");
+
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
-        Assertions.assertEquals(1, queueInfo.getMessageCount());
+
         var expectedServiceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, null);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
@@ -66,17 +70,24 @@ public class IntegrationTest {
     @Test
     void shouldSendOfflineRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
-        var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 50,  100, null);
+        var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 50, 100, null);
 
         nerimaController.postOfflineGamblePlay(serviceRequest);
-        Thread.sleep(2000);
+        await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var queueInfo = rabbitAdmin.getQueueInfo("MyA1");
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
-        Assertions.assertEquals(1, queueInfo.getMessageCount());
-        var expectedServiceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 5,  100, null);
+        var expectedServiceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 5, 100, null);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
 
+    private Callable<Boolean> messageIsProcessedAndSentToQueue() {
+        return new Callable<Boolean>() {
+            public Boolean call() {
+                // check the condition that must be fulfilled.
+                var queueInfo = rabbitAdmin.getQueueInfo("MyA1");
+                return queueInfo.getMessageCount() == 1;
+            }
+        };
+    }
 }

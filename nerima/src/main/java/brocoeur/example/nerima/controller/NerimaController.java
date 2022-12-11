@@ -28,7 +28,7 @@ public class NerimaController {
 
     @PostMapping("/api/nerima/gamble")
     public ResponseEntity<ServiceRequest> postDirectGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
-        final ServiceRequest directGambleServiceRequest = serviceRequest.clone();
+        final ServiceRequest directGambleServiceRequest = new ServiceRequest(serviceRequest);
         // normalize
         directGambleServiceRequest.setServiceRequestTypes(DIRECT);
 
@@ -39,7 +39,7 @@ public class NerimaController {
 
     @PostMapping("/api/nerima/offline/gamble")
     public ResponseEntity<ServiceRequest> postOfflineGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
-        final ServiceRequest offlineGambleServiceRequest = serviceRequest.clone();
+        final ServiceRequest offlineGambleServiceRequest = new ServiceRequest(serviceRequest);
         // normalize
         offlineGambleServiceRequest.setServiceRequestTypes(OFFLINE);
         offlineGambleServiceRequest.setTimeToLive(Integer.min(offlineGambleServiceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));

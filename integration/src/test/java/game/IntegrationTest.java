@@ -16,15 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static org.awaitility.Awaitility.await;
 
 @EnableRabbit
 @SpringBootTest(classes = Main.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("dev")
-public class IntegrationTest {
+class IntegrationTest {
 
     @Autowired
     private GamesController gamesController;
@@ -77,12 +81,10 @@ public class IntegrationTest {
         var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, 354561);
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", serviceRequest);
 
-        Thread.sleep(2000);
+        await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var queueInfo = rabbitAdmin.getQueueInfo("analyticInput");
         var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("analyticInput");
 
-        Assertions.assertEquals(1, queueInfo.getMessageCount());
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
         Assertions.assertEquals(123, analyticServiceRequestPresentInQueue.getGameId());
         Assertions.assertEquals(8, analyticServiceRequestPresentInQueue.getUserId());
@@ -104,12 +106,10 @@ public class IntegrationTest {
         );
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", offlineServiceRequest);
 
-        Thread.sleep(2000);
+        await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var queueInfo = rabbitAdmin.getQueueInfo("analyticInput");
         var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("analyticInput");
 
-        Assertions.assertEquals(1, queueInfo.getMessageCount());
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
         Assertions.assertEquals(324, analyticServiceRequestPresentInQueue.getGameId());
         Assertions.assertEquals(8, analyticServiceRequestPresentInQueue.getUserId());
@@ -122,5 +122,15 @@ public class IntegrationTest {
         rabbitListenerEndpointRegistry.getListenerContainer(
                 "game-controller-lister-id"
         ).start();
+    }
+
+    private Callable<Boolean> messageIsProcessedAndSentToQueue() {
+        return new Callable<Boolean>() {
+            public Boolean call() {
+                // check the condition that must be fulfilled.
+                var queueInfo = rabbitAdmin.getQueueInfo("analyticInput");
+                return queueInfo.getMessageCount() == 1;
+            }
+        };
     }
 }
