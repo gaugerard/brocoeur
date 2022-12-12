@@ -5,10 +5,7 @@ import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.games.Main;
 import brocoeur.example.games.controller.GamesController;
 import org.junit.jupiter.api.*;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
@@ -49,7 +46,7 @@ class GameIT {
         rabbitAdmin.declareBinding(testBinding);
 
         final Queue testQueue2 = new Queue("analyticInput", false, false, true);
-        final TopicExchange testTopicExchange2 = new TopicExchange("analyticDirectExchange");
+        final DirectExchange testTopicExchange2 = new DirectExchange("analyticDirectExchange", false, true);
         final Binding testBinding2 = BindingBuilder.bind(testQueue2).to(testTopicExchange2).with("analyticInput");
 
         rabbitAdmin.declareQueue(testQueue2);

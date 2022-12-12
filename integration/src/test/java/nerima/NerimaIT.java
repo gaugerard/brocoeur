@@ -4,10 +4,7 @@ import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.Main;
 import brocoeur.example.nerima.controller.NerimaController;
 import org.junit.jupiter.api.*;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +30,7 @@ class NerimaIT {
     @BeforeAll
     void beforeAll() {
         final Queue testQueue = new Queue("MyA1", false, false, true);
-        final TopicExchange testTopicExchange = new TopicExchange("A1DirectExchange");
+        final DirectExchange testTopicExchange = new DirectExchange("A1DirectExchange", false, true);
         final Binding testBinding = BindingBuilder.bind(testQueue).to(testTopicExchange).with("MyA1");
         rabbitAdmin.declareQueue(testQueue);
         rabbitAdmin.declareExchange(testTopicExchange);
@@ -73,7 +70,7 @@ class NerimaIT {
         var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 50, 100, null);
 
         nerimaController.postOfflineGamblePlay(serviceRequest);
-        await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
+        await().atMost(5, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 

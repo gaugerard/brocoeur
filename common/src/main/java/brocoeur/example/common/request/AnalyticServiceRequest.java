@@ -51,7 +51,7 @@ public class AnalyticServiceRequest implements Serializable {
         this.analyticServiceRequestTypes = analyticServiceRequest.analyticServiceRequestTypes;
         this.gameId = analyticServiceRequest.gameId;
         this.userId = analyticServiceRequest.userId;
-        this.listOfIsWinner = List.copyOf(listOfIsWinner);
+        this.listOfIsWinner = List.copyOf(analyticServiceRequest.listOfIsWinner);
         this.amount = analyticServiceRequest.amount;
         this.linkedJobId = analyticServiceRequest.linkedJobId;
     }
