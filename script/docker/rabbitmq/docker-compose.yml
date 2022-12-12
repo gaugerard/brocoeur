@@ -17,8 +17,8 @@ services:
       retries: 60
     ports:
       - 9042:9042
-    volumes:
-      - ~/apps/cas1:/var/lib/cassandra
     environment:
       - CASSANDRA_CLUSTER_NAME=SolarSystem
-    #entrypoint: [ "sh", "-c", "ls /var/lib/cassandra" ]
+    entrypoint: [ "/sample_data.sh" ]
+    volumes:
+      - ./sample_data.sh:/sample_data.sh
