@@ -27,6 +27,7 @@ import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEME
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
 import static org.awaitility.Awaitility.await;
 
+@Disabled("Not supported for the moment 12-12-22")
 @EnableRabbit
 @SpringBootTest(classes = Main.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
