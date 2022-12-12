@@ -6,3 +6,19 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
+  cassandra1:
+    image: cassandra:4.0
+    container_name: cassandra1
+    hostname: cassandra1
+    healthcheck:
+      test: [ "CMD", "cqlsh", "-e", "describe keyspaces" ]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    ports:
+      - 9042:9042
+    volumes:
+      - ~/apps/cas1:/var/lib/cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=SolarSystem
+    #entrypoint: [ "sh", "-c", "ls /var/lib/cassandra" ]
