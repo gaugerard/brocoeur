@@ -14,10 +14,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Start containers RabbitMq
+      - name: Start containers (RabbitMq & Cassandra)
         run: docker-compose -f "script/docker/rabbitmq/docker-compose.yml" up -d --build
-      - name: Start containers Cassandra
-        run: docker-compose -f "script/docker/cassandra/docker-compose.yml" up -d --build
       - name: Set up JDK 19
         uses: actions/setup-java@v1
         with:
