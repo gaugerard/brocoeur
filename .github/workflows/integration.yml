@@ -17,7 +17,7 @@ jobs:
       - name: Start containers RabbitMq
         run: docker-compose -f "script/docker/rabbitmq/docker-compose.yml" up -d --build
       - name: Start containers Cassandra
-        run: docker-compose -f "script/docker/cassandra/docker-compose.yml" up -d --build &&  bash script/docker/cassandra/initialize.sh
+        run: docker-compose -f "script/docker/cassandra/docker-compose.yml" up -d --build && bash ./script/docker/cassandra/initialize.sh
       - name: Set up JDK 19
         uses: actions/setup-java@v1
         with:
