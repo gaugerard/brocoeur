@@ -19,6 +19,6 @@ services:
       - 9042:9042
     environment:
       - CASSANDRA_CLUSTER_NAME=SolarSystem
-    entrypoint: [ "/sample_data.sh" ]
+    entrypoint: ["chmod", "+x", "/sample_data.sh"]
     volumes:
       - ./sample_data.sh:/sample_data.sh
