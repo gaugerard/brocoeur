@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -36,19 +34,6 @@ public class ServiceRequestStatusService {
     private RandomService randomService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
-    public void initializeGames(List<ServiceRequestStatus> serviceRequestStatusServices) {
-        Flux<ServiceRequestStatus> savedServiceRequestStatusServices = serviceRequestStatusRepository.saveAll(serviceRequestStatusServices);
-        savedServiceRequestStatusServices.subscribe();
-    }
-
-    public Flux<ServiceRequestStatus> getAllServiceRequestStatus() {
-        return serviceRequestStatusRepository.findAll();
-    }
-
-    public Mono<ServiceRequestStatus> getServiceRequestStatusById(int id) {
-        return serviceRequestStatusRepository.findById(id);
-    }
 
     public void deleteAllServiceRequestStatus() {
         serviceRequestStatusRepository.deleteAll().subscribe();
@@ -89,7 +74,12 @@ public class ServiceRequestStatusService {
     public void addServiceRequestStatus(final ServiceRequest serviceRequest) {
         final int jobId = randomService.getRandomJobId();
         final int userId = Integer.parseInt(serviceRequest.getUserId());
+
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
+        if (userMoney == null) {
+            throw new IllegalStateException("UserMoney for userId " + userId + " do not exists.");
+        }
+
         final int amountToGamble = serviceRequest.getAmountToGamble();
         final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequest.getServiceRequestTypes(), serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
@@ -100,7 +90,7 @@ public class ServiceRequestStatusService {
 
             // Update total amount of money available for the user.
             userMoney.setMoney(totalAmountOfMoneyAvailable - amountOfMoneyToBlock);
-            userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
+            userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
 
             // Insert new line in 'serviceRequestStatus' table.
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
@@ -113,7 +103,7 @@ public class ServiceRequestStatusService {
                     0
             );
 
-            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> SAVED: " + updated));
+            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Saved : {}", updated));
 
             // Send 'ServiceRequest' to Game module.
             serviceRequest.setLinkedJobId(jobId);
@@ -128,7 +118,7 @@ public class ServiceRequestStatusService {
                     currentTimeInMilliseconds,
                     currentTimeInMilliseconds
             );
-            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> SAVED: " + updated));
+            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Saved : {}", updated));
         }
 
     }
@@ -153,6 +143,11 @@ public class ServiceRequestStatusService {
      */
     public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
         final ServiceRequestStatus serviceRequestStatus = serviceRequestStatusRepository.findById(jobId).block();
+
+        if (serviceRequestStatus == null) {
+            throw new IllegalStateException("ServiceRequestStatus for jobId " + jobId + " do not exists.");
+        }
+
         final int userId = serviceRequestStatus.getUserId();
 
         serviceRequestStatus.setAckTimeMilliSecond(randomService.getCurrentTimeInSeconds());
@@ -161,6 +156,11 @@ public class ServiceRequestStatusService {
         final int totalAmountWon = getAmountOfMoneyWon(listOfIsWinner, amountGambled);
 
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
+
+        if (userMoney == null) {
+            throw new IllegalStateException("UserMoney for userId " + userId + " do not exists.");
+        }
+
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
 
         if (totalAmountWon > amountBlocked) {
@@ -170,7 +170,7 @@ public class ServiceRequestStatusService {
         }
 
         userMoney.setMoney(totalAmountOfMoneyAvailable + totalAmountWon);
-        userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("==> " + userMoney + " UPDATED TO: " + updated));
-        serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("==> " + serviceRequestStatus + " UPDATED TO: " + updated));
+        userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
+        serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
     }
 }

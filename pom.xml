@@ -8,7 +8,13 @@
         <module>games</module>
         <module>analytics</module>
         <module>nerima</module>
+        <module>integration</module>
     </modules>
+
+    <properties>
+        <java.version>19</java.version>
+    </properties>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -20,9 +26,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>brocoeur</name>
     <description>Demo project for Spring Boot</description>
-    <properties>
-        <java.version>19</java.version>
-    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

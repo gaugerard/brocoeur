@@ -29,7 +29,7 @@ public class GamesController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(queues = "#{gamesConfigProperties.getRpcMessageQueue()}")
+    @RabbitListener(id = "game-controller-lister-id", queues = "#{gamesConfigProperties.getRpcMessageQueue()}", autoStartup = "#{gamesConfigProperties.getAutoStartup()}")
     public void getMsg(final ServiceRequest serviceRequest) {
         final ServiceRequestTypes serviceRequestType = serviceRequest.getServiceRequestTypes();
         switch (serviceRequestType) {
@@ -52,10 +52,12 @@ public class GamesController {
     }
 
     private void processDirectMsg(final ServiceRequest serviceRequest) {
+        LOGGER.info("[DIRECT] - request : {}", serviceRequest);
+
         final int userId = Integer.parseInt(serviceRequest.getUserId());
         final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
-
+        final GameTypes gameTypes = gameStrategyTypes.getGameTypes();
         GamePlay gamePlayFromUser = gameStrategy.getStrategy();
 
         final GamePlay gamePlayFromService = gameService.play(gameStrategyTypes.getGameTypes());
@@ -72,19 +74,16 @@ public class GamesController {
 
         }
 
-        LOGGER.info(String.format("[DIRECT] - USER's play: ' %s ' and SERVICE' play: ' %s '.", gamePlayFromUser.toString(),gamePlayFromService.toString()));
+        LOGGER.info("[DIRECT] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
 
-        if (gameService.didPlayerWin(gameStrategyTypes.getGameTypes(),gamePlayFromUser,gamePlayFromService)) {
-            LOGGER.info("User WON !");
-            sendAnalyticMessage(userId, gameStrategyTypes.getGameTypes(), true, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
-        } else {
-            LOGGER.info("User LOST !");
-            sendAnalyticMessage(userId, gameStrategyTypes.getGameTypes(), false, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
-        }
+        final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
+
+        sendAnalyticMessage(userId, gameTypes, isWinner, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
     }
 
     private void processOfflineMsg(final ServiceRequest offlineServiceRequest) {
-        LOGGER.info(String.format("[OFFLINE] %s", offlineServiceRequest.toString()));
+        LOGGER.info("[OFFLINE] - request : {}", offlineServiceRequest);
+
         final int userId = Integer.parseInt(offlineServiceRequest.getUserId());
         final OfflineGameStrategyTypes offlineGameStrategyTypes = offlineServiceRequest.getOfflineGameStrategyTypes();
         final OfflineGameStrategy offlineGameStrategy = offlineGameStrategyTypes.getOfflineGameStrategy();
@@ -93,22 +92,17 @@ public class GamesController {
         List<GamePlay> listOfPreviousGameResult = new ArrayList<>();
         List<Boolean> listOfIsWinner = new ArrayList<>();
 
+        final GameTypes gameTypes = offlineGameStrategyTypes.getGameTypes();
+
         for (var i = 0; i < repetition; i++) {
             final GamePlay gamePlayFromUser = offlineGameStrategy.getOfflineStrategyPlay(listOfPreviousGameResult);
-            final GamePlay gamePlayFromService = gameService.play(offlineGameStrategyTypes.getGameTypes());
-            LOGGER.info(String.format("[OFFLINE] - USER plays: ' %s ' and SERVICE plays: ' %s '.",gamePlayFromUser.toString(), gamePlayFromService.toString()));
+            final GamePlay gamePlayFromService = gameService.play(gameTypes);
+            LOGGER.info("[OFFLINE] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
 
             listOfPreviousGameResult.add(gamePlayFromService);
-
-            if (gamePlayFromUser.equals(gamePlayFromService)) {
-                LOGGER.info("User WON !");
-                listOfIsWinner.add(true);
-            } else {
-                LOGGER.info("User LOST !");
-                listOfIsWinner.add(false);
-            }
+            final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
+            listOfIsWinner.add(isWinner);
         }
-        sendAnalyticMessage(userId, offlineGameStrategyTypes.getGameTypes(), listOfIsWinner, offlineServiceRequest.getAmountToGamble(), offlineServiceRequest.getLinkedJobId());
+        sendAnalyticMessage(userId, gameTypes, listOfIsWinner, offlineServiceRequest.getAmountToGamble(), offlineServiceRequest.getLinkedJobId());
     }
-
 }

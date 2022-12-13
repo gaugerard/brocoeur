@@ -1,6 +1,5 @@
 package brocoeur.example.nerima.controller;
 
-import brocoeur.example.common.ServiceRequestTypes;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.slf4j.Logger;
@@ -23,12 +22,13 @@ public class NerimaController {
     private static final int MAXIMUM_ALLOWED_TTL = 5;
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
-    @Autowired
     private NerimaConfigProperties nerimaConfigProperties;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @PostMapping("/api/nerima/gamble")
-    public ResponseEntity<ServiceRequest> postDirectGamblePlay(@RequestBody final ServiceRequest directGambleServiceRequest) {
+    public ResponseEntity<ServiceRequest> postDirectGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
+        final ServiceRequest directGambleServiceRequest = new ServiceRequest(serviceRequest);
         // normalize
         directGambleServiceRequest.setServiceRequestTypes(DIRECT);
 
@@ -38,7 +38,8 @@ public class NerimaController {
     }
 
     @PostMapping("/api/nerima/offline/gamble")
-    public ResponseEntity<ServiceRequest> postOfflineGamblePlay(@RequestBody final ServiceRequest offlineGambleServiceRequest) {
+    public ResponseEntity<ServiceRequest> postOfflineGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
+        final ServiceRequest offlineGambleServiceRequest = new ServiceRequest(serviceRequest);
         // normalize
         offlineGambleServiceRequest.setServiceRequestTypes(OFFLINE);
         offlineGambleServiceRequest.setTimeToLive(Integer.min(offlineGambleServiceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
@@ -49,9 +50,7 @@ public class NerimaController {
     }
 
     private void post(final ServiceRequest serviceRequest) {
-        final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
-
-        LOGGER.info("==> " + serviceRequestTypes + " REQUEST: " + serviceRequest);
+        LOGGER.info("Received request : {}", serviceRequest);
         rabbitTemplate.convertAndSend(
                 nerimaConfigProperties.getRpcExchange(),
                 nerimaConfigProperties.getRpcMessageQueue(),

@@ -6,8 +6,8 @@ import brocoeur.example.common.request.AnalyticServiceRequest;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -36,18 +36,9 @@ public class UserWinLossByGameController {
         userWinLossByGameService.initializeUserWinLossByGame(userWinLossByGameServices);
     }
 
-    @GetMapping("/list")
-    public Flux<UserWinLossByGame> getAllUserWinLossByGame() {
-        return userWinLossByGameService.getAllUserWinLossByGame();
-    }
-
-    @GetMapping("/{gameid}")
-    public Flux<UserWinLossByGame> getUserById(@PathVariable final int gameid) {
-        return userWinLossByGameService.getUserWinLossByGameByGameIdAndUserId(gameid, 5);
-    }
-
     @RabbitListener(queues = "analyticInput")
     public void getMsg(final AnalyticServiceRequest analyticServiceRequest) {
-        userWinLossByGameService.updateAnalyticAccordingToWinOrLoss(analyticServiceRequest);
+        final AnalyticServiceRequest copyAnalyticServiceRequest = new AnalyticServiceRequest(analyticServiceRequest);
+        userWinLossByGameService.updateAnalyticAccordingToWinOrLoss(copyAnalyticServiceRequest);
     }
 }

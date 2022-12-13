@@ -10,6 +10,7 @@ public class GamesConfigProperties {
     private String rpcMessageQueue;
     private String rpcReplyMessageQueue;
     private String rpcExchange;
+    private String autoStartup;
 
     public String getRpcMessageQueue() {
         return rpcMessageQueue;
@@ -33,5 +34,13 @@ public class GamesConfigProperties {
 
     public void setRpcExchange(final String rpcExchange) {
         this.rpcExchange = rpcExchange;
+    }
+
+    public String getAutoStartup() {
+        return autoStartup;
+    }
+
+    public void setAutoStartup(String autoStartup) {
+        this.autoStartup = autoStartup;
     }
 }

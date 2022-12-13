@@ -2,6 +2,8 @@ package brocoeur.example.analytics.service.utils;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class RandomService {
     public int getCurrentTimeInSeconds() {
@@ -9,6 +11,7 @@ public class RandomService {
     }
 
     public int getRandomJobId() {
-        return (int) (Math.random() * 100000);
+        final Random random = new Random();
+        return random.nextInt(100000);  // returns pseudo-random value between 0 and 100000
     }
 }
