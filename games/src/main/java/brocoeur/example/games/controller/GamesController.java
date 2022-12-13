@@ -64,13 +64,15 @@ public class GamesController {
         switch (gameStrategyTypes.getGameTypes()){
             case BLACK_JACK :
                 gamePlayFromUser = gameService.play(gameStrategyTypes.getGameTypes(),gameStrategy);
+                break;
 
-
+            default:
+                break;
             //more cases to come in the future games
 
         }
 
-        LOGGER.info("[DIRECT] - USER's play: '" + gamePlayFromUser + "' and SERVICE' play: '" + gamePlayFromService + "'.");
+        LOGGER.info(String.format("[DIRECT] - USER's play: ' %s ' and SERVICE' play: ' %s '.", gamePlayFromUser.toString(),gamePlayFromService.toString()));
 
         if (gameService.didPlayerWin(gameStrategyTypes.getGameTypes(),gamePlayFromUser,gamePlayFromService)) {
             LOGGER.info("User WON !");
@@ -82,7 +84,7 @@ public class GamesController {
     }
 
     private void processOfflineMsg(final ServiceRequest offlineServiceRequest) {
-        LOGGER.info("[OFFLINE] " + offlineServiceRequest);
+        LOGGER.info(String.format("[OFFLINE] %s", offlineServiceRequest.toString()));
         final int userId = Integer.parseInt(offlineServiceRequest.getUserId());
         final OfflineGameStrategyTypes offlineGameStrategyTypes = offlineServiceRequest.getOfflineGameStrategyTypes();
         final OfflineGameStrategy offlineGameStrategy = offlineGameStrategyTypes.getOfflineGameStrategy();
@@ -94,7 +96,7 @@ public class GamesController {
         for (var i = 0; i < repetition; i++) {
             final GamePlay gamePlayFromUser = offlineGameStrategy.getOfflineStrategyPlay(listOfPreviousGameResult);
             final GamePlay gamePlayFromService = gameService.play(offlineGameStrategyTypes.getGameTypes());
-            LOGGER.info("[OFFLINE] - USER plays: '" + gamePlayFromUser + "' and SERVICE plays: '" + gamePlayFromService + "'.");
+            LOGGER.info(String.format("[OFFLINE] - USER plays: ' %s ' and SERVICE plays: ' %s '.",gamePlayFromUser.toString(), gamePlayFromService.toString()));
 
             listOfPreviousGameResult.add(gamePlayFromService);
 
