@@ -42,5 +42,4 @@ public class GameService {
             case BLACK_JACK -> blackJackService.didPlayerWin(userPlay,servicePlay);
         };
     }
-
 }

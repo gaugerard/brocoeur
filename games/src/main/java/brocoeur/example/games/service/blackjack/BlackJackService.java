@@ -10,7 +10,7 @@ public class BlackJackService implements GameRound {
 
     @Override
     public GamePlay play(){
-        //Romain code to do here for the dealer to play
+        // Romain code to do here for the dealer to play
         // will return a BlackJackResult => see enum class
 
         return BlackJackResults.SEVENTEEN;
@@ -19,7 +19,7 @@ public class BlackJackService implements GameRound {
 
     @Override
     public GamePlay play(GameStrategy gameStrategy){
-        //Romain code to do here for the player to play
+        // Romain code to do here for the player to play
         // will return a BlackJackResult => see enum class
 
 
@@ -27,7 +27,7 @@ public class BlackJackService implements GameRound {
     }
 
     public boolean didPlayerWin(final GamePlay userPlay, final GamePlay servicePlay){
-        //todo
+        // TODO
 
         return true;
     }

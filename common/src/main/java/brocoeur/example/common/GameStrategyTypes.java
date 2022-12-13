@@ -12,7 +12,7 @@ public enum GameStrategyTypes {
     ROULETTE_SAFE(new RouletteSafeStrategy(), GameTypes.ROULETTE),
     // Coin Toss
     COIN_TOSS_RANDOM(new RandomCoinToss(), GameTypes.COIN_TOSS),
-    //Black Jack
+    // Black Jack
     BLACK_JACK_SAFE(new BlackJackSafe(), GameTypes.BLACK_JACK),
     BLACK_JACK_RISKY(new BlackJackRisky(), GameTypes.BLACK_JACK);
 

@@ -58,20 +58,19 @@ public class GamesController {
         final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
         final GameTypes gameTypes = gameStrategyTypes.getGameTypes();
-        GamePlay gamePlayFromUser = gameStrategy.getStrategy();
+        GamePlay gamePlayFromUser = null;
 
-        final GamePlay gamePlayFromService = gameService.play(gameStrategyTypes.getGameTypes());
+        final GamePlay gamePlayFromService = gameService.play(gameTypes);
 
-        //all the cases which are about user giving strategies and not value to compare ↓
-        switch (gameStrategyTypes.getGameTypes()){
+        // all the cases which are about user giving strategies and not value to compare ↓
+        switch (gameTypes){
             case BLACK_JACK :
-                gamePlayFromUser = gameService.play(gameStrategyTypes.getGameTypes(),gameStrategy);
+                gamePlayFromUser = gameService.play(gameTypes,gameStrategy);
                 break;
 
             default:
+                gamePlayFromUser = gameStrategy.getStrategy();
                 break;
-            //more cases to come in the future games
-
         }
 
         LOGGER.info("[DIRECT] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
