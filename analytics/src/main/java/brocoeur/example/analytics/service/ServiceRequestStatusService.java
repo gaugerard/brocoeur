@@ -15,12 +15,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
+
 @Service
 public class ServiceRequestStatusService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRequestStatusService.class);
 
     private static final String IN_PROGRESS = "IN_PROGRESS";
+    private static final String TODO = "TODO";
     private static final String DONE_WIN = "DONE_WIN";
     private static final String DONE_LOSS = "DONE_LOSS";
     private static final String REJECTED = "REJECTED"; // When not enough money.
@@ -50,14 +53,14 @@ public class ServiceRequestStatusService {
      */
     private int getAmountOfMoneyToBlock(final ServiceRequestTypes serviceRequestType, final Integer timeToLive, final int amountToGamble) {
         return switch (serviceRequestType) {
-            case DIRECT -> amountToGamble;
+            case DIRECT, MULTIPLAYER -> amountToGamble;
             case OFFLINE -> amountToGamble * timeToLive;
         };
     }
 
     private String getGameStrategyTypes(final ServiceRequest serviceRequest) {
         return switch (serviceRequest.getServiceRequestTypes()) {
-            case DIRECT -> serviceRequest.getGameStrategyTypes().toString();
+            case DIRECT, MULTIPLAYER -> serviceRequest.getGameStrategyTypes().toString();
             case OFFLINE -> serviceRequest.getOfflineGameStrategyTypes().toString();
         };
     }
@@ -81,7 +84,8 @@ public class ServiceRequestStatusService {
         }
 
         final int amountToGamble = serviceRequest.getAmountToGamble();
-        final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequest.getServiceRequestTypes(), serviceRequest.getTimeToLive(), amountToGamble);
+        final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
+        final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequestTypes, serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
         final int currentTimeInMilliseconds = randomService.getCurrentTimeInSeconds();
         final String gameStrategyTypes = getGameStrategyTypes(serviceRequest);
@@ -92,10 +96,12 @@ public class ServiceRequestStatusService {
             userMoney.setMoney(totalAmountOfMoneyAvailable - amountOfMoneyToBlock);
             userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
 
+            final String status = (MULTIPLAYER.equals(serviceRequestTypes)) ? TODO : IN_PROGRESS;
+
             // Insert new line in 'serviceRequestStatus' table.
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
-                    IN_PROGRESS,
+                    status,
                     amountOfMoneyToBlock,
                     userId,
                     gameStrategyTypes,
@@ -105,9 +111,13 @@ public class ServiceRequestStatusService {
 
             serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Saved : {}", updated));
 
-            // Send 'ServiceRequest' to Game module.
-            serviceRequest.setLinkedJobId(jobId);
-            rabbitTemplate.convertAndSend("myexchange1", "MyQ1", serviceRequest);
+            if (MULTIPLAYER.equals(serviceRequestTypes)) {
+                LOGGER.info("Multiplayer request is saved and will be played later or cancelled after 5 minutes.");
+            } else {
+                // Send 'ServiceRequest' to Game module.
+                serviceRequest.setLinkedJobId(jobId);
+                rabbitTemplate.convertAndSend("myexchange1", "MyQ1", serviceRequest);
+            }
         } else {
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
@@ -138,7 +148,7 @@ public class ServiceRequestStatusService {
      * <p>For now, when a user wins a game round, the amount gambled is <b>DOUBLED</b> for the said round.</p>
      *
      * @param jobId
-     * @param isWinner
+     * @param listOfIsWinner
      * @param amountGambled
      */
     public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
