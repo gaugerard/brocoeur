@@ -3,9 +3,9 @@ package brocoeur.example.games.service.blackjack;
 import brocoeur.example.common.GamePlay;
 import brocoeur.example.common.GameStrategy;
 import brocoeur.example.games.service.GameRound;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class BlackJackService implements GameRound {
 
     @Override

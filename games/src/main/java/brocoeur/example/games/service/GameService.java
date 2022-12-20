@@ -15,7 +15,6 @@ public class GameService {
     private CoinTossService coinTossService;
     @Autowired
     private RouletteService rouletteService;
-
     @Autowired
     private BlackJackService blackJackService;
 
@@ -37,8 +36,7 @@ public class GameService {
 
     public boolean didPlayerWin(final GameTypes gameTypes, final GamePlay userPlay,final GamePlay servicePlay){
         return switch (gameTypes){
-            case ROULETTE -> userPlay.equals(servicePlay);
-            case COIN_TOSS -> userPlay.equals(servicePlay);
+            case COIN_TOSS, ROULETTE -> userPlay.equals(servicePlay);
             case BLACK_JACK -> blackJackService.didPlayerWin(userPlay,servicePlay);
         };
     }
