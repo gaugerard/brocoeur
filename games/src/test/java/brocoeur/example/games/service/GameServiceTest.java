@@ -64,21 +64,49 @@ class GameServiceTest {
     }
 
     @Test
-    void shouldTestGameServicePlayForBlackJack(){
+    void shouldTestGameServicePlayForPlayerBlackJack(){
         // Given
         var gameTypes = GameTypes.BLACK_JACK;
         var gameStrategy = new BlackJackRisky();
 
-        when(blackJackServiceMock.play()).thenReturn(BlackJackResults.SEVENTEEN);
         when(blackJackServiceMock.play(gameStrategy)).thenReturn(BlackJackResults.EIGHTEEN);
 
         // When
-        var actualBankGamePlay = gameService.play(gameTypes);
         var actualPlayerGamePlay = gameService.play(gameTypes,gameStrategy);
 
         // Then
-        Assertions.assertEquals(BlackJackResults.SEVENTEEN, actualBankGamePlay);
         Assertions.assertEquals(BlackJackResults.EIGHTEEN, actualPlayerGamePlay);
+    }
+
+    @Test
+    void shouldTestGameServicePlayForCasinoBlackJack(){
+        // Given
+        var gameTypes = GameTypes.BLACK_JACK;
+
+        when(blackJackServiceMock.play()).thenReturn(BlackJackResults.SEVENTEEN);
+
+        // When
+        var actualCasinoGamePlay = gameService.play(gameTypes);
+
+        // Then
+        Assertions.assertEquals(BlackJackResults.SEVENTEEN, actualCasinoGamePlay);
+    }
+
+    @Test
+    void shouldTestIfPlayerWonBlackJack(){
+        // Given
+        var gameTypes = GameTypes.BLACK_JACK;
+        var playerPlay = BlackJackResults.EIGHTEEN;
+        var casinoPlay = BlackJackResults.SEVENTEEN;
+
+        when(blackJackServiceMock.didPlayerWin(playerPlay,casinoPlay)).thenReturn(true);
+
+        // When
+        var result = gameService.didPlayerWin(gameTypes, playerPlay, casinoPlay);
+
+        // Then
+        Assertions.assertTrue(result);
+
     }
 
 }

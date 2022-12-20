@@ -1,7 +1,9 @@
 package brocoeur.example.games.service.blackjack;
 
 import brocoeur.example.common.GamePlay;
+import lombok.Getter;
 
+@Getter
 public enum BlackJackResults implements GamePlay {
 
     ONE(1),

@@ -59,7 +59,7 @@ public class GamesController {
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
         final GameTypes gameTypes = gameStrategyTypes.getGameTypes();
         final GamePlay gamePlayFromUser = switch (gameTypes){
-            case BLACK_JACK -> gameService.play(gameStrategyTypes.getGameTypes(),gameStrategy);
+            case BLACK_JACK -> gameService.play(gameTypes,gameStrategy);
             default -> gameStrategy.getStrategy();
         };
 
