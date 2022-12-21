@@ -26,6 +26,7 @@ public class GameController {
         List<Game> games = new ArrayList<>();
         games.add(new Game(123, "Roulette"));
         games.add(new Game(324, "Coin Toss"));
+        games.add(new Game(666, "Black Jack"));
         gameService.initializeGames(games);
     }
 }

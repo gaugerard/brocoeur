@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class RandomCoinToss implements GameStrategy {
     @Override
-    public CoinTossPlay getStrategyPlay() {
+    public CoinTossPlay getStrategy() {
         return Arrays.stream(CoinTossPlay.values()).toList().get(new Random().nextInt(CoinTossPlay.values().length));
     }
 

@@ -61,8 +61,10 @@ class GamesControllerTest {
             var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
             Mockito.when(gameServiceMock.play(GameTypes.ROULETTE)).thenReturn(GREEN);
+            Mockito.when(gameServiceMock.play(GameTypes.ROULETTE, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN, GREEN)).thenReturn(true);
 
             // When
             gamesController.getMsg(serviceRequest);
@@ -86,8 +88,10 @@ class GamesControllerTest {
             var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
             Mockito.when(gameServiceMock.play(GameTypes.ROULETTE)).thenReturn(RED);
+            Mockito.when(gameServiceMock.play(GameTypes.ROULETTE, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN, RED)).thenReturn(false);
 
             // When
             gamesController.getMsg(serviceRequest);
