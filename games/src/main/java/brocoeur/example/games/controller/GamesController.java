@@ -43,7 +43,12 @@ public class GamesController {
     }
 
     private void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final List<Boolean> listOfIsWinner, final int amountToGamble, final int linkedJobId) {
-        final int gameId = (gameTypes == GameTypes.ROULETTE) ? 123 : 324;
+        final int gameId = switch (gameTypes){
+            case ROULETTE -> 123;
+            case COIN_TOSS -> 324;
+            case BLACK_JACK -> 666;
+            case POKER -> 420;
+            };
         final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, gameId, userId, listOfIsWinner, amountToGamble, linkedJobId);
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
@@ -58,12 +63,12 @@ public class GamesController {
         final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
         final GameTypes gameTypes = gameStrategyTypes.getGameTypes();
-        final GamePlay gamePlayFromUser = gameStrategy.getStrategyPlay();
+        final GamePlay gamePlayFromUser = gameService.play(gameTypes,gameStrategy);
         final GamePlay gamePlayFromService = gameService.play(gameTypes);
 
         LOGGER.info("[DIRECT] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
 
-        final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
+        final boolean isWinner = gameService.didPlayerWin(gameTypes,gamePlayFromUser,gamePlayFromService);
 
         sendAnalyticMessage(userId, gameTypes, isWinner, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
     }

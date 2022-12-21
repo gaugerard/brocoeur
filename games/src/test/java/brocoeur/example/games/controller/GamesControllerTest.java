@@ -1,8 +1,10 @@
 package brocoeur.example.games.controller;
 
 import brocoeur.example.common.AnalyticServiceRequestTypes;
+import brocoeur.example.common.GameTypes;
 import brocoeur.example.common.request.AnalyticServiceRequest;
 import brocoeur.example.common.request.ServiceRequest;
+import brocoeur.example.common.roulette.RoulettePlay;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import org.hamcrest.MatcherAssert;
@@ -53,10 +55,13 @@ class GamesControllerTest {
             var amountToGamble = 5;
             var linkedJobId = 123456;
             var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, amountToGamble, linkedJobId);
+            var gameType = serviceRequest.getGameStrategyTypes().getGameTypes();
 
-            Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(GREEN);
+            Mockito.when(gameServiceMock.play(gameType)).thenReturn(GREEN);
+            Mockito.when(gameServiceMock.play(gameType, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN,GREEN)).thenReturn(true);
 
             // When
             gamesController.getMsg(serviceRequest);
@@ -76,10 +81,13 @@ class GamesControllerTest {
             var amountToGamble = 8;
             var linkedJobId = 123456;
             var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, amountToGamble, linkedJobId);
+            var gameType = serviceRequest.getGameStrategyTypes().getGameTypes();
 
-            Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(RED);
+            Mockito.when(gameServiceMock.play(gameType)).thenReturn(RED);
+            Mockito.when(gameServiceMock.play(gameType, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN,RED)).thenReturn(false);
 
             // When
             gamesController.getMsg(serviceRequest);
