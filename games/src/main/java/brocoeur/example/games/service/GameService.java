@@ -7,8 +7,9 @@ import brocoeur.example.games.service.blackjack.BlackJackService;
 import brocoeur.example.games.service.roulette.RouletteService;
 import brocoeur.example.games.service.cointoss.CoinTossService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import static brocoeur.example.common.poker.PokerPlay.STOP;
 
 @Service
 public class GameService {
@@ -24,6 +25,7 @@ public class GameService {
             case COIN_TOSS -> coinTossService.play();
             case ROULETTE -> rouletteService.play();
             case BLACK_JACK -> blackJackService.play();
+            case POKER -> STOP;
         };
     }
 
@@ -32,6 +34,7 @@ public class GameService {
             case COIN_TOSS -> coinTossService.play(gameStrategy);
             case ROULETTE -> rouletteService.play(gameStrategy);
             case BLACK_JACK -> blackJackService.play(gameStrategy);
+            case POKER -> STOP;
         };
     }
 
@@ -40,6 +43,7 @@ public class GameService {
             case COIN_TOSS -> coinTossService.didPlayerWin(userPlay,servicePlay);
             case ROULETTE -> rouletteService.didPlayerWin(userPlay,servicePlay);
             case BLACK_JACK -> blackJackService.didPlayerWin(userPlay,servicePlay);
+            case POKER -> false;
         };
     }
 }

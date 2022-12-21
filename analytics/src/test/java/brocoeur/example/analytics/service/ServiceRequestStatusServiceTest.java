@@ -5,6 +5,7 @@ import brocoeur.example.analytics.model.UserMoney;
 import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.repository.UserMoneyRepository;
 import brocoeur.example.analytics.service.utils.RandomService;
+import brocoeur.example.common.ServiceRequestTypes;
 import brocoeur.example.common.request.ServiceRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 import static brocoeur.example.common.GameStrategyTypes.COIN_TOSS_RANDOM;
+import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 import static org.mockito.Mockito.*;
 
@@ -305,6 +307,57 @@ class ServiceRequestStatusServiceTest {
             verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
             verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedOfflineServiceRequest);
             verifyNoMoreInteractions(rabbitTemplateMock);
+        }
+    }
+
+    @Nested
+    @DisplayName("Tests for MULTIPLAYER ServiceRequestStatusService")
+    class MultiplayerServiceRequestStatusService {
+
+        @Test
+        void shouldAddServiceRequestStatusWhenEnoughMoney() {
+            // Given
+            var jobId = 156478;
+            var currentTimeInSeconds = 1400000;
+            var directServiceRequest = new ServiceRequest(
+                    ServiceRequestTypes.MULTIPLAYER,
+                    "8",
+                    POKER_RANDOM,
+                    null,
+                    null,
+                    50,
+                    null
+            );
+            var userMoney = new UserMoney(8, 1000);
+            var userMoneyUpdated = new UserMoney(8, 950);
+            var serviceRequestStatus = new ServiceRequestStatus(
+                    jobId,
+                    "TODO",
+                    50,
+                    8,
+                    POKER_RANDOM.toString(),
+                    currentTimeInSeconds,
+                    0
+            );
+            var monoFindById = Mono.just(userMoney);
+            var monoSaveUserMoney = Mono.just(userMoneyUpdated);
+            var monoSaveServiceRequestStatus = Mono.just(serviceRequestStatus);
+
+            when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
+            when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
+            when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
+            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
+
+            // When
+            serviceRequestStatusService.addServiceRequestStatus(directServiceRequest);
+
+            // Then
+            verify(userMoneyRepositoryMock).save(userMoneyUpdated);
+            verifyNoMoreInteractions(userMoneyRepositoryMock);
+            verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
+            verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
+            verifyNoInteractions(rabbitTemplateMock);
         }
     }
 }

@@ -47,6 +47,7 @@ public class GamesController {
             case ROULETTE -> 123;
             case COIN_TOSS -> 324;
             case BLACK_JACK -> 666;
+            case POKER -> 420;
             };
         final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, gameId, userId, listOfIsWinner, amountToGamble, linkedJobId);
         rabbitTemplate.convertAndSend(
