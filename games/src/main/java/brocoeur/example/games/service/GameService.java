@@ -8,8 +8,9 @@ import brocoeur.example.games.service.roulette.RouletteService;
 import brocoeur.example.games.service.cointoss.CoinTossService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class GameService {
     @Autowired
     private CoinTossService coinTossService;
@@ -36,7 +37,8 @@ public class GameService {
 
     public boolean didPlayerWin(final GameTypes gameTypes, final GamePlay userPlay,final GamePlay servicePlay){
         return switch (gameTypes){
-            case COIN_TOSS, ROULETTE -> userPlay.equals(servicePlay);
+            case COIN_TOSS -> coinTossService.didPlayerWin(userPlay,servicePlay);
+            case ROULETTE -> rouletteService.didPlayerWin(userPlay,servicePlay);
             case BLACK_JACK -> blackJackService.didPlayerWin(userPlay,servicePlay);
         };
     }

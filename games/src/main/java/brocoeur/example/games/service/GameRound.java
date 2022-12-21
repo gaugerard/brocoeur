@@ -9,4 +9,6 @@ public interface GameRound {
 
     public GamePlay play(GameStrategy gameStrategy);
 
+    public boolean didPlayerWin(GamePlay userPlay, GamePlay servicePlay);
+
 }

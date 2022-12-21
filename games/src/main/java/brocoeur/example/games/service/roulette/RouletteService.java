@@ -19,4 +19,14 @@ public class RouletteService implements GameRound {
     public GamePlay play(GameStrategy gameStrategy){
         return gameStrategy.getStrategy();
     }
+
+    @Override
+    public boolean didPlayerWin(GamePlay userPlay, GamePlay servicePlay){
+        if(userPlay.equals(servicePlay)){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

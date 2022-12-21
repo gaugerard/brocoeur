@@ -1,8 +1,10 @@
 package brocoeur.example.games.controller;
 
 import brocoeur.example.common.AnalyticServiceRequestTypes;
+import brocoeur.example.common.GameTypes;
 import brocoeur.example.common.request.AnalyticServiceRequest;
 import brocoeur.example.common.request.ServiceRequest;
+import brocoeur.example.common.roulette.RoulettePlay;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import org.hamcrest.MatcherAssert;
@@ -57,6 +59,7 @@ class GamesControllerTest {
             Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN,GREEN)).thenReturn(true);
 
             // When
             gamesController.getMsg(serviceRequest);
@@ -80,6 +83,7 @@ class GamesControllerTest {
             Mockito.when(gameServiceMock.play(serviceRequest.getGameStrategyTypes().getGameTypes())).thenReturn(RED);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN,RED)).thenReturn(false);
 
             // When
             gamesController.getMsg(serviceRequest);
