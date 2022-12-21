@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static brocoeur.example.common.poker.PokerPlay.STOP;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +28,7 @@ class GameServiceTest {
     private GameService gameService;
 
     @Test
-    void shouldTestGameServicePlayForCoinToss(){
+    void shouldTestGameServicePlayForCoinToss() {
         // Given
         var gameTypes = GameTypes.COIN_TOSS;
 
@@ -42,7 +43,7 @@ class GameServiceTest {
     }
 
     @Test
-    void shouldTestGameServicePlayForRoulette(){
+    void shouldTestGameServicePlayForRoulette() {
         // Given
         var gameTypes = GameTypes.ROULETTE;
 
@@ -54,5 +55,19 @@ class GameServiceTest {
         // Then
         Assertions.assertEquals(RoulettePlay.GREEN, actualGamePlay);
         Mockito.verifyNoInteractions(coinTossServiceMock);
+    }
+
+    @Test
+    void shouldTestGameServicePlayForPoker() {
+        // Given
+        var gameTypes = GameTypes.POKER;
+
+        // When
+        var actualGamePlay = gameService.play(gameTypes);
+
+        // Then
+        Assertions.assertEquals(STOP, actualGamePlay);
+        Mockito.verifyNoInteractions(coinTossServiceMock);
+        Mockito.verifyNoInteractions(rouletteServiceMock);
     }
 }

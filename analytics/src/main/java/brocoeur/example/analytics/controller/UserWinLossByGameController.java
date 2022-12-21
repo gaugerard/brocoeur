@@ -3,6 +3,8 @@ package brocoeur.example.analytics.controller;
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.service.UserWinLossByGameService;
 import brocoeur.example.common.request.AnalyticServiceRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ import java.util.List;
 @RestController
 @RequestMapping("userwinlossbygame")
 public class UserWinLossByGameController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserWinLossByGameController.class);
+
 
     @Autowired
     private UserWinLossByGameService userWinLossByGameService;
@@ -38,7 +43,6 @@ public class UserWinLossByGameController {
 
     @RabbitListener(queues = "analyticInput")
     public void getMsg(final AnalyticServiceRequest analyticServiceRequest) {
-        final AnalyticServiceRequest copyAnalyticServiceRequest = new AnalyticServiceRequest(analyticServiceRequest);
-        userWinLossByGameService.updateAnalyticAccordingToWinOrLoss(copyAnalyticServiceRequest);
+        userWinLossByGameService.updateAnalyticAccordingToWinOrLoss(analyticServiceRequest);
     }
 }
