@@ -22,12 +22,7 @@ public class CoinTossService implements GameRound {
 
     @Override
     public boolean didPlayerWin(GamePlay userPlay, GamePlay servicePlay){
-        if(userPlay.equals(servicePlay)){
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (userPlay.equals(servicePlay)) ? true : false;
     }
 
 }

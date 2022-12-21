@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static brocoeur.example.common.blackjack.BlackJackPlay.STOP_LIMIT_20;
 
 @ExtendWith(MockitoExtension.class)
-public class BlackJackRiskyTest {
+class BlackJackRiskyTest {
 
     @InjectMocks
     private BlackJackRisky blackJackRisky;
