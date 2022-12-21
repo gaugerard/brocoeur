@@ -15,19 +15,34 @@ In order to test the application features using a real RabbitMq queueing system,
 #### DIRECT ServiceRequest
 ```json
 {
-   "userId": "8",
-   "gameStrategyTypes": "COIN_TOSS_RANDOM",
-   "amountToGamble": 100
+  "serviceRequestTypes": "DIRECT",
+  "playerRequestList": [
+    {
+      "userId": "8",
+      "gameStrategyTypes": "COIN_TOSS_RANDOM",
+      "offlineGameStrategyTypes": null,
+      "amountToGamble": "50",
+      "linkedJobId": null
+    }
+  ],
+  "timeToLive": null
 }
 ```
 
 #### OFFLINE ServiceRequest
 ```json
 {
-   "userId": "8",
-   "offlineGameStrategyTypes": "OFFLINE_COIN_TOSS_RANDOM",
-   "timeToLive": 50,
-   "amountToGamble": 100
+  "serviceRequestTypes": "OFFLINE",
+  "playerRequestList": [
+    {
+      "userId": "8",
+      "gameStrategyTypes": null,
+      "offlineGameStrategyTypes": "OFFLINE_COIN_TOSS_RANDOM",
+      "amountToGamble": "100",
+      "linkedJobId": null
+    }
+  ],
+  "timeToLive": 3
 }
 ```
 

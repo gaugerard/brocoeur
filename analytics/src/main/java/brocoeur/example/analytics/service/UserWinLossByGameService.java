@@ -3,6 +3,7 @@ package brocoeur.example.analytics.service;
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.repository.UserWinLossByGameRepository;
 import brocoeur.example.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.PlayerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,27 @@ public class UserWinLossByGameService {
         userWinLossByGameRepository.deleteAll().subscribe();
     }
 
-    public void updateAnalyticAccordingToWinOrLoss(final AnalyticServiceRequest analyticServiceRequest) {
-        final int gameId = analyticServiceRequest.getGameId();
-        final int userId = analyticServiceRequest.getUserId();
+    /**
+     * Updates Win or Loss for each player involved (may contain several players if MULTIPLAYER game)..
+     *
+     * @param analyticServiceRequest
+     */
+    public void manageAnalyticAccordingToWinOrLoss(final AnalyticServiceRequest analyticServiceRequest) {
+        for (PlayerResponse playerResponse : analyticServiceRequest.getPlayerResponseList()) {
+            updateAnalyticAccordingToWinOrLoss(playerResponse);
+        }
+    }
+
+    private void updateAnalyticAccordingToWinOrLoss(final PlayerResponse playerResponse) {
+        final int gameId = playerResponse.getGameId();
+        final int userId = playerResponse.getUserId();
         final UserWinLossByGame userWinLossByGame = userWinLossByGameRepository.findByGameIdAndUserId(gameId, userId).block();
 
         if (userWinLossByGame == null) {
             throw new IllegalStateException("UserWinLossByGame with gameId : " + gameId + " and userId : " + userId + " do not exists.");
         }
 
-        final List<Boolean> listOfIsWinner = analyticServiceRequest.getListOfIsWinner();
+        final List<Boolean> listOfIsWinner = playerResponse.getListOfIsWinner();
 
         int updatedNumberOfWin = userWinLossByGame.getNumberOfWin();
         int updatedNumberOfLoss = userWinLossByGame.getNumberOfLoss();
@@ -53,13 +65,13 @@ public class UserWinLossByGameService {
 
         final UserWinLossByGame newUserWinLossByGame = new UserWinLossByGame(
                 gameId,
-                analyticServiceRequest.getUserId(),
+                userId,
                 userWinLossByGame.getGameName(),
                 userWinLossByGame.getPseudo(),
                 updatedNumberOfWin,
                 updatedNumberOfLoss);
 
         userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("Updated : {}", updated));
-        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(analyticServiceRequest.getLinkedJobId(), listOfIsWinner, analyticServiceRequest.getAmount());
+        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), listOfIsWinner, playerResponse.getAmount());
     }
 }

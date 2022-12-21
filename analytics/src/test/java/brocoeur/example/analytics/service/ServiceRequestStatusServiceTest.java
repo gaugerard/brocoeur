@@ -5,7 +5,7 @@ import brocoeur.example.analytics.model.UserMoney;
 import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.repository.UserMoneyRepository;
 import brocoeur.example.analytics.service.utils.RandomService;
-import brocoeur.example.common.ServiceRequestTypes;
+import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +24,7 @@ import java.util.List;
 import static brocoeur.example.common.GameStrategyTypes.COIN_TOSS_RANDOM;
 import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.ServiceRequestTypes.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,12 +51,9 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000;
-            var directServiceRequest = new ServiceRequest(
-                    "8",
-                    COIN_TOSS_RANDOM,
-                    50,
-                    0
-            );
+            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 50, null);
+            var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+
             var userMoney = new UserMoney(8, 1000);
             var userMoneyUpdated = new UserMoney(8, 950);
             var serviceRequestStatus = new ServiceRequestStatus(
@@ -81,12 +79,9 @@ class ServiceRequestStatusServiceTest {
             serviceRequestStatusService.addServiceRequestStatus(directServiceRequest);
 
             // Then
-            var expectedDirectServiceRequest = new ServiceRequest(
-                    "8",
-                    COIN_TOSS_RANDOM,
-                    50,
-                    jobId
-            );
+            var expectedPlayerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 50, jobId);
+            var expectedDirectServiceRequest = new ServiceRequest(DIRECT, expectedPlayerRequest, null);
+
             verify(userMoneyRepositoryMock).save(userMoneyUpdated);
             verifyNoMoreInteractions(userMoneyRepositoryMock);
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
@@ -100,12 +95,9 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000;
-            var directServiceRequest = new ServiceRequest(
-                    "8",
-                    COIN_TOSS_RANDOM,
-                    800,
-                    0
-            );
+            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 800, null);
+            var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+
             var userMoney = new UserMoney(8, 150);
             var serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
@@ -138,12 +130,8 @@ class ServiceRequestStatusServiceTest {
         void shouldThrowIllegalStateExceptionWhenAddServiceRequestStatusUserIdDoesNotExists() {
             // Given
             var jobId = 156478;
-            var directServiceRequest = new ServiceRequest(
-                    "10",
-                    COIN_TOSS_RANDOM,
-                    800,
-                    0
-            );
+            var playerRequest = new PlayerRequest("10", COIN_TOSS_RANDOM, null, 800, null);
+            var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
             when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
             when(userMoneyRepositoryMock.findById(10)).thenReturn(Mono.empty());
@@ -261,13 +249,9 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000;
-            var offlineServiceRequest = new ServiceRequest(
-                    "8",
-                    OFFLINE_COIN_TOSS_RANDOM,
-                    3,
-                    50,
-                    156478
-            );
+            var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, null);
+            var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, 3);
+
             var userMoney = new UserMoney(8, 1000);
             var userMoneyUpdated = new UserMoney(8, 850);
             var serviceRequestStatus = new ServiceRequestStatus(
@@ -294,13 +278,9 @@ class ServiceRequestStatusServiceTest {
             serviceRequestStatusService.addServiceRequestStatus(offlineServiceRequest);
 
             // Then
-            var expectedOfflineServiceRequest = new ServiceRequest(
-                    "8",
-                    OFFLINE_COIN_TOSS_RANDOM,
-                    3,
-                    50,
-                    jobId
-            );
+            var expectedPlayerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, jobId);
+            var expectedOfflineServiceRequest = new ServiceRequest(OFFLINE, expectedPlayerRequest, 3);
+
             verify(userMoneyRepositoryMock).save(userMoneyUpdated);
             verifyNoMoreInteractions(userMoneyRepositoryMock);
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
@@ -319,15 +299,9 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000;
-            var directServiceRequest = new ServiceRequest(
-                    ServiceRequestTypes.MULTIPLAYER,
-                    "8",
-                    POKER_RANDOM,
-                    null,
-                    null,
-                    50,
-                    null
-            );
+            var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 50, null);
+            var directServiceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
+
             var userMoney = new UserMoney(8, 1000);
             var userMoneyUpdated = new UserMoney(8, 950);
             var serviceRequestStatus = new ServiceRequestStatus(

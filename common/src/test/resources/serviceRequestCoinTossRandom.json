@@ -1,5 +1,13 @@
 {
   "serviceRequestTypes": "DIRECT",
-  "userId": "67890",
-  "gameStrategyTypes": "COIN_TOSS_RANDOM"
+  "playerRequestList": [
+    {
+      "userId": "8",
+      "gameStrategyTypes": "COIN_TOSS_RANDOM",
+      "offlineGameStrategyTypes": null,
+      "amountToGamble": "50",
+      "linkedJobId": "345543"
+    }
+  ],
+  "timeToLive": null
 }

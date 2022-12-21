@@ -6,6 +6,7 @@ import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.repository.UserMoneyRepository;
 import brocoeur.example.analytics.service.utils.RandomService;
 import brocoeur.example.common.ServiceRequestTypes;
+import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +59,10 @@ public class ServiceRequestStatusService {
         };
     }
 
-    private String getGameStrategyTypes(final ServiceRequest serviceRequest) {
-        return switch (serviceRequest.getServiceRequestTypes()) {
-            case DIRECT, MULTIPLAYER -> serviceRequest.getGameStrategyTypes().toString();
-            case OFFLINE -> serviceRequest.getOfflineGameStrategyTypes().toString();
+    private String getGameStrategyTypes(final ServiceRequestTypes serviceRequestTypes, final PlayerRequest playerRequest) {
+        return switch (serviceRequestTypes) {
+            case DIRECT, MULTIPLAYER -> playerRequest.getGameStrategyTypes().toString();
+            case OFFLINE -> playerRequest.getOfflineGameStrategyTypes().toString();
         };
     }
 
@@ -76,19 +77,25 @@ public class ServiceRequestStatusService {
      */
     public void addServiceRequestStatus(final ServiceRequest serviceRequest) {
         final int jobId = randomService.getRandomJobId();
-        final int userId = Integer.parseInt(serviceRequest.getUserId());
+
+        if (serviceRequest.getPlayerRequestList().size() != 1) {
+            throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
+        }
+
+        final PlayerRequest playerRequest = serviceRequest.getPlayerRequestList().get(0);
+        final int userId = Integer.parseInt(playerRequest.getUserId());
 
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
         if (userMoney == null) {
             throw new IllegalStateException("UserMoney for userId " + userId + " do not exists.");
         }
 
-        final int amountToGamble = serviceRequest.getAmountToGamble();
+        final int amountToGamble = playerRequest.getAmountToGamble();
         final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
         final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequestTypes, serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
         final int currentTimeInMilliseconds = randomService.getCurrentTimeInSeconds();
-        final String gameStrategyTypes = getGameStrategyTypes(serviceRequest);
+        final String gameStrategyTypes = getGameStrategyTypes(serviceRequestTypes, playerRequest);
 
         if (amountOfMoneyToBlock <= totalAmountOfMoneyAvailable) {
 
@@ -115,7 +122,7 @@ public class ServiceRequestStatusService {
                 LOGGER.info("Multiplayer request is saved and will be played later or cancelled after 5 minutes.");
             } else {
                 // Send 'ServiceRequest' to Game module.
-                serviceRequest.setLinkedJobId(jobId);
+                playerRequest.setLinkedJobId(jobId);
                 rabbitTemplate.convertAndSend("myexchange1", "MyQ1", serviceRequest);
             }
         } else {

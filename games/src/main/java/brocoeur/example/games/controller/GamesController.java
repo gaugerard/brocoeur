@@ -2,6 +2,8 @@ package brocoeur.example.games.controller;
 
 import brocoeur.example.common.*;
 import brocoeur.example.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.PlayerRequest;
+import brocoeur.example.common.request.PlayerResponse;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
@@ -35,6 +37,7 @@ public class GamesController {
         switch (serviceRequestType) {
             case DIRECT -> processDirectMsg(serviceRequest);
             case OFFLINE -> processOfflineMsg(serviceRequest);
+            case MULTIPLAYER -> throw new IllegalStateException("MULTIPLAYER is not yet managed");
         }
     }
 
@@ -44,7 +47,8 @@ public class GamesController {
 
     private void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final List<Boolean> listOfIsWinner, final int amountToGamble, final int linkedJobId) {
         final int gameId = (gameTypes == GameTypes.ROULETTE) ? 123 : 324;
-        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, gameId, userId, listOfIsWinner, amountToGamble, linkedJobId);
+        final PlayerResponse playerResponse = new PlayerResponse(gameId, userId, listOfIsWinner, amountToGamble, linkedJobId);
+        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
                 gamesConfigProperties.getRpcReplyMessageQueue(),
@@ -54,8 +58,14 @@ public class GamesController {
     private void processDirectMsg(final ServiceRequest serviceRequest) {
         LOGGER.info("[DIRECT] - request : {}", serviceRequest);
 
-        final int userId = Integer.parseInt(serviceRequest.getUserId());
-        final GameStrategyTypes gameStrategyTypes = serviceRequest.getGameStrategyTypes();
+        if (serviceRequest.getPlayerRequestList().size() != 1) {
+            throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
+        }
+
+        final PlayerRequest playerRequest = serviceRequest.getPlayerRequestList().get(0);
+
+        final int userId = Integer.parseInt(playerRequest.getUserId());
+        final GameStrategyTypes gameStrategyTypes = playerRequest.getGameStrategyTypes();
         final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
         final GameTypes gameTypes = gameStrategyTypes.getGameTypes();
         final GamePlay gamePlayFromUser = gameStrategy.getStrategyPlay();
@@ -65,14 +75,20 @@ public class GamesController {
 
         final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
 
-        sendAnalyticMessage(userId, gameTypes, isWinner, serviceRequest.getAmountToGamble(), serviceRequest.getLinkedJobId());
+        sendAnalyticMessage(userId, gameTypes, isWinner, playerRequest.getAmountToGamble(), playerRequest.getLinkedJobId());
     }
 
     private void processOfflineMsg(final ServiceRequest offlineServiceRequest) {
         LOGGER.info("[OFFLINE] - request : {}", offlineServiceRequest);
 
-        final int userId = Integer.parseInt(offlineServiceRequest.getUserId());
-        final OfflineGameStrategyTypes offlineGameStrategyTypes = offlineServiceRequest.getOfflineGameStrategyTypes();
+        if (offlineServiceRequest.getPlayerRequestList().size() != 1) {
+            throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
+        }
+
+        final PlayerRequest playerRequest = offlineServiceRequest.getPlayerRequestList().get(0);
+
+        final int userId = Integer.parseInt(playerRequest.getUserId());
+        final OfflineGameStrategyTypes offlineGameStrategyTypes = playerRequest.getOfflineGameStrategyTypes();
         final OfflineGameStrategy offlineGameStrategy = offlineGameStrategyTypes.getOfflineGameStrategy();
         final int repetition = offlineServiceRequest.getTimeToLive();
 
@@ -90,6 +106,6 @@ public class GamesController {
             final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
             listOfIsWinner.add(isWinner);
         }
-        sendAnalyticMessage(userId, gameTypes, listOfIsWinner, offlineServiceRequest.getAmountToGamble(), offlineServiceRequest.getLinkedJobId());
+        sendAnalyticMessage(userId, gameTypes, listOfIsWinner, playerRequest.getAmountToGamble(), playerRequest.getLinkedJobId());
     }
 }

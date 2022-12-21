@@ -1,6 +1,7 @@
 package game;
 
 import brocoeur.example.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.games.Main;
 import brocoeur.example.games.controller.GamesController;
@@ -22,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
+import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
 import static org.awaitility.Awaitility.await;
 
 @EnableRabbit
@@ -78,44 +81,43 @@ class GameIT {
         startRabbitListener();
 
         var userId = "8";
-        var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, 354561);
+        var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, 354561);
+        var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", serviceRequest);
 
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
         var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("analyticInput");
+        var playerResponse = analyticServiceRequestPresentInQueue.getPlayerResponseList().get(0);
 
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
-        Assertions.assertEquals(123, analyticServiceRequestPresentInQueue.getGameId());
-        Assertions.assertEquals(8, analyticServiceRequestPresentInQueue.getUserId());
-        Assertions.assertEquals(1, analyticServiceRequestPresentInQueue.getListOfIsWinner().size());
-        Assertions.assertEquals(5, analyticServiceRequestPresentInQueue.getAmount());
-        Assertions.assertEquals(354561, analyticServiceRequestPresentInQueue.getLinkedJobId());
+        Assertions.assertEquals(123, playerResponse.getGameId());
+        Assertions.assertEquals(8, playerResponse.getUserId());
+        Assertions.assertEquals(1, playerResponse.getListOfIsWinner().size());
+        Assertions.assertEquals(5, playerResponse.getAmount());
+        Assertions.assertEquals(354561, playerResponse.getLinkedJobId());
     }
 
     @Test
     void shouldFetchOfflineServiceRequestFromMyQ1AndSendToMyAnalyticInputQueue() throws InterruptedException {
         startRabbitListener();
 
-        var offlineServiceRequest = new ServiceRequest(
-                "8",
-                OFFLINE_COIN_TOSS_RANDOM,
-                3,
-                50,
-                156478
-        );
+        var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, 156478);
+        var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, 3);
+
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", offlineServiceRequest);
 
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
         var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("analyticInput");
+        var playerResponse = analyticServiceRequestPresentInQueue.getPlayerResponseList().get(0);
 
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
-        Assertions.assertEquals(324, analyticServiceRequestPresentInQueue.getGameId());
-        Assertions.assertEquals(8, analyticServiceRequestPresentInQueue.getUserId());
-        Assertions.assertEquals(3, analyticServiceRequestPresentInQueue.getListOfIsWinner().size());
-        Assertions.assertEquals(50, analyticServiceRequestPresentInQueue.getAmount());
-        Assertions.assertEquals(156478, analyticServiceRequestPresentInQueue.getLinkedJobId());
+        Assertions.assertEquals(324, playerResponse.getGameId());
+        Assertions.assertEquals(8, playerResponse.getUserId());
+        Assertions.assertEquals(3, playerResponse.getListOfIsWinner().size());
+        Assertions.assertEquals(50, playerResponse.getAmount());
+        Assertions.assertEquals(156478, playerResponse.getLinkedJobId());
     }
 
     private void startRabbitListener() {
