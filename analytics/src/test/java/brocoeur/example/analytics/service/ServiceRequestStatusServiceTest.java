@@ -355,6 +355,7 @@ class ServiceRequestStatusServiceTest {
             // Then
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatusUpdated);
             verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", serviceRequest);
+
         }
     }
 }
