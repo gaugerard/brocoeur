@@ -1,6 +1,8 @@
 package brocoeur.example.nerima.controller;
 
 import brocoeur.example.common.GameStrategyTypes;
+import brocoeur.example.common.ServiceRequestTypes;
+import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.NerimaConfigProperties;
 import org.junit.jupiter.api.Assertions;
@@ -43,10 +45,10 @@ class NerimaControllerTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getInputForRoulette")
-    void shouldPostDirectPlayAndGetHttpStatusOK(final String testName, final GameStrategyTypes rouletteStrategyType) {
+    void shouldPostDirectPlayAndGetHttpStatusOK(final String testName, final GameStrategyTypes gameStrategyTypes) {
         // Given
-        var userId = "12345";
-        var serviceRequest = new ServiceRequest(userId, rouletteStrategyType, 5, 123456);
+        var playerRequest = new PlayerRequest("8", gameStrategyTypes, null, 5, null);
+        var serviceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, playerRequest, 1);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
         Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
@@ -62,9 +64,8 @@ class NerimaControllerTest {
     @Test
     void shouldPostOfflinePlayAndGetHttpStatusOK() {
         // Given
-        var userId = "12345";
-        var timeToLive = 3;
-        var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, timeToLive);
+        var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 5, null);
+        var serviceRequest = new ServiceRequest(ServiceRequestTypes.OFFLINE, playerRequest, 3);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
         Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");

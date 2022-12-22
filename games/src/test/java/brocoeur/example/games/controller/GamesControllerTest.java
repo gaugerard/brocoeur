@@ -3,8 +3,9 @@ package brocoeur.example.games.controller;
 import brocoeur.example.common.AnalyticServiceRequestTypes;
 import brocoeur.example.common.GameTypes;
 import brocoeur.example.common.request.AnalyticServiceRequest;
+import brocoeur.example.common.request.PlayerRequest;
+import brocoeur.example.common.request.PlayerResponse;
 import brocoeur.example.common.request.ServiceRequest;
-import brocoeur.example.common.roulette.RoulettePlay;
 import brocoeur.example.games.GamesConfigProperties;
 import brocoeur.example.games.service.GameService;
 import org.hamcrest.MatcherAssert;
@@ -21,6 +22,8 @@ import java.util.List;
 
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
+import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
 import static brocoeur.example.common.cointoss.CoinTossPlay.HEAD;
 import static brocoeur.example.common.roulette.RoulettePlay.GREEN;
 import static brocoeur.example.common.roulette.RoulettePlay.RED;
@@ -54,14 +57,14 @@ class GamesControllerTest {
             var userId = "12345";
             var amountToGamble = 5;
             var linkedJobId = 123456;
-            var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, amountToGamble, linkedJobId);
-            var gameType = serviceRequest.getGameStrategyTypes().getGameTypes();
+            var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, amountToGamble, linkedJobId);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
-            Mockito.when(gameServiceMock.play(gameType)).thenReturn(GREEN);
-            Mockito.when(gameServiceMock.play(gameType, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
+            Mockito.when(gameServiceMock.play(GameTypes.ROULETTE)).thenReturn(GREEN);
+            Mockito.when(gameServiceMock.play(GameTypes.ROULETTE, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
-            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN,GREEN)).thenReturn(true);
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN, GREEN)).thenReturn(true);
 
             // When
             gamesController.getMsg(serviceRequest);
@@ -70,7 +73,8 @@ class GamesControllerTest {
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, 123, 12345, true, amountToGamble, linkedJobId);
+            var playerResponse = new PlayerResponse(123, 12345, true, amountToGamble, linkedJobId);
+            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, playerResponse);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
         }
 
@@ -80,14 +84,14 @@ class GamesControllerTest {
             var userId = "12345";
             var amountToGamble = 8;
             var linkedJobId = 123456;
-            var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, amountToGamble, linkedJobId);
-            var gameType = serviceRequest.getGameStrategyTypes().getGameTypes();
+            var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, amountToGamble, linkedJobId);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
-            Mockito.when(gameServiceMock.play(gameType)).thenReturn(RED);
-            Mockito.when(gameServiceMock.play(gameType, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
+            Mockito.when(gameServiceMock.play(GameTypes.ROULETTE)).thenReturn(RED);
+            Mockito.when(gameServiceMock.play(GameTypes.ROULETTE, ROULETTE_RISKY.getGameStrategy())).thenReturn(GREEN);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
-            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN,RED)).thenReturn(false);
+            Mockito.when(gameServiceMock.didPlayerWin(GameTypes.ROULETTE, GREEN, RED)).thenReturn(false);
 
             // When
             gamesController.getMsg(serviceRequest);
@@ -96,7 +100,8 @@ class GamesControllerTest {
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, 123, 12345, false, amountToGamble, linkedJobId);
+            var playerResponse = new PlayerResponse(123, 12345, false, amountToGamble, linkedJobId);
+            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, playerResponse);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
         }
     }
@@ -111,9 +116,10 @@ class GamesControllerTest {
             var timeToLive = 3;
             var amountToGamble = 8;
             var linkedJobId = 123456;
-            var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, timeToLive, amountToGamble, linkedJobId);
+            var playerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, amountToGamble, linkedJobId);
+            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, timeToLive);
 
-            Mockito.when(gameServiceMock.play(serviceRequest.getOfflineGameStrategyTypes().getGameTypes()))
+            Mockito.when(gameServiceMock.play(GameTypes.COIN_TOSS))
                     .thenReturn(HEAD)
                     .thenReturn(HEAD)
                     .thenReturn(HEAD);
@@ -127,7 +133,8 @@ class GamesControllerTest {
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, 324, 12345, List.of(true, false, true), amountToGamble, linkedJobId);
+            var playerResponse = new PlayerResponse(324, 12345, List.of(true, false, true), amountToGamble, linkedJobId);
+            var analyticServiceRequest = new AnalyticServiceRequest(AnalyticServiceRequestTypes.MONEY_MANAGEMENT, playerResponse);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
         }
     }

@@ -1,5 +1,6 @@
 package nerima;
 
+import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.nerima.Main;
 import brocoeur.example.nerima.controller.NerimaController;
@@ -18,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
+import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
+import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
 import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(classes = Main.class)
@@ -54,7 +57,8 @@ class NerimaIT {
     @Test
     void shouldSendDirectRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
-        var serviceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, null);
+        var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, null);
+        var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
         nerimaController.postDirectGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
@@ -62,22 +66,24 @@ class NerimaIT {
 
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
-
-        var expectedServiceRequest = new ServiceRequest(userId, ROULETTE_RISKY, 5, null);
+        var expectedPlayerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, null);
+        var expectedServiceRequest = new ServiceRequest(DIRECT, expectedPlayerRequest, null);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
 
     @Test
     void shouldSendOfflineRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
-        var serviceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 50, 100, null);
+        var playerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, 100, null);
+        var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, 15);
 
         nerimaController.postOfflineGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
-        var expectedServiceRequest = new ServiceRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 5, 100, null);
+        var expectedPlayerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, 100, null);
+        var expectedServiceRequest = new ServiceRequest(OFFLINE, expectedPlayerRequest, 5);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
 

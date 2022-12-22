@@ -1,6 +1,7 @@
 package brocoeur.example.common.request;
 
 import brocoeur.example.common.GameStrategyTypes;
+import brocoeur.example.common.ServiceRequestTypes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,8 @@ class ServiceRequestTest {
     void shouldCreateJsonFromServiceRequest() throws IOException {
         // Given
         var objectMapper = new ObjectMapper();
-        var serviceRequest = new ServiceRequest("12345", GameStrategyTypes.ROULETTE_RISKY, 5, 123456);
+        var playerRequest = new PlayerRequest("12345", GameStrategyTypes.ROULETTE_RISKY, null, 5, null);
+        var serviceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, playerRequest, null);
         var serviceRequestFile = new File(tempDir, "serviceRequest.json");
 
         // When
@@ -40,7 +42,8 @@ class ServiceRequestTest {
         var actual = objectMapper.readValue(new File("src/test/resources/serviceRequestCoinTossRandom.json"), ServiceRequest.class);
 
         // Then
-        var expected = new ServiceRequest("67890", GameStrategyTypes.COIN_TOSS_RANDOM, 0, null);
-        Assertions.assertEquals(actual, expected);
+        var expectedPlayerRequest = new PlayerRequest("8", GameStrategyTypes.COIN_TOSS_RANDOM, null, 50, 345543);
+        var expectedServiceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, expectedPlayerRequest, null);
+        Assertions.assertEquals(actual, expectedServiceRequest);
     }
 }
