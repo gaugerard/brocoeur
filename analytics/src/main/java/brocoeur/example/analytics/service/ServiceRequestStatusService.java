@@ -13,9 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.*;
 import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
 
 @Service
@@ -23,11 +25,6 @@ public class ServiceRequestStatusService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRequestStatusService.class);
 
-    private static final String IN_PROGRESS = "IN_PROGRESS";
-    private static final String TODO = "TODO";
-    private static final String DONE_WIN = "DONE_WIN";
-    private static final String DONE_LOSS = "DONE_LOSS";
-    private static final String REJECTED = "REJECTED"; // When not enough money.
     private static final int WIN_MULTIPLIER = 2;
 
     @Autowired
@@ -103,7 +100,7 @@ public class ServiceRequestStatusService {
             userMoney.setMoney(totalAmountOfMoneyAvailable - amountOfMoneyToBlock);
             userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
 
-            final String status = (MULTIPLAYER.equals(serviceRequestTypes)) ? TODO : IN_PROGRESS;
+            final String status = (MULTIPLAYER.equals(serviceRequestTypes)) ? TODO.label : IN_PROGRESS.label;
 
             // Insert new line in 'serviceRequestStatus' table.
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
@@ -128,7 +125,7 @@ public class ServiceRequestStatusService {
         } else {
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
-                    REJECTED,
+                    REJECTED.label,
                     amountOfMoneyToBlock,
                     userId,
                     gameStrategyTypes,
@@ -181,13 +178,26 @@ public class ServiceRequestStatusService {
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
 
         if (totalAmountWon > amountBlocked) {
-            serviceRequestStatus.setStatus(DONE_WIN);
+            serviceRequestStatus.setStatus(DONE_WIN.label);
         } else {
-            serviceRequestStatus.setStatus(DONE_LOSS);
+            serviceRequestStatus.setStatus(DONE_LOSS.label);
         }
 
         userMoney.setMoney(totalAmountOfMoneyAvailable + totalAmountWon);
         userMoneyRepository.save(userMoney).subscribe(updated -> LOGGER.info("Updated : {}", updated));
         serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
+    }
+
+    public void rejectServiceRequestStatus(ServiceRequestStatus serviceRequestStatus){
+        serviceRequestStatus.setStatus(REJECTED.label);
+        serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
+    }
+
+    public List<ServiceRequestStatus> findAllServiceRequestStatusByStatus(ServiceRequestStatusStatus serviceRequestStatusStatus){
+        return serviceRequestStatusRepository.findAllByStatus(IN_PROGRESS.label).collectList().block();
+    }
+
+    public List<ServiceRequestStatus> findAllServiceRequestStatusByStrategyAndStatus(String strategy, ServiceRequestStatusStatus serviceRequestStatusStatus){
+        return serviceRequestStatusRepository.findAllByStrategyAndStatus(strategy, serviceRequestStatusStatus.label).collectList().block();
     }
 }
