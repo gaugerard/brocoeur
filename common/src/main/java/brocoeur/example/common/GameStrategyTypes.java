@@ -34,4 +34,13 @@ public enum GameStrategyTypes {
     public GameTypes getGameTypes() {
         return gameTypes;
     }
+
+    public static GameStrategyTypes getGameStrategyTypesFromName(final String name) {
+        for (GameStrategyTypes gameStrategyTypes : GameStrategyTypes.values()) {
+            if (gameStrategyTypes.toString().equals(name)) {
+                return gameStrategyTypes;
+            }
+        }
+        return null;
+    }
 }

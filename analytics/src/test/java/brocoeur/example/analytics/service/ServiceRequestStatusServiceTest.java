@@ -26,6 +26,7 @@ import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 import static brocoeur.example.common.ServiceRequestTypes.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceRequestStatusServiceTest {
@@ -332,6 +333,28 @@ class ServiceRequestStatusServiceTest {
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
             verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
             verifyNoInteractions(rabbitTemplateMock);
+        }
+
+        @Test
+        void shouldSendMultiplayerServiceRequest() {
+            // Given
+            var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 30, 1);
+            var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
+            var serviceRequestStatus = new ServiceRequestStatus(1, "TODO", 30, 8, "POKER_RANDOM", 1234567, 0);
+            var monoFindById = Mono.just(serviceRequestStatus);
+            var serviceRequestStatusUpdated = new ServiceRequestStatus(1, "IN_PROGRESS", 30, 8, "POKER_RANDOM", 1234567, 0);
+            var monoSave = Mono.just(serviceRequestStatusUpdated);
+
+
+            when(serviceRequestStatusRepositoryMock.findById(1)).thenReturn(monoFindById);
+            when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSave);
+
+            // When
+            serviceRequestStatusService.sendMultiplayerServiceRequest(serviceRequest);
+
+            // Then
+            verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatusUpdated);
+            verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", serviceRequest);
         }
     }
 }
