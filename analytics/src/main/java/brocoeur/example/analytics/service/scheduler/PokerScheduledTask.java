@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.IN_PROGRESS;
 import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.TODO;
@@ -101,17 +102,23 @@ public class PokerScheduledTask {
     }
 
     /**
-     * Recurrent task to look for blocked jobs/request for more than 5 seconds
+     * <p>Every 30 seconds, this task will be triggered to <b>cancel</b> pending/blocked. </p>
+     * <p>A job is considered pending/blocked when its has not been completed after 5 minutes.</p>
      */
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 30000)
     public void rejectBlockedRequests() {
-        LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(new Date()));
-        final List<ServiceRequestStatus> pendingRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(IN_PROGRESS);
-        for(ServiceRequestStatus request : pendingRequests){
-            LOGGER.info("request time = "+ request.getInsertionTimeMilliSecond() + " current time = " + (int)new Date().getTime());
-            if(request.getInsertionTimeMilliSecond() < (int)new Date().getTime() - 5000){
-                LOGGER.info("Cancelling request : {}", request);
-                serviceRequestStatusService.rejectServiceRequestStatus(request);
+        final Date currentDate = new Date();
+        final long currentTime = currentDate.getTime();
+        LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(currentDate));
+
+        final List<ServiceRequestStatus> pendingTodoRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(TODO);
+        final List<ServiceRequestStatus> pendingInProgressRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(IN_PROGRESS);
+        final List<ServiceRequestStatus> allPendingRequest = Stream.concat(pendingTodoRequests.stream(), pendingInProgressRequests.stream()).toList();
+
+        for (ServiceRequestStatus pendingRequest : allPendingRequest) {
+            if (pendingRequest.getInsertionTimeMilliSecond() < currentTime - 300_000) {
+                LOGGER.info("Cancelling request : {}", pendingRequest);
+                serviceRequestStatusService.cancelServiceRequestStatus(pendingRequest);
             }
         }
 

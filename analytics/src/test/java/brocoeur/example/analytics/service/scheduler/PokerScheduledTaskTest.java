@@ -95,7 +95,7 @@ class PokerScheduledTaskTest {
         pokerScheduledTask.rejectBlockedRequests();
 
         // Then
-        Mockito.verify(serviceRequestStatusServiceMock).rejectServiceRequestStatus(blockedRequest);
+        Mockito.verify(serviceRequestStatusServiceMock).cancelServiceRequestStatus(blockedRequest);
     }
 
 

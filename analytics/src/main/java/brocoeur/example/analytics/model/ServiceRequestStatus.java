@@ -17,6 +17,6 @@ public class ServiceRequestStatus {
     private int amountBlocked;
     private int userId;
     private String strategy;
-    private int insertionTimeMilliSecond;
-    private int ackTimeMilliSecond;
+    private long insertionTimeMilliSecond;
+    private long ackTimeMilliSecond;
 }
