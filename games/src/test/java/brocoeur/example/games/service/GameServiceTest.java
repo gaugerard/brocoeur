@@ -1,14 +1,13 @@
 package brocoeur.example.games.service;
 
-import brocoeur.example.common.GameStrategy;
 import brocoeur.example.common.GameTypes;
-import brocoeur.example.common.blackjack.BlackJackPlay;
 import brocoeur.example.common.blackjack.strategy.BlackJackRisky;
 import brocoeur.example.common.cointoss.CoinTossPlay;
 import brocoeur.example.common.roulette.RoulettePlay;
 import brocoeur.example.games.service.blackjack.BlackJackResults;
 import brocoeur.example.games.service.blackjack.BlackJackService;
 import brocoeur.example.games.service.cointoss.CoinTossService;
+import brocoeur.example.games.service.poker.PokerService;
 import brocoeur.example.games.service.roulette.RouletteService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static brocoeur.example.common.poker.PokerPlay.STOP;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +28,8 @@ class GameServiceTest {
     private RouletteService rouletteServiceMock;
     @Mock
     private BlackJackService blackJackServiceMock;
+    @Mock
+    private PokerService pokerServiceMock;
 
     @InjectMocks
     private GameService gameService;
@@ -65,7 +65,7 @@ class GameServiceTest {
     }
 
     @Test
-    void shouldTestGameServicePlayForPlayerBlackJack(){
+    void shouldTestGameServicePlayForPlayerBlackJack() {
         // Given
         var gameTypes = GameTypes.BLACK_JACK;
         var gameStrategy = new BlackJackRisky();
@@ -73,14 +73,14 @@ class GameServiceTest {
         when(blackJackServiceMock.play(gameStrategy)).thenReturn(BlackJackResults.EIGHTEEN);
 
         // When
-        var actualPlayerGamePlay = gameService.play(gameTypes,gameStrategy);
+        var actualPlayerGamePlay = gameService.play(gameTypes, gameStrategy);
 
         // Then
         Assertions.assertEquals(BlackJackResults.EIGHTEEN, actualPlayerGamePlay);
     }
 
     @Test
-    void shouldTestGameServicePlayForCasinoBlackJack(){
+    void shouldTestGameServicePlayForCasinoBlackJack() {
         // Given
         var gameTypes = GameTypes.BLACK_JACK;
 
@@ -94,13 +94,13 @@ class GameServiceTest {
     }
 
     @Test
-    void shouldTestIfPlayerWonBlackJack(){
+    void shouldTestIfPlayerWonBlackJack() {
         // Given
         var gameTypes = GameTypes.BLACK_JACK;
         var playerPlay = BlackJackResults.EIGHTEEN;
         var casinoPlay = BlackJackResults.SEVENTEEN;
 
-        when(blackJackServiceMock.didPlayerWin(playerPlay,casinoPlay)).thenReturn(true);
+        when(blackJackServiceMock.didPlayerWin(playerPlay, casinoPlay)).thenReturn(true);
 
         // When
         var result = gameService.didPlayerWin(gameTypes, playerPlay, casinoPlay);
@@ -117,11 +117,14 @@ class GameServiceTest {
         var gameTypes = GameTypes.POKER;
 
         // When
-        var actualGamePlay = gameService.play(gameTypes);
+        var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.play(gameTypes));
+
+        Assertions.assertEquals("Poker should not be managed here.", exception.getMessage());
 
         // Then
-        Assertions.assertEquals(STOP, actualGamePlay);
         Mockito.verifyNoInteractions(coinTossServiceMock);
         Mockito.verifyNoInteractions(rouletteServiceMock);
+        Mockito.verifyNoInteractions(blackJackServiceMock);
+        Mockito.verifyNoInteractions(pokerServiceMock);
     }
 }

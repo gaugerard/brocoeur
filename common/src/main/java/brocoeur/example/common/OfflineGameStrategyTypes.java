@@ -7,11 +7,11 @@ import brocoeur.example.common.roulette.strategy.offline.OfflineGreenOnlyRoulett
 public enum OfflineGameStrategyTypes {
 
     // Offline Coin Toss
-    OFFLINE_COIN_TOSS_RANDOM(new OfflineRandomCoinToss(),GameTypes.COIN_TOSS),
-    OFFLINE_COIN_TOSS_HEAD_ONLY(new OfflineHeadOnlyCoinToss(),GameTypes.COIN_TOSS),
+    OFFLINE_COIN_TOSS_RANDOM(new OfflineRandomCoinToss(), GameTypes.COIN_TOSS),
+    OFFLINE_COIN_TOSS_HEAD_ONLY(new OfflineHeadOnlyCoinToss(), GameTypes.COIN_TOSS),
 
     // Offline Roulette
-    OFFLINE_ROULETTE_GREEN_ONLY(new OfflineGreenOnlyRoulette(),GameTypes.ROULETTE);
+    OFFLINE_ROULETTE_GREEN_ONLY(new OfflineGreenOnlyRoulette(), GameTypes.ROULETTE);
 
     private final OfflineGameStrategy offlineGameStrategy;
     private final GameTypes gameTypes;
@@ -24,8 +24,17 @@ public enum OfflineGameStrategyTypes {
         return gameTypes;
     }
 
-    OfflineGameStrategyTypes(final OfflineGameStrategy offlineGameStrategy,final GameTypes gameTypes) {
+    OfflineGameStrategyTypes(final OfflineGameStrategy offlineGameStrategy, final GameTypes gameTypes) {
         this.offlineGameStrategy = offlineGameStrategy;
         this.gameTypes = gameTypes;
+    }
+
+    public static OfflineGameStrategyTypes getOfflineGameStrategyTypesFromName(final String name) {
+        for (OfflineGameStrategyTypes offlineGameStrategyTypes : OfflineGameStrategyTypes.values()) {
+            if (offlineGameStrategyTypes.toString().equals(name)) {
+                return offlineGameStrategyTypes;
+            }
+        }
+        return null;
     }
 }

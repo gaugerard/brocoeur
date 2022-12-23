@@ -37,7 +37,7 @@ public class GamesController {
         switch (serviceRequestType) {
             case DIRECT -> processDirectMsg(serviceRequest);
             case OFFLINE -> processOfflineMsg(serviceRequest);
-            case MULTIPLAYER -> throw new IllegalStateException("MULTIPLAYER is not yet managed");
+            case MULTIPLAYER -> processMultiplayerMsg(serviceRequest);
         }
     }
 
@@ -54,6 +54,20 @@ public class GamesController {
         };
         final PlayerResponse playerResponse = new PlayerResponse(gameId, userId, listOfIsWinner, amountToGamble, linkedJobId);
         final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
+        rabbitTemplate.convertAndSend(
+                gamesConfigProperties.getRpcExchange(),
+                gamesConfigProperties.getRpcReplyMessageQueue(),
+                analyticServiceRequest);
+    }
+
+    private void processMultiplayerMsg(final ServiceRequest serviceRequest) {
+        LOGGER.info("[MULTIPLAYER] - request : {}", serviceRequest);
+
+        if (serviceRequest.getPlayerRequestList().size() != 3) {
+            throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 3 (for Poker).");
+        }
+        final List<PlayerResponse> playerResponseList = gameService.playPoker(serviceRequest);
+        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponseList);
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
                 gamesConfigProperties.getRpcReplyMessageQueue(),
