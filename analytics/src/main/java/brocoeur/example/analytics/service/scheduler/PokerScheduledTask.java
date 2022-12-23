@@ -1,14 +1,12 @@
 package brocoeur.example.analytics.service.scheduler;
 
 import brocoeur.example.analytics.model.ServiceRequestStatus;
-import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,8 +45,8 @@ public class PokerScheduledTask {
         LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(new Date()));
         List<ServiceRequestStatus> pendingRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(IN_PROGRESS);
         for(ServiceRequestStatus request : pendingRequests){
-            LOGGER.info(request.toString());
-            if(request.getAckTimeMilliSecond() < new Date().getTime() - 5000){
+            if(request.getInsertionTimeMilliSecond() < (int)new Date().getTime() - 5000){
+                LOGGER.info("Cancelling request : " + request.toString());
                 serviceRequestStatusService.rejectServiceRequestStatus(request);
             }
         }
