@@ -26,7 +26,6 @@ import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
 import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 import static brocoeur.example.common.ServiceRequestTypes.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceRequestStatusServiceTest {
