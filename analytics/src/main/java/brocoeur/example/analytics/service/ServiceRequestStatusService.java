@@ -67,6 +67,24 @@ public class ServiceRequestStatusService {
     }
 
     /**
+     * Sets poker serviceRequest to IN_PROGRESS and sends the poker ServiceRequest.
+     *
+     * @param serviceRequest
+     */
+    public void sendMultiplayerServiceRequest(final ServiceRequest serviceRequest) {
+        // Update status of the 3 poker request.
+        for (PlayerRequest playerRequest : serviceRequest.getPlayerRequestList()) {
+            final int jobId = playerRequest.getLinkedJobId();
+            final ServiceRequestStatus serviceRequestStatus = serviceRequestStatusRepository.findById(jobId).block();
+            serviceRequestStatus.setStatus(IN_PROGRESS);
+            serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
+        }
+
+        // Sends the poker request to 'Game' module.
+        rabbitTemplate.convertAndSend("myexchange1", "MyQ1", serviceRequest);
+    }
+
+    /**
      * <p>This method checks if user has enough money to play the requested 'ServiceRequest'.</p>
      * <ul>
      *     <li>If YES: It blocks the requested amount of money from the user, add a line in 'serviceRequestStatus' Cassandra table (with status <b>IN_PROGRESS</b>) and sends the 'ServiceRequest'.</li>
