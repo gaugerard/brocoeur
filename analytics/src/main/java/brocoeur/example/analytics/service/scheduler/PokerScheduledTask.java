@@ -106,7 +106,7 @@ public class PokerScheduledTask {
      * <p>A job is considered pending/blocked when its has not been completed after 5 minutes.</p>
      */
     @Scheduled(fixedRate = 30000)
-    public void rejectBlockedRequests() {
+    public void cancelBlockedRequests() {
         final Date currentDate = new Date();
         final long currentTime = currentDate.getTime();
         LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(currentDate));
