@@ -11,4 +11,8 @@ public interface ServiceRequestStatusRepository extends ReactiveCassandraReposit
 
     @AllowFiltering
     Flux<ServiceRequestStatus> findAllByStrategyAndStatus(final String strategy, final String status);
+
+    @AllowFiltering
+    Flux<ServiceRequestStatus> findAllByStatus(final String status);
+
 }

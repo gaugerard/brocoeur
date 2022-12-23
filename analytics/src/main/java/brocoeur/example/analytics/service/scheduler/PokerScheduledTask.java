@@ -1,7 +1,6 @@
 package brocoeur.example.analytics.service.scheduler;
 
 import brocoeur.example.analytics.model.ServiceRequestStatus;
-import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import brocoeur.example.common.GameStrategyTypes;
 import brocoeur.example.common.OfflineGameStrategyTypes;
@@ -18,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.IN_PROGRESS;
+import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.TODO;
 import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
 import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
 
@@ -27,8 +28,6 @@ public class PokerScheduledTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(PokerScheduledTask.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Autowired
-    private ServiceRequestStatusRepository serviceRequestStatusRepository;
     @Autowired
     private ServiceRequestStatusService serviceRequestStatusService;
 
@@ -45,7 +44,7 @@ public class PokerScheduledTask {
         LOGGER.info("Poker scheduled task started at : {}", dateFormat.format(new Date()));
 
         // Keep 3 first distinct poker request (3 different player).
-        final List<ServiceRequestStatus> listServiceRequestStatus = serviceRequestStatusRepository.findAllByStrategyAndStatus(POKER_RANDOM.toString(), "TODO").collectList().block();
+        final List<ServiceRequestStatus> listServiceRequestStatus = serviceRequestStatusService.findAllServiceRequestStatusByStrategyAndStatus(POKER_RANDOM.toString(), TODO);
         final List<ServiceRequestStatus> listOfServiceRequestStatusToBePlayed = getThreeFirstDistinctServiceRequest(listServiceRequestStatus);
 
         if (listOfServiceRequestStatusToBePlayed.size() == 3) {
@@ -100,4 +99,20 @@ public class PokerScheduledTask {
 
         return new ServiceRequest(MULTIPLAYER, playerRequestList, null);
     }
+
+    /**
+     * Recurrent task to look for blocked jobs/request for more than 5 seconds
+     */
+    @Scheduled(fixedRate = 3000)
+    public void rejectBlockedRequests() {
+        LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(new Date()));
+        final List<ServiceRequestStatus> pendingRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(IN_PROGRESS);
+        for(ServiceRequestStatus request : pendingRequests){
+            if(request.getInsertionTimeMilliSecond() < (int)new Date().getTime() - 5000){
+                LOGGER.info("Cancelling request : {}", request);
+                serviceRequestStatusService.rejectServiceRequestStatus(request);
+            }
+        }
+    }
+
 }

@@ -1,7 +1,6 @@
 package brocoeur.example.analytics.service.scheduler;
 
 import brocoeur.example.analytics.model.ServiceRequestStatus;
-import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
@@ -11,17 +10,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
 
+import java.util.Date;
 import java.util.List;
 
-import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
+import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.IN_PROGRESS;
+import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.TODO;
+import static brocoeur.example.common.GameStrategyTypes.*;
 import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PokerScheduledTaskTest {
-    @Mock
-    private ServiceRequestStatusRepository serviceRequestStatusRepositoryMock;
+
     @Mock
     private ServiceRequestStatusService serviceRequestStatusServiceMock;
     @InjectMocks
@@ -34,13 +35,13 @@ class PokerScheduledTaskTest {
         var serviceRequestStatus2 = new ServiceRequestStatus(2, "TODO", 15, 9, "POKER_RANDOM", 10001, 0);
         var serviceRequestStatus3 = new ServiceRequestStatus(3, "TODO", 20, 10, "POKER_RANDOM", 10002, 0);
         var serviceRequestStatus4 = new ServiceRequestStatus(4, "TODO", 25, 11, "POKER_RANDOM", 10002, 0);
-        var fluxFindAllByStrategyAndStatus = Flux.just(
+        var findAllByStrategyAndStatus = List.of(
                 serviceRequestStatus1,
                 serviceRequestStatus2,
                 serviceRequestStatus3,
                 serviceRequestStatus4
         );
-        Mockito.when(serviceRequestStatusRepositoryMock.findAllByStrategyAndStatus(POKER_RANDOM.toString(), "TODO")).thenReturn(fluxFindAllByStrategyAndStatus);
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStrategyAndStatus(POKER_RANDOM.toString(), TODO)).thenReturn(findAllByStrategyAndStatus);
 
         // When
         pokerScheduledTask.executeScheduledTask();
@@ -60,16 +61,76 @@ class PokerScheduledTaskTest {
         // Given
         var serviceRequestStatus1 = new ServiceRequestStatus(1, "TODO", 10, 8, "POKER_RANDOM", 10000, 0);
         var serviceRequestStatus2 = new ServiceRequestStatus(2, "TODO", 15, 9, "POKER_RANDOM", 10001, 0);
-        var fluxFindAllByStrategyAndStatus = Flux.just(
+        var findAllByStrategyAndStatus = List.of(
                 serviceRequestStatus1,
                 serviceRequestStatus2
         );
-        Mockito.when(serviceRequestStatusRepositoryMock.findAllByStrategyAndStatus(POKER_RANDOM.toString(), "TODO")).thenReturn(fluxFindAllByStrategyAndStatus);
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStrategyAndStatus(POKER_RANDOM.toString(), TODO)).thenReturn(findAllByStrategyAndStatus);
 
         // When
         pokerScheduledTask.executeScheduledTask();
 
         // Then
-        Mockito.verifyNoInteractions(serviceRequestStatusServiceMock);
+        Mockito.verify(serviceRequestStatusServiceMock).findAllServiceRequestStatusByStrategyAndStatus(POKER_RANDOM.toString(), TODO);
+        Mockito.verifyNoMoreInteractions(serviceRequestStatusServiceMock);
     }
+
+    @Test
+    void shouldTestRejectBlockedRequestsWithOneBlockedRequest(){
+
+        // Given
+        ServiceRequestStatus blockedRequest = new ServiceRequestStatus(
+                123,
+                IN_PROGRESS.label,
+                200,
+                8,
+                ROULETTE_RISKY.name(),
+                (int)new Date().getTime() - 10000,
+                0
+        );
+
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(List.of(blockedRequest));
+
+        // When
+        pokerScheduledTask.rejectBlockedRequests();
+
+        // Then
+        Mockito.verify(serviceRequestStatusServiceMock).rejectServiceRequestStatus(blockedRequest);
+    }
+
+
+    @Test
+    void shouldTestRejectBlockedRequestsWithoutBlockingRequest(){
+
+        // Given
+        ServiceRequestStatus blockedRequest = new ServiceRequestStatus(
+                123,
+                IN_PROGRESS.label,
+                200,
+                8,
+                ROULETTE_RISKY.name(),
+                (int)new Date().getTime(),
+                0
+        );
+
+        ServiceRequestStatus secondRequest = new ServiceRequestStatus(
+                124,
+                IN_PROGRESS.label,
+                100,
+                8,
+                ROULETTE_SAFE.name(),
+                (int)new Date().getTime() - 500,
+                0
+        );
+
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(List.of(blockedRequest, secondRequest));
+
+        // When
+        pokerScheduledTask.rejectBlockedRequests();
+
+        // Then
+        Mockito.verify(serviceRequestStatusServiceMock).findAllServiceRequestStatusByStatus(IN_PROGRESS);
+        Mockito.verifyNoMoreInteractions(serviceRequestStatusServiceMock);
+    }
+
 }
