@@ -35,14 +35,23 @@ public class UserWinLossByGameController {
         // Initialization
         String user5Name = "MeatAlive";
         String user8Name = "Baba";
+        String user11Name = "Romain";
 
         List<UserWinLossByGame> userWinLossByGameServices = new ArrayList<>();
         userWinLossByGameServices.add(new UserWinLossByGame(123, 5, "Roulette", user5Name, 0, 0));
         userWinLossByGameServices.add(new UserWinLossByGame(324, 5, "Coin Toss", user5Name, 0, 0));
         userWinLossByGameServices.add(new UserWinLossByGame(666, 5, "Black Jack", user5Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(420, 5, "Poker", user5Name, 0, 0));
+
         userWinLossByGameServices.add(new UserWinLossByGame(123, 8, "Roulette", user8Name, 0, 0));
         userWinLossByGameServices.add(new UserWinLossByGame(324, 8, "Coin Toss", user8Name, 0, 0));
         userWinLossByGameServices.add(new UserWinLossByGame(666, 8, "Black Jack", user8Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(420, 8, "Poker", user8Name, 0, 0));
+
+        userWinLossByGameServices.add(new UserWinLossByGame(123, 11, "Roulette", user11Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(324, 11, "Coin Toss", user11Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(666, 11, "Black Jack", user11Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(420, 11, "Poker", user11Name, 0, 0));
 
         userWinLossByGameService.initializeUserWinLossByGame(userWinLossByGameServices);
     }

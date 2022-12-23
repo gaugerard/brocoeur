@@ -9,7 +9,8 @@ public enum ServiceRequestStatusStatus {
     TODO("TODO"),
     DONE_WIN("DONE_WIN"),
     DONE_LOSS("DONE_LOSS"),
-    REJECTED("REJECTED");
+    REJECTED("REJECTED"),
+    CANCELLED("CANCELLED");
 
     public final String label;
 
