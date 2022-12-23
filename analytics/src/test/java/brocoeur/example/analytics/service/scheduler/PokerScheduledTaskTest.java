@@ -1,7 +1,6 @@
 package brocoeur.example.analytics.service.scheduler;
 
 import brocoeur.example.analytics.model.ServiceRequestStatus;
-import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;

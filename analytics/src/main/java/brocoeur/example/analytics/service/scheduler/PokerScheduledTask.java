@@ -1,13 +1,11 @@
 package brocoeur.example.analytics.service.scheduler;
 
 import brocoeur.example.analytics.model.ServiceRequestStatus;
-import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import brocoeur.example.common.GameStrategyTypes;
 import brocoeur.example.common.OfflineGameStrategyTypes;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
-import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
