@@ -17,7 +17,7 @@ import static brocoeur.example.common.GameStrategyTypes.ROULETTE_SAFE;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PokerScheduledTaskTest {
+class PokerScheduledTaskTest {
 
     @Mock
     ServiceRequestStatusService serviceRequestStatusServiceMock;

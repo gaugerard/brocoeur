@@ -46,7 +46,7 @@ public class PokerScheduledTask {
         List<ServiceRequestStatus> pendingRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(IN_PROGRESS);
         for(ServiceRequestStatus request : pendingRequests){
             if(request.getInsertionTimeMilliSecond() < (int)new Date().getTime() - 5000){
-                LOGGER.info("Cancelling request : " + request.toString());
+                LOGGER.info("Cancelling request : {}", request);
                 serviceRequestStatusService.rejectServiceRequestStatus(request);
             }
         }
