@@ -108,7 +108,7 @@ public class ServiceRequestStatusService {
         final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
         final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequestTypes, serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
-        final int currentTimeInMilliseconds = randomService.getCurrentTimeInSeconds();
+        final long currentTimeInMilliseconds = randomService.getCurrentTimeInMilliseconds();
         final String gameStrategyTypes = getGameStrategyTypes(serviceRequestTypes, playerRequest);
 
         if (amountOfMoneyToBlock <= totalAmountOfMoneyAvailable) {
@@ -181,7 +181,7 @@ public class ServiceRequestStatusService {
 
         final int userId = serviceRequestStatus.getUserId();
 
-        serviceRequestStatus.setAckTimeMilliSecond(randomService.getCurrentTimeInSeconds());
+        serviceRequestStatus.setAckTimeMilliSecond(randomService.getCurrentTimeInMilliseconds());
 
         final int amountBlocked = serviceRequestStatus.getAmountBlocked();
         final int totalAmountWon = getAmountOfMoneyWon(listOfIsWinner, amountGambled);
@@ -205,16 +205,16 @@ public class ServiceRequestStatusService {
         serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
     }
 
-    public void rejectServiceRequestStatus(ServiceRequestStatus serviceRequestStatus){
+    public void cancelServiceRequestStatus(ServiceRequestStatus serviceRequestStatus) {
         serviceRequestStatus.setStatus(CANCELLED.label);
         serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
     }
 
-    public List<ServiceRequestStatus> findAllServiceRequestStatusByStatus(ServiceRequestStatusStatus serviceRequestStatusStatus){
+    public List<ServiceRequestStatus> findAllServiceRequestStatusByStatus(ServiceRequestStatusStatus serviceRequestStatusStatus) {
         return serviceRequestStatusRepository.findAllByStatus(serviceRequestStatusStatus.label).collectList().block();
     }
 
-    public List<ServiceRequestStatus> findAllServiceRequestStatusByStrategyAndStatus(String strategy, ServiceRequestStatusStatus serviceRequestStatusStatus){
+    public List<ServiceRequestStatus> findAllServiceRequestStatusByStrategyAndStatus(String strategy, ServiceRequestStatusStatus serviceRequestStatusStatus) {
         return serviceRequestStatusRepository.findAllByStrategyAndStatus(strategy, serviceRequestStatusStatus.label).collectList().block();
     }
 }

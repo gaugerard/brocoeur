@@ -60,5 +60,5 @@ For Cassandra:
 7) Run `cqlsh:brocoeurkeyspace> CREATE TABLE User( userid int PRIMARY KEY, pseudo text);`.
 8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserWinLossByGame( game_id int, user_id int, gamename text, pseudo text, numberofwin int, numberofloss int, PRIMARY KEY ((game_id, user_id)));`.
 8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserMoney( userId int PRIMARY KEY, money int);`.
-8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE ServiceRequestStatus( jobId int PRIMARY KEY, status text, amountBlocked int, userId int, strategy text, insertionTimeMilliSecond int, ackTimeMilliSecond int);`.
+8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE ServiceRequestStatus( jobId int PRIMARY KEY, status text, amountBlocked int, userId int, strategy text, insertionTimeMilliSecond bigint, ackTimeMilliSecond bigint);`.
 9) Run `analytics` main method using a mvn configuration (analytics will add dummy data in Cassandra (TODO: Make keyspace and table creation automatic)).

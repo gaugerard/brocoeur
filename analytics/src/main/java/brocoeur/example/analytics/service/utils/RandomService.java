@@ -7,8 +7,8 @@ import java.util.Random;
 
 @Component
 public class RandomService {
-    public int getCurrentTimeInSeconds() {
-        return (int)new Date().getTime();
+    public long getCurrentTimeInMilliseconds() {
+        return new Date().getTime();
     }
 
     public int getRandomJobId() {

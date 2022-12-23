@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +77,7 @@ class PokerScheduledTaskTest {
     }
 
     @Test
-    void shouldTestRejectBlockedRequestsWithOneBlockedRequest(){
+    void shouldTestRejectBlockedRequestsWithOneBlockedRequest() {
 
         // Given
         ServiceRequestStatus blockedRequest = new ServiceRequestStatus(
@@ -85,22 +86,23 @@ class PokerScheduledTaskTest {
                 200,
                 8,
                 ROULETTE_RISKY.name(),
-                (int)new Date().getTime() - 10000,
+                new Date().getTime() - 310_000,
                 0
         );
 
         when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(List.of(blockedRequest));
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(TODO)).thenReturn(Collections.emptyList());
 
         // When
-        pokerScheduledTask.rejectBlockedRequests();
+        pokerScheduledTask.cancelBlockedRequests();
 
         // Then
-        Mockito.verify(serviceRequestStatusServiceMock).rejectServiceRequestStatus(blockedRequest);
+        Mockito.verify(serviceRequestStatusServiceMock).cancelServiceRequestStatus(blockedRequest);
     }
 
 
     @Test
-    void shouldTestRejectBlockedRequestsWithoutBlockingRequest(){
+    void shouldTestRejectBlockedRequestsWithoutBlockingRequest() {
 
         // Given
         ServiceRequestStatus blockedRequest = new ServiceRequestStatus(
@@ -109,7 +111,7 @@ class PokerScheduledTaskTest {
                 200,
                 8,
                 ROULETTE_RISKY.name(),
-                (int)new Date().getTime(),
+                new Date().getTime(),
                 0
         );
 
@@ -119,17 +121,19 @@ class PokerScheduledTaskTest {
                 100,
                 8,
                 ROULETTE_SAFE.name(),
-                (int)new Date().getTime() - 500,
+                new Date().getTime() - 500,
                 0
         );
 
         when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(List.of(blockedRequest, secondRequest));
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(TODO)).thenReturn(Collections.emptyList());
 
         // When
-        pokerScheduledTask.rejectBlockedRequests();
+        pokerScheduledTask.cancelBlockedRequests();
 
         // Then
         Mockito.verify(serviceRequestStatusServiceMock).findAllServiceRequestStatusByStatus(IN_PROGRESS);
+        Mockito.verify(serviceRequestStatusServiceMock).findAllServiceRequestStatusByStatus(TODO);
         Mockito.verifyNoMoreInteractions(serviceRequestStatusServiceMock);
     }
 

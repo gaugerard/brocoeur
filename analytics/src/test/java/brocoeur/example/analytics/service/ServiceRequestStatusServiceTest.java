@@ -50,7 +50,7 @@ class ServiceRequestStatusServiceTest {
         void shouldAddServiceRequestStatusWhenEnoughMoney() {
             // Given
             var jobId = 156478;
-            var currentTimeInSeconds = 1400000;
+            var currentTimeInSeconds = 1400000L;
             var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 50, null);
             var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
@@ -72,7 +72,7 @@ class ServiceRequestStatusServiceTest {
             when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
             when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
             when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
-            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(randomServiceMock.getCurrentTimeInMilliseconds()).thenReturn(currentTimeInSeconds);
             when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
             // When
@@ -94,7 +94,7 @@ class ServiceRequestStatusServiceTest {
         void shouldAddServiceRequestStatusWhenNotEnoughMoney() {
             // Given
             var jobId = 156478;
-            var currentTimeInSeconds = 1400000;
+            var currentTimeInSeconds = 1400000L;
             var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 800, null);
             var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
 
@@ -113,7 +113,7 @@ class ServiceRequestStatusServiceTest {
 
             when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
             when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
-            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(randomServiceMock.getCurrentTimeInMilliseconds()).thenReturn(currentTimeInSeconds);
             when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
             // When
@@ -161,7 +161,7 @@ class ServiceRequestStatusServiceTest {
             var serviceRequestStatus = new ServiceRequestStatus(jobId, "IN_PROGESS", 80, userId, COIN_TOSS_RANDOM.toString(), 12340, 0);
             var monoFindById = Mono.just(serviceRequestStatus);
             when(serviceRequestStatusRepositoryMock.findById(jobId)).thenReturn(monoFindById);
-            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(13245);
+            when(randomServiceMock.getCurrentTimeInMilliseconds()).thenReturn(13245L);
 
             var userMoney = new UserMoney(userId, 100);
             var monoFindByIdUser = Mono.just(userMoney);
@@ -221,7 +221,7 @@ class ServiceRequestStatusServiceTest {
             var serviceRequestStatus = new ServiceRequestStatus(jobId, "IN_PROGESS", 80, userId, COIN_TOSS_RANDOM.toString(), 12340, 0);
             var monoFindById = Mono.just(serviceRequestStatus);
             when(serviceRequestStatusRepositoryMock.findById(jobId)).thenReturn(monoFindById);
-            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(13245);
+            when(randomServiceMock.getCurrentTimeInMilliseconds()).thenReturn(13245L);
 
             when(userMoneyRepositoryMock.findById(userId)).thenReturn(Mono.empty());
 
@@ -248,7 +248,7 @@ class ServiceRequestStatusServiceTest {
         void shouldAddServiceRequestStatusWhenEnoughMoney() {
             // Given
             var jobId = 156478;
-            var currentTimeInSeconds = 1400000;
+            var currentTimeInSeconds = 1400000L;
             var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, null);
             var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, 3);
 
@@ -270,7 +270,7 @@ class ServiceRequestStatusServiceTest {
             when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
             when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
             when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
-            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(randomServiceMock.getCurrentTimeInMilliseconds()).thenReturn(currentTimeInSeconds);
             when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
 
@@ -298,7 +298,7 @@ class ServiceRequestStatusServiceTest {
         void shouldAddServiceRequestStatusWhenEnoughMoney() {
             // Given
             var jobId = 156478;
-            var currentTimeInSeconds = 1400000;
+            var currentTimeInSeconds = 1400000L;
             var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 50, null);
             var directServiceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
 
@@ -320,7 +320,7 @@ class ServiceRequestStatusServiceTest {
             when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
             when(userMoneyRepositoryMock.findById(8)).thenReturn(monoFindById);
             when(userMoneyRepositoryMock.save(userMoneyUpdated)).thenReturn(monoSaveUserMoney);
-            when(randomServiceMock.getCurrentTimeInSeconds()).thenReturn(currentTimeInSeconds);
+            when(randomServiceMock.getCurrentTimeInMilliseconds()).thenReturn(currentTimeInSeconds);
             when(serviceRequestStatusRepositoryMock.save(serviceRequestStatus)).thenReturn(monoSaveServiceRequestStatus);
 
             // When
