@@ -103,16 +103,18 @@ public class PokerScheduledTask {
     /**
      * Recurrent task to look for blocked jobs/request for more than 5 seconds
      */
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(fixedRate = 10000)
     public void rejectBlockedRequests() {
         LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(new Date()));
         final List<ServiceRequestStatus> pendingRequests = serviceRequestStatusService.findAllServiceRequestStatusByStatus(IN_PROGRESS);
         for(ServiceRequestStatus request : pendingRequests){
+            LOGGER.info("request time = "+ request.getInsertionTimeMilliSecond() + " current time = " + (int)new Date().getTime());
             if(request.getInsertionTimeMilliSecond() < (int)new Date().getTime() - 5000){
                 LOGGER.info("Cancelling request : {}", request);
                 serviceRequestStatusService.rejectServiceRequestStatus(request);
             }
         }
+
     }
 
 }

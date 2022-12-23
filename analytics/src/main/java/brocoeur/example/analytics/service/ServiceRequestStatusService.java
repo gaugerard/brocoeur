@@ -206,12 +206,12 @@ public class ServiceRequestStatusService {
     }
 
     public void rejectServiceRequestStatus(ServiceRequestStatus serviceRequestStatus){
-        serviceRequestStatus.setStatus(REJECTED.label);
+        serviceRequestStatus.setStatus(CANCELLED.label);
         serviceRequestStatusRepository.save(serviceRequestStatus).subscribe(updated -> LOGGER.info("Updated : {}", updated));
     }
 
     public List<ServiceRequestStatus> findAllServiceRequestStatusByStatus(ServiceRequestStatusStatus serviceRequestStatusStatus){
-        return serviceRequestStatusRepository.findAllByStatus(IN_PROGRESS.label).collectList().block();
+        return serviceRequestStatusRepository.findAllByStatus(serviceRequestStatusStatus.label).collectList().block();
     }
 
     public List<ServiceRequestStatus> findAllServiceRequestStatusByStrategyAndStatus(String strategy, ServiceRequestStatusStatus serviceRequestStatusStatus){

@@ -26,6 +26,7 @@ public class UserController {
         List<User> users = new ArrayList<>();
         users.add(new User(5, "MeatAlive"));
         users.add(new User(8, "Baba"));
+        users.add(new User(11, "Romain"));
         userService.initializeGames(users);
     }
 }

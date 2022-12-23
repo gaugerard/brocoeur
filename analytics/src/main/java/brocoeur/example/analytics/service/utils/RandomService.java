@@ -2,12 +2,13 @@ package brocoeur.example.analytics.service.utils;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Random;
 
 @Component
 public class RandomService {
     public int getCurrentTimeInSeconds() {
-        return (int) java.time.Instant.now().getEpochSecond();
+        return (int)new Date().getTime();
     }
 
     public int getRandomJobId() {

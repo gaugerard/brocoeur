@@ -27,6 +27,7 @@ public class GameController {
         games.add(new Game(123, "Roulette"));
         games.add(new Game(324, "Coin Toss"));
         games.add(new Game(666, "Black Jack"));
+        games.add(new Game(420, "Poker"));
         gameService.initializeGames(games);
     }
 }
