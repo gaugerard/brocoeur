@@ -40,6 +40,9 @@ public class PokerScheduledTask {
         LOGGER.info("List of poker request : {}", listServiceRequestStatus);
     }
 
+    /**
+     * Recurrent task to look for blocked jobs/request for more than 5 seconds
+     */
     @Scheduled(fixedRate = 3000)
     public void rejectBlockedRequests() {
         LOGGER.info("Cleaning scheduled task started at : {}", dateFormat.format(new Date()));

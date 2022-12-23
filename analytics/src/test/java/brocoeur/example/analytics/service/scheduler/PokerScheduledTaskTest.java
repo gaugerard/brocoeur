@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static brocoeur.example.analytics.service.ServiceRequestStatusStatus.IN_PROGRESS;
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
@@ -39,7 +40,7 @@ class PokerScheduledTaskTest {
                 0
         );
 
-        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(Arrays.asList(blockedRequest));
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(List.of(blockedRequest));
 
         // When
         pokerScheduledTask.rejectBlockedRequests();
@@ -73,7 +74,7 @@ class PokerScheduledTaskTest {
                 0
         );
 
-        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(Arrays.asList(blockedRequest,secondRequest));
+        when(serviceRequestStatusServiceMock.findAllServiceRequestStatusByStatus(IN_PROGRESS)).thenReturn(List.of(blockedRequest, secondRequest));
 
         // When
         pokerScheduledTask.rejectBlockedRequests();

@@ -1,5 +1,8 @@
 package brocoeur.example.analytics.service;
 
+import lombok.Getter;
+
+@Getter
 public enum ServiceRequestStatusStatus {
 
     IN_PROGRESS("IN_PROGRESS"),
