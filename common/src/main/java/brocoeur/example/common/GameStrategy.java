@@ -9,7 +9,6 @@ public interface GameStrategy {
      *
      * @return GamePlay
      */
-    @Deprecated
     public GamePlay play();
 
     /**
