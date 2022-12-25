@@ -1,15 +1,16 @@
 package brocoeur.example.games.service;
 
-import brocoeur.example.common.GameTypes;
-import brocoeur.example.common.blackjack.strategy.BlackJackRisky;
-import brocoeur.example.common.cointoss.CoinTossPlay;
-import brocoeur.example.common.roulette.RoulettePlay;
-import brocoeur.example.games.service.blackjack.BlackJackResults;
+import brocoeur.example.common.request.PlayerRequest;
+import brocoeur.example.common.request.PlayerResponse;
+import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.games.service.blackjack.BlackJackService;
 import brocoeur.example.games.service.cointoss.CoinTossService;
 import brocoeur.example.games.service.poker.PokerService;
 import brocoeur.example.games.service.roulette.RouletteService;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
+import static brocoeur.example.common.GameStrategyTypes.*;
+import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_HEAD_ONLY;
+import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_ROULETTE_GREEN_ONLY;
+import static brocoeur.example.common.ServiceRequestTypes.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,97 +42,225 @@ class GameServiceTest {
     @InjectMocks
     private GameService gameService;
 
-    @Test
-    void shouldTestGameServicePlayForCoinToss() {
-        // Given
-        var gameTypes = GameTypes.COIN_TOSS;
+    @Nested
+    @DisplayName("Tests for DIRECT service Request")
+    class DirectGameServiceTest {
+        @Test
+        void shouldTestPlayDirectGameRoulette() {
+            // Given
+            var playerRequest = new PlayerRequest("8", ROULETTE_RISKY, null, 25, 1);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
 
-        when(coinTossServiceMock.play()).thenReturn(CoinTossPlay.TAIL);
+            when(rouletteServiceMock.playRouletteGame(serviceRequest)).thenReturn(playerResponseList);
 
-        // When
-        var actualGamePlay = gameService.play(gameTypes);
+            // When
+            var actualPlayerResponseList = gameService.playDirectGame(serviceRequest);
 
-        // Then
-        Assertions.assertEquals(CoinTossPlay.TAIL, actualGamePlay);
-        Mockito.verifyNoInteractions(rouletteServiceMock);
+            // Then
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
+            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
+            Mockito.verifyNoMoreInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
+
+        @Test
+        void shouldTestPlayDirectGameCoinToss() {
+            // Given
+            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 35, 1);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+
+            when(coinTossServiceMock.playCoinTossGame(serviceRequest)).thenReturn(playerResponseList);
+
+            // When
+            var actualPlayerResponseList = gameService.playDirectGame(serviceRequest);
+
+            // Then
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
+            Mockito.verifyNoMoreInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
+
+        @Test
+        void shouldTestPlayDirectGameBlackJack() {
+            // Given
+            var playerRequest = new PlayerRequest("8", BLACK_JACK_SAFE, null, 50, 1);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 50, 1));
+
+            when(blackJackServiceMock.playBlackJackGame(serviceRequest)).thenReturn(playerResponseList);
+
+            // When
+            var actualPlayerResponseList = gameService.playDirectGame(serviceRequest);
+
+            // Then
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 50, 1));
+            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
+            Mockito.verifyNoMoreInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
+
+        @Test
+        void shouldTestPlayDirectGamePoker() {
+            // Given
+            var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 60, 1);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+
+            // When
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playDirectGame(serviceRequest));
+
+            Assertions.assertEquals("Poker should not be managed here.", exception.getMessage());
+
+            // Then
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
+
+        @Test
+        void shouldTestPlayDirectGameForMissingMandatoryElement() {
+            // Given
+            var playerRequest = new PlayerRequest("8", null, null, 60, 1);
+            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+
+            // When
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playDirectGame(serviceRequest));
+
+            Assertions.assertEquals("Missing mandatory 'GameStrategyTypes'.", exception.getMessage());
+
+            // Then
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
     }
 
-    @Test
-    void shouldTestGameServicePlayForRoulette() {
-        // Given
-        var gameTypes = GameTypes.ROULETTE;
+    @Nested
+    @DisplayName("Tests for OFFLINE service Request")
+    class OfflineGameServiceTest {
+        @Test
+        void shouldTestPlayOfflineGameRoulette() {
+            // Given
+            var playerRequest = new PlayerRequest("8", null, OFFLINE_ROULETTE_GREEN_ONLY, 25, 1);
+            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, null);
+            List<Boolean> listOfIsWinner = List.of();
+            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
 
-        when(rouletteServiceMock.play()).thenReturn(RoulettePlay.GREEN);
+            when(rouletteServiceMock.playRouletteGame(serviceRequest, listOfIsWinner)).thenReturn(playerResponseList);
 
-        // When
-        var actualGamePlay = gameService.play(gameTypes);
+            // When
+            var actualPlayerResponseList = gameService.playOfflineGame(serviceRequest, listOfIsWinner);
 
-        // Then
-        Assertions.assertEquals(RoulettePlay.GREEN, actualGamePlay);
-        Mockito.verifyNoInteractions(coinTossServiceMock);
+            // Then
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
+            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
+            Mockito.verifyNoMoreInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
+
+        @Test
+        void shouldTestPlayOfflineGameCoinToss() {
+            // Given
+            var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_HEAD_ONLY, 35, 1);
+            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, null);
+            List<Boolean> listOfIsWinner = List.of();
+            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+
+            when(coinTossServiceMock.playCoinTossGame(serviceRequest, listOfIsWinner)).thenReturn(playerResponseList);
+
+            // When
+            var actualPlayerResponseList = gameService.playOfflineGame(serviceRequest, listOfIsWinner);
+
+            // Then
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
+            Mockito.verifyNoMoreInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
+
+
+        @Test
+        void shouldTestPlayOfflineGameForMissingMandatoryElement() {
+            // Given
+            var playerRequest = new PlayerRequest("8", null, null, 70, 1);
+            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, null);
+            List<Boolean> listOfIsWinner = List.of();
+
+            // When
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playOfflineGame(serviceRequest, listOfIsWinner));
+
+            Assertions.assertEquals("Missing mandatory 'OfflineGameStrategyTypes'.", exception.getMessage());
+
+            // Then
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
     }
 
-    @Test
-    void shouldTestGameServicePlayForPlayerBlackJack() {
-        // Given
-        var gameTypes = GameTypes.BLACK_JACK;
-        var gameStrategy = new BlackJackRisky();
+    @Nested
+    @DisplayName("Tests for MULTIPLAYER service Request")
+    class MultiplayerGameServiceTest {
+        @Test
+        void shouldTestPlayMultiplayerGameRoulette() {
+            // Given
+            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, null, 43, 1);
+            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, null, 43, 2);
+            var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, null, 43, 3);
+            var serviceRequest = new ServiceRequest(MULTIPLAYER, List.of(playerRequest1, playerRequest2, playerRequest3), null);
+            var playerResponse1 = new PlayerResponse(420, 8, false, 43, 1);
+            var playerResponse2 = new PlayerResponse(420, 9, true, 43, 2);
+            var playerResponse3 = new PlayerResponse(420, 10, false, 43, 3);
+            var playerResponseList = List.of(playerResponse1, playerResponse2, playerResponse3);
 
-        when(blackJackServiceMock.play(gameStrategy)).thenReturn(BlackJackResults.EIGHTEEN);
+            when(pokerServiceMock.playPokerGame(serviceRequest)).thenReturn(playerResponseList);
 
-        // When
-        var actualPlayerGamePlay = gameService.play(gameTypes, gameStrategy);
+            // When
+            var actualPlayerResponseList = gameService.playMultiplayerGame(serviceRequest);
 
-        // Then
-        Assertions.assertEquals(BlackJackResults.EIGHTEEN, actualPlayerGamePlay);
-    }
+            // Then
+            var expectedPlayerResponse1 = new PlayerResponse(420, 8, false, 43, 1);
+            var expectedPlayerResponse2 = new PlayerResponse(420, 9, true, 43, 2);
+            var expectedPlayerResponse3 = new PlayerResponse(420, 10, false, 43, 3);
+            var expectedPlayerResponseList = List.of(expectedPlayerResponse1, expectedPlayerResponse2, expectedPlayerResponse3);
+            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
+            Mockito.verifyNoMoreInteractions(pokerServiceMock);
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+        }
 
-    @Test
-    void shouldTestGameServicePlayForCasinoBlackJack() {
-        // Given
-        var gameTypes = GameTypes.BLACK_JACK;
+        @Test
+        void shouldTestPlayMultiplayerGameForMissingMandatoryElement() {
+            // Given
+            var playerRequest = new PlayerRequest("8", null, null, 60, 1);
+            var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
 
-        when(blackJackServiceMock.play()).thenReturn(BlackJackResults.SEVENTEEN);
+            // When
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playMultiplayerGame(serviceRequest));
 
-        // When
-        var actualCasinoGamePlay = gameService.play(gameTypes);
+            Assertions.assertEquals("Missing mandatory 'GameStrategyTypes'.", exception.getMessage());
 
-        // Then
-        Assertions.assertEquals(BlackJackResults.SEVENTEEN, actualCasinoGamePlay);
-    }
-
-    @Test
-    void shouldTestIfPlayerWonBlackJack() {
-        // Given
-        var gameTypes = GameTypes.BLACK_JACK;
-        var playerPlay = BlackJackResults.EIGHTEEN;
-        var casinoPlay = BlackJackResults.SEVENTEEN;
-
-        when(blackJackServiceMock.didPlayerWin(playerPlay, casinoPlay)).thenReturn(true);
-
-        // When
-        var result = gameService.didPlayerWin(gameTypes, playerPlay, casinoPlay);
-
-        // Then
-        Assertions.assertTrue(result);
-
-    }
-
-
-    @Test
-    void shouldTestGameServicePlayForPoker() {
-        // Given
-        var gameTypes = GameTypes.POKER;
-
-        // When
-        var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.play(gameTypes));
-
-        Assertions.assertEquals("Poker should not be managed here.", exception.getMessage());
-
-        // Then
-        Mockito.verifyNoInteractions(coinTossServiceMock);
-        Mockito.verifyNoInteractions(rouletteServiceMock);
-        Mockito.verifyNoInteractions(blackJackServiceMock);
-        Mockito.verifyNoInteractions(pokerServiceMock);
+            // Then
+            Mockito.verifyNoInteractions(coinTossServiceMock);
+            Mockito.verifyNoInteractions(rouletteServiceMock);
+            Mockito.verifyNoInteractions(blackJackServiceMock);
+            Mockito.verifyNoInteractions(pokerServiceMock);
+        }
     }
 }

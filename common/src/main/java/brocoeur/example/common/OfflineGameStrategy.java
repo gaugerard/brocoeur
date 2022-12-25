@@ -4,5 +4,10 @@ import java.util.List;
 
 public interface OfflineGameStrategy {
 
-    public GamePlay getOfflineStrategyPlay(List<GamePlay> listOfPreviousGameResult);
+    /**
+     * Method for determining the player's action for current game round <b>based on</b> the player's previous win streak.
+     *
+     * @return GamePlay
+     */
+    public GamePlay playOffline(List<Boolean> listOfPreviousIsWinner);
 }

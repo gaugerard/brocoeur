@@ -22,14 +22,14 @@ public class AnalyticServiceRequest implements Serializable {
     }
 
     public AnalyticServiceRequest(final AnalyticServiceRequestTypes analyticServiceRequestTypes,
-                                  final PlayerResponse playerResponseList) {
+                                  final PlayerResponse playerResponse) {
         this.analyticServiceRequestTypes = analyticServiceRequestTypes;
-        this.playerResponseList = List.of(playerResponseList);
+        this.playerResponseList = List.of(playerResponse);
     }
 
     public AnalyticServiceRequest(final AnalyticServiceRequest analyticServiceRequest) {
         this.analyticServiceRequestTypes = analyticServiceRequest.analyticServiceRequestTypes;
-        this.playerResponseList = List.copyOf(playerResponseList);
+        this.playerResponseList = List.copyOf(analyticServiceRequest.playerResponseList);
     }
 
     public AnalyticServiceRequestTypes getAnalyticServiceRequestTypes() {

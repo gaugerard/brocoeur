@@ -1,4 +1,4 @@
-package brocoeur.example.games.service.poker;
+package brocoeur.example.common;
 
 import org.springframework.stereotype.Component;
 
@@ -17,10 +17,9 @@ public class DeckOfCards {
         Collections.shuffle(deck);
     }
 
-    Card getCard(){
+    public Card getCard() {
         return deck.remove(0);
     }
-
 
 
     public static class Card {

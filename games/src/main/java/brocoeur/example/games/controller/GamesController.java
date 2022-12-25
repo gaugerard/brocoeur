@@ -1,8 +1,7 @@
 package brocoeur.example.games.controller;
 
-import brocoeur.example.common.*;
+import brocoeur.example.common.ServiceRequestTypes;
 import brocoeur.example.common.request.AnalyticServiceRequest;
-import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.games.GamesConfigProperties;
@@ -41,33 +40,15 @@ public class GamesController {
         }
     }
 
-    private void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final boolean isWinner, final int amountToGamble, final int linkedJobId) {
-        sendAnalyticMessage(userId, gameTypes, List.of(isWinner), amountToGamble, linkedJobId);
-    }
-
-    private void sendAnalyticMessage(final int userId, final GameTypes gameTypes, final List<Boolean> listOfIsWinner, final int amountToGamble, final int linkedJobId) {
-        final int gameId = switch (gameTypes) {
-            case ROULETTE -> 123;
-            case COIN_TOSS -> 324;
-            case BLACK_JACK -> 666;
-            case POKER -> 420;
-        };
-        final PlayerResponse playerResponse = new PlayerResponse(gameId, userId, listOfIsWinner, amountToGamble, linkedJobId);
-        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
-        rabbitTemplate.convertAndSend(
-                gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
-                analyticServiceRequest);
-    }
-
     private void processMultiplayerMsg(final ServiceRequest serviceRequest) {
         LOGGER.info("[MULTIPLAYER] - request : {}", serviceRequest);
 
         if (serviceRequest.getPlayerRequestList().size() != 3) {
             throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 3 (for Poker).");
         }
-        final List<PlayerResponse> playerResponseList = gameService.playPoker(serviceRequest);
+        final List<PlayerResponse> playerResponseList = gameService.playMultiplayerGame(serviceRequest);
         final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponseList);
+
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
                 gamesConfigProperties.getRpcReplyMessageQueue(),
@@ -80,21 +61,13 @@ public class GamesController {
         if (serviceRequest.getPlayerRequestList().size() != 1) {
             throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
         }
+        final List<PlayerResponse> playerResponseList = gameService.playDirectGame(serviceRequest);
+        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponseList);
 
-        final PlayerRequest playerRequest = serviceRequest.getPlayerRequestList().get(0);
-
-        final int userId = Integer.parseInt(playerRequest.getUserId());
-        final GameStrategyTypes gameStrategyTypes = playerRequest.getGameStrategyTypes();
-        final GameStrategy gameStrategy = gameStrategyTypes.getGameStrategy();
-        final GameTypes gameTypes = gameStrategyTypes.getGameTypes();
-        final GamePlay gamePlayFromUser = gameService.play(gameTypes, gameStrategy);
-        final GamePlay gamePlayFromService = gameService.play(gameTypes);
-
-        LOGGER.info("[DIRECT] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
-
-        final boolean isWinner = gameService.didPlayerWin(gameTypes, gamePlayFromUser, gamePlayFromService);
-
-        sendAnalyticMessage(userId, gameTypes, isWinner, playerRequest.getAmountToGamble(), playerRequest.getLinkedJobId());
+        rabbitTemplate.convertAndSend(
+                gamesConfigProperties.getRpcExchange(),
+                gamesConfigProperties.getRpcReplyMessageQueue(),
+                analyticServiceRequest);
     }
 
     private void processOfflineMsg(final ServiceRequest offlineServiceRequest) {
@@ -104,27 +77,25 @@ public class GamesController {
             throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
         }
 
-        final PlayerRequest playerRequest = offlineServiceRequest.getPlayerRequestList().get(0);
-
-        final int userId = Integer.parseInt(playerRequest.getUserId());
-        final OfflineGameStrategyTypes offlineGameStrategyTypes = playerRequest.getOfflineGameStrategyTypes();
-        final OfflineGameStrategy offlineGameStrategy = offlineGameStrategyTypes.getOfflineGameStrategy();
+        List<Boolean> listOfIsWinner = new ArrayList<>();
+        List<PlayerResponse> playerResponseList = null;
         final int repetition = offlineServiceRequest.getTimeToLive();
 
-        List<GamePlay> listOfPreviousGameResult = new ArrayList<>();
-        List<Boolean> listOfIsWinner = new ArrayList<>();
-
-        final GameTypes gameTypes = offlineGameStrategyTypes.getGameTypes();
-
         for (var i = 0; i < repetition; i++) {
-            final GamePlay gamePlayFromUser = offlineGameStrategy.getOfflineStrategyPlay(listOfPreviousGameResult);
-            final GamePlay gamePlayFromService = gameService.play(gameTypes);
-            LOGGER.info("[OFFLINE] - USER plays: {} and SERVICE plays: {}", gamePlayFromUser, gamePlayFromService);
-
-            listOfPreviousGameResult.add(gamePlayFromService);
-            final boolean isWinner = gamePlayFromUser.equals(gamePlayFromService);
+            playerResponseList = gameService.playOfflineGame(offlineServiceRequest, listOfIsWinner);
+            final boolean isWinner = playerResponseList.get(0).getListOfIsWinner().get(0);
             listOfIsWinner.add(isWinner);
         }
-        sendAnalyticMessage(userId, gameTypes, listOfIsWinner, playerRequest.getAmountToGamble(), playerRequest.getLinkedJobId());
+
+        // Update last 'playerResponseList' object to contain the list of win/loss.
+        final PlayerResponse playerResponse = playerResponseList.get(0);
+        playerResponse.setListOfIsWinner(listOfIsWinner);
+
+        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
+
+        rabbitTemplate.convertAndSend(
+                gamesConfigProperties.getRpcExchange(),
+                gamesConfigProperties.getRpcReplyMessageQueue(),
+                analyticServiceRequest);
     }
 }

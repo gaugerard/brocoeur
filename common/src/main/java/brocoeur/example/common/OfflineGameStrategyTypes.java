@@ -16,14 +16,6 @@ public enum OfflineGameStrategyTypes {
     private final OfflineGameStrategy offlineGameStrategy;
     private final GameTypes gameTypes;
 
-    public OfflineGameStrategy getOfflineGameStrategy() {
-        return offlineGameStrategy;
-    }
-
-    public GameTypes getGameTypes() {
-        return gameTypes;
-    }
-
     OfflineGameStrategyTypes(final OfflineGameStrategy offlineGameStrategy, final GameTypes gameTypes) {
         this.offlineGameStrategy = offlineGameStrategy;
         this.gameTypes = gameTypes;
@@ -36,5 +28,13 @@ public enum OfflineGameStrategyTypes {
             }
         }
         return null;
+    }
+
+    public OfflineGameStrategy getOfflineGameStrategy() {
+        return offlineGameStrategy;
+    }
+
+    public GameTypes getGameTypes() {
+        return gameTypes;
     }
 }

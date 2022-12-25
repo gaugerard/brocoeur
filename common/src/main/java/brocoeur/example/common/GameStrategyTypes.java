@@ -11,11 +11,14 @@ public enum GameStrategyTypes {
     // Roulette
     ROULETTE_RISKY(new RouletteRiskyStrategy(), GameTypes.ROULETTE),
     ROULETTE_SAFE(new RouletteSafeStrategy(), GameTypes.ROULETTE),
+
     // Coin Toss
     COIN_TOSS_RANDOM(new RandomCoinToss(), GameTypes.COIN_TOSS),
+
     // Black Jack
     BLACK_JACK_SAFE(new BlackJackSafe(), GameTypes.BLACK_JACK),
     BLACK_JACK_RISKY(new BlackJackRisky(), GameTypes.BLACK_JACK),
+
     // Poker
     POKER_RANDOM(new RandomPoker(), GameTypes.POKER);
 
@@ -27,14 +30,6 @@ public enum GameStrategyTypes {
         this.gameTypes = gameTypes;
     }
 
-    public GameStrategy getGameStrategy() {
-        return gameStrategy;
-    }
-
-    public GameTypes getGameTypes() {
-        return gameTypes;
-    }
-
     public static GameStrategyTypes getGameStrategyTypesFromName(final String name) {
         for (GameStrategyTypes gameStrategyTypes : GameStrategyTypes.values()) {
             if (gameStrategyTypes.toString().equals(name)) {
@@ -42,5 +37,13 @@ public enum GameStrategyTypes {
             }
         }
         return null;
+    }
+
+    public GameStrategy getGameStrategy() {
+        return gameStrategy;
+    }
+
+    public GameTypes getGameTypes() {
+        return gameTypes;
     }
 }
