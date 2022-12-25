@@ -1,6 +1,6 @@
 package brocoeur.example.games.service.poker;
 
-import brocoeur.example.common.GameStrategyTypes;
+import brocoeur.example.common.DeckOfCards;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import org.hamcrest.MatcherAssert;
@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;

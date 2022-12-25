@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static brocoeur.example.common.blackjack.BlackJackPlay.STOP_LIMIT_20;
+import static brocoeur.example.common.blackjack.BlackJackPlay.MORE;
 
 @ExtendWith(MockitoExtension.class)
 class BlackJackRiskyTest {
@@ -15,11 +15,11 @@ class BlackJackRiskyTest {
     private BlackJackRisky blackJackRisky;
 
     @Test
-    void shouldGetStopAtTwentyRiskyRouletteStrategy(){
+    void shouldGetStopAtTwentyRiskyRouletteStrategy() {
         // Given - When
-        var actualPlay = blackJackRisky.getStrategy();
+        var actualPlay = blackJackRisky.play();
 
         // Then
-        Assertions.assertEquals(STOP_LIMIT_20,actualPlay);
+        Assertions.assertEquals(MORE, actualPlay);
     }
 }

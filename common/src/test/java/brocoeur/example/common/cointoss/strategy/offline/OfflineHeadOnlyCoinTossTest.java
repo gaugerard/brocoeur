@@ -18,7 +18,7 @@ class OfflineHeadOnlyCoinTossTest {
     @Test
     void shouldGetHeadWithOfflineHeadOnlyCoinToss(){
         // Given - When
-        var actualPlay = offlineHeadOnlyCoinToss.getOfflineStrategyPlay(Collections.emptyList());
+        var actualPlay = offlineHeadOnlyCoinToss.playOffline(Collections.emptyList());
 
         // Then
         Assertions.assertEquals(CoinTossPlay.HEAD, actualPlay);

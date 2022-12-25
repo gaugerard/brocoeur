@@ -19,7 +19,7 @@ class OfflineGreenOnlyRouletteTest {
     @Test
     void shouldGetGreenWithOfflineGreenOnlyRoulette(){
         // Given - When
-        var actualPlay = offlineGreenOnlyRoulette.getOfflineStrategyPlay(Collections.emptyList());
+        var actualPlay = offlineGreenOnlyRoulette.playOffline(Collections.emptyList());
 
         // Then
         Assertions.assertEquals(GREEN, actualPlay);
