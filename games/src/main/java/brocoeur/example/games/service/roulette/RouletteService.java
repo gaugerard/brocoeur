@@ -53,11 +53,6 @@ public class RouletteService implements GameRound {
                 player.getLinkedJobId());
     }
 
-    @Override
-    public boolean didPlayerWin(GamePlay userPlay, GamePlay servicePlay) {
-        return userPlay.equals(servicePlay);
-    }
-
     /**
      * Use for <b>Direct</b> play.
      */

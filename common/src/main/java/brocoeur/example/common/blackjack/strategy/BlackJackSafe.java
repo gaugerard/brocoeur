@@ -3,6 +3,7 @@ package brocoeur.example.common.blackjack.strategy;
 import brocoeur.example.common.DeckOfCards;
 import brocoeur.example.common.GameStrategy;
 import brocoeur.example.common.blackjack.BlackJackPlay;
+import brocoeur.example.common.blackjack.BlackJackUtils;
 import lombok.ToString;
 
 import java.util.List;
@@ -19,20 +20,12 @@ public class BlackJackSafe implements GameStrategy {
 
     @Override
     public BlackJackPlay play(final List<DeckOfCards.Card> playerCards) {
-        final int totalScore = getTotalScore(playerCards);
+        final int totalScore = BlackJackUtils.getTotalScore(playerCards);
         return totalScore >= 15 ? STOP : MORE;
     }
 
     @Override
     public BlackJackPlay play(List<DeckOfCards.Card> playerCards, List<DeckOfCards.Card> casinoCards) {
         return null;
-    }
-
-    private int getTotalScore(final List<DeckOfCards.Card> cards) {
-        int totalScore = 0;
-        for (DeckOfCards.Card card : cards) {
-            totalScore += card.getValue();
-        }
-        return totalScore;
     }
 }

@@ -1,7 +1,6 @@
 package brocoeur.example.games.service.blackjack;
 
 import brocoeur.example.common.GamePlay;
-import brocoeur.example.common.GameStrategy;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import brocoeur.example.common.request.ServiceRequest;
@@ -28,19 +27,6 @@ public class BlackJackService implements GameRound {
 
         return BlackJackResults.SEVENTEEN;
 
-    }
-
-    @Override
-    public GamePlay play(GameStrategy gameStrategy) {
-        // Romain code to do here for the player to play
-        // will return a BlackJackResult => see enum class
-
-
-        return BlackJackResults.EIGHTEEN;
-    }
-
-    public boolean didPlayerWin(final GamePlay userPlay, final GamePlay servicePlay) {
-        return true;
     }
 
     public List<PlayerResponse> playBlackJackGame(final ServiceRequest serviceRequest) {

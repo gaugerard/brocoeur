@@ -2,7 +2,6 @@ package brocoeur.example.games.service.cointoss;
 
 
 import brocoeur.example.common.GamePlay;
-import brocoeur.example.common.GameStrategy;
 import brocoeur.example.common.cointoss.CoinTossPlay;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
@@ -24,10 +23,6 @@ public class CoinTossService implements GameRound {
     @Override
     public GamePlay play() {
         return Arrays.stream(CoinTossPlay.values()).toList().get(new Random().nextInt(CoinTossPlay.values().length));
-    }
-
-    public GamePlay play(GameStrategy gameStrategy) {
-        return gameStrategy.play();
     }
 
     public PlayerResponse play(final PlayerRequest player) {
@@ -52,11 +47,6 @@ public class CoinTossService implements GameRound {
                 isWinner,
                 player.getAmountToGamble(),
                 player.getLinkedJobId());
-    }
-
-    @Override
-    public boolean didPlayerWin(GamePlay userPlay, GamePlay servicePlay) {
-        return userPlay.equals(servicePlay);
     }
 
     /**
