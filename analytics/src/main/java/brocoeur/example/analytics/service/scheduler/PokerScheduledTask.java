@@ -1,5 +1,6 @@
 package brocoeur.example.analytics.service.scheduler;
 
+import brocoeur.example.analytics.AnalyticsConfigProperties;
 import brocoeur.example.analytics.model.ServiceRequestStatus;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import brocoeur.example.common.GameStrategyTypes;
@@ -31,6 +32,8 @@ public class PokerScheduledTask {
 
     @Autowired
     private ServiceRequestStatusService serviceRequestStatusService;
+    @Autowired
+    private AnalyticsConfigProperties analyticsConfigProperties;
 
     /**
      * Every 30 sec, this task will be triggered in order to execute the poker games.
@@ -40,7 +43,7 @@ public class PokerScheduledTask {
      *     <li>3) Else, does nothing and waits 30 seconds before executing again.</li>
      * </ul>
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRateString = "#{analyticsConfigProperties.getPokerFetchingRate()}")
     public void executeScheduledTask() {
         LOGGER.info("Poker scheduled task started at : {}", dateFormat.format(new Date()));
 
@@ -105,7 +108,7 @@ public class PokerScheduledTask {
      * <p>Every 30 seconds, this task will be triggered to <b>cancel</b> pending/blocked. </p>
      * <p>A job is considered pending/blocked when its has not been completed after 5 minutes.</p>
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRateString = "#{analyticsConfigProperties.getBlockedRequestRate()}")
     public void cancelBlockedRequests() {
         final Date currentDate = new Date();
         final long currentTime = currentDate.getTime();
