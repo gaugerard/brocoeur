@@ -17,4 +17,12 @@ public class AnalyticsConfigProperties {
     private String analyticInputQueueName;
     private String nerimaToAnalyticsQueueName;
 
+    public String getBlockedRequestRate(){
+        return (blockedRequestRate != null ) ? blockedRequestRate : "30000";
+    }
+
+    public String getPokerFetchingRate(){
+        return (pokerFetchingRate != null ) ? pokerFetchingRate : "30000";
+    }
+
 }

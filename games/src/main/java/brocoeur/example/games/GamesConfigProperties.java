@@ -16,4 +16,5 @@ public class GamesConfigProperties {
     private String rpcExchange;
     private String autoStartup;
 
+
 }
