@@ -30,7 +30,7 @@ public class GamesController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @RabbitListener(id = "game-controller-lister-id", queues = "#{gamesConfigProperties.getRpcMessageQueue()}", autoStartup = "#{gamesConfigProperties.getAutoStartup()}")
+    @RabbitListener(id = "game-controller-lister-id", queues = "#{gamesConfigProperties.getServiceRequestQueueName()}", autoStartup = "#{gamesConfigProperties.getAutoStartup()}")
     public void getMsg(final ServiceRequest serviceRequest) {
         final ServiceRequestTypes serviceRequestType = serviceRequest.getServiceRequestTypes();
         switch (serviceRequestType) {
@@ -51,7 +51,7 @@ public class GamesController {
 
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
+                gamesConfigProperties.getAnalyticInputQueueName(),
                 analyticServiceRequest);
     }
 
@@ -66,7 +66,7 @@ public class GamesController {
 
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
+                gamesConfigProperties.getAnalyticInputQueueName(),
                 analyticServiceRequest);
     }
 
@@ -95,7 +95,7 @@ public class GamesController {
 
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
+                gamesConfigProperties.getAnalyticInputQueueName(),
                 analyticServiceRequest);
     }
 }

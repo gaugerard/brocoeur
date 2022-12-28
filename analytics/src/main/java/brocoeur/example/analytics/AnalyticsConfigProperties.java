@@ -14,4 +14,7 @@ public class AnalyticsConfigProperties {
     private String blockedRequestRate;
     private String pokerFetchingRate;
 
+    private String analyticInputQueueName;
+    private String nerimaToAnalyticsQueueName;
+
 }
