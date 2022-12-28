@@ -43,17 +43,17 @@ class GameIT {
 
     @BeforeAll
     void beforeAll() {
-        final Queue testQueue = new Queue("MyQ1", false, false, true);
+        final Queue testQueue = new Queue("ServiceRequestQueue", false, false, true);
         final TopicExchange testTopicExchange = new TopicExchange("myexchange1");
-        final Binding testBinding = BindingBuilder.bind(testQueue).to(testTopicExchange).with("MyQ1");
+        final Binding testBinding = BindingBuilder.bind(testQueue).to(testTopicExchange).with("ServiceRequestQueue");
 
         rabbitAdmin.declareQueue(testQueue);
         rabbitAdmin.declareExchange(testTopicExchange);
         rabbitAdmin.declareBinding(testBinding);
 
-        final Queue testQueue2 = new Queue("analyticInput", false, false, true);
+        final Queue testQueue2 = new Queue("analyticInputQueue", false, false, true);
         final TopicExchange testTopicExchange2 = new TopicExchange("analyticDirectExchange");
-        final Binding testBinding2 = BindingBuilder.bind(testQueue2).to(testTopicExchange2).with("analyticInput");
+        final Binding testBinding2 = BindingBuilder.bind(testQueue2).to(testTopicExchange2).with("AnalyticInputQueue");
 
         rabbitAdmin.declareQueue(testQueue2);
         rabbitAdmin.declareExchange(testTopicExchange2);
@@ -64,30 +64,30 @@ class GameIT {
 
     @AfterEach
     void afterEach() {
-        rabbitAdmin.purgeQueue("MyQ1");
-        rabbitAdmin.purgeQueue("analyticInput");
+        rabbitAdmin.purgeQueue("ServiceRequestQueue");
+        rabbitAdmin.purgeQueue("AnalyticInputQueue");
     }
 
     @AfterAll
     void afterAll() {
-        rabbitAdmin.deleteQueue("MyQ1");
-        rabbitAdmin.deleteQueue("analyticInput");
+        rabbitAdmin.deleteQueue("ServiceRequestQueue");
+        rabbitAdmin.deleteQueue("AnalyticInputQueue");
         rabbitAdmin.deleteExchange("myexchange1");
         rabbitAdmin.deleteExchange("analyticDirectExchange");
     }
 
     @Test
-    void shouldFetchDirectServiceRequestFromMyQ1AndSendToMyAnalyticInputQueue() throws InterruptedException {
+    void shouldFetchDirectServiceRequestFromServiceRequestQueueAndSendToMyAnalyticInputQueue() throws InterruptedException {
         startRabbitListener();
 
         var userId = "8";
         var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, 354561);
         var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
-        rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", serviceRequest);
+        rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "ServiceRequestQueue", serviceRequest);
 
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("analyticInput");
+        var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("AnalyticInputQueue");
         var playerResponse = analyticServiceRequestPresentInQueue.getPlayerResponseList().get(0);
 
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
@@ -99,17 +99,17 @@ class GameIT {
     }
 
     @Test
-    void shouldFetchOfflineServiceRequestFromMyQ1AndSendToMyAnalyticInputQueue() throws InterruptedException {
+    void shouldFetchOfflineServiceRequestFromServiceRequestQueueAndSendToMyAnalyticInputQueue() throws InterruptedException {
         startRabbitListener();
 
         var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, 156478);
         var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, 3);
 
-        rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", offlineServiceRequest);
+        rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "ServiceRequestQueue", offlineServiceRequest);
 
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("analyticInput");
+        var analyticServiceRequestPresentInQueue = (AnalyticServiceRequest) rabbitAdmin.getRabbitTemplate().receiveAndConvert("AnalyticInputQueue");
         var playerResponse = analyticServiceRequestPresentInQueue.getPlayerResponseList().get(0);
 
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
@@ -130,7 +130,7 @@ class GameIT {
         return new Callable<Boolean>() {
             public Boolean call() {
                 // check the condition that must be fulfilled.
-                var queueInfo = rabbitAdmin.getQueueInfo("analyticInput");
+                var queueInfo = rabbitAdmin.getQueueInfo("AnalyticInputQueue");
                 return queueInfo.getMessageCount() == 1;
             }
         };

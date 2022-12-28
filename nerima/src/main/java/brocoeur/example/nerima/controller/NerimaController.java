@@ -51,7 +51,7 @@ public class NerimaController {
         LOGGER.info("Received request : {}", serviceRequest);
         rabbitTemplate.convertAndSend(
                 nerimaConfigProperties.getRpcExchange(),
-                nerimaConfigProperties.getServiceRequestQueueName(),
+                nerimaConfigProperties.getNerimaToAnalyticsQueueName(),
                 serviceRequest);
     }
 }

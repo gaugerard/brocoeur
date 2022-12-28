@@ -51,13 +51,13 @@ class NerimaControllerTest {
         var serviceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, playerRequest, 1);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
-        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
+        Mockito.when(nerimaConfigPropertiesMock.getNerimaToAnalyticsQueueName()).thenReturn("NerimaToAnalyticsQueue");
 
         // When
         var actualServiceResponse = nerimaController.postDirectGamblePlay(serviceRequest);
 
         // Then
-        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
+        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "NerimaToAnalyticsQueue", serviceRequest);
         Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actualServiceResponse);
     }
 
@@ -68,13 +68,13 @@ class NerimaControllerTest {
         var serviceRequest = new ServiceRequest(ServiceRequestTypes.OFFLINE, playerRequest, 3);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
-        Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
+        Mockito.when(nerimaConfigPropertiesMock.getNerimaToAnalyticsQueueName()).thenReturn("NerimaToAnalyticsQueue");
 
         // When
         var actualServiceResponse = nerimaController.postOfflineGamblePlay(serviceRequest);
 
         // Then
-        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
+        Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "NerimaToAnalyticsQueue", serviceRequest);
         Assertions.assertEquals(new ResponseEntity<>(serviceRequest, HttpStatus.OK), actualServiceResponse);
     }
 }
