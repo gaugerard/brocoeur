@@ -72,6 +72,6 @@ public class UserWinLossByGameService {
                 updatedNumberOfLoss);
 
         userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("Updated : {}", updated));
-        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), listOfIsWinner, playerResponse.getAmount());
+        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), playerResponse.getAmount());
     }
 }
