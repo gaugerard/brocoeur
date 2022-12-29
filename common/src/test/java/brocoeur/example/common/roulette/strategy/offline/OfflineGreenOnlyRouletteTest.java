@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 
-import static brocoeur.example.common.roulette.RoulettePlay.GREEN;
+import static brocoeur.example.common.roulette.RoulettePlay.ZERO;
 
 @ExtendWith(MockitoExtension.class)
 class OfflineGreenOnlyRouletteTest {
@@ -22,6 +22,6 @@ class OfflineGreenOnlyRouletteTest {
         var actualPlay = offlineGreenOnlyRoulette.playOffline(Collections.emptyList());
 
         // Then
-        Assertions.assertEquals(GREEN, actualPlay);
+        Assertions.assertEquals(ZERO, actualPlay);
     }
 }

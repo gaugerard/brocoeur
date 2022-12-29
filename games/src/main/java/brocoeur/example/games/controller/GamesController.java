@@ -79,17 +79,20 @@ public class GamesController {
 
         List<Boolean> listOfIsWinner = new ArrayList<>();
         List<PlayerResponse> playerResponseList = null;
+        int totalAmountWon = 0;
         final int repetition = offlineServiceRequest.getTimeToLive();
 
         for (var i = 0; i < repetition; i++) {
             playerResponseList = gameService.playOfflineGame(offlineServiceRequest, listOfIsWinner);
             final boolean isWinner = playerResponseList.get(0).getListOfIsWinner().get(0);
             listOfIsWinner.add(isWinner);
+            totalAmountWon += playerResponseList.get(0).getAmount();
         }
 
         // Update last 'playerResponseList' object to contain the list of win/loss.
         final PlayerResponse playerResponse = playerResponseList.get(0);
         playerResponse.setListOfIsWinner(listOfIsWinner);
+        playerResponse.setAmount(totalAmountWon);
 
         final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
 

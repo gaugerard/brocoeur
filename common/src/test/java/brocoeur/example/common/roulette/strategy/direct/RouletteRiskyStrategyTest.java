@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static brocoeur.example.common.roulette.RoulettePlay.GREEN;
+import static brocoeur.example.common.roulette.RoulettePlay.ZERO;
 
 @ExtendWith(MockitoExtension.class)
 class RouletteRiskyStrategyTest {
@@ -20,6 +20,6 @@ class RouletteRiskyStrategyTest {
         var actualPlay = rouletteRiskyStrategy.play();
 
         // Then
-        Assertions.assertEquals(GREEN, actualPlay);
+        Assertions.assertEquals(ZERO, actualPlay);
     }
 }

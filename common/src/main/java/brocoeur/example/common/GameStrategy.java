@@ -9,20 +9,27 @@ public interface GameStrategy {
      *
      * @return GamePlay
      */
-    public GamePlay play();
+    public Gamble play(int availableAmount);
+
+    /**
+     * Method for determining the <b>single</b> or <b>multiple</b> player's action(s) for current game round.
+     *
+     * @return List<GamePlay>
+     */
+    public Gamble playSingleOrMultiple(int availableAmount);
 
     /**
      * Method for determining the player's action for current game round <b>based on</b> the player's cards.
      *
      * @return GamePlay
      */
-    public GamePlay play(List<DeckOfCards.Card> playerCards);
+    public Gamble play(List<DeckOfCards.Card> playerCards, int availableAmount);
 
     /**
      * Method for determining the player's action for current game round <b>based on</b> the player's cards <b>and</b> the casino's cards.
      *
      * @return GamePlay
      */
-    public GamePlay play(List<DeckOfCards.Card> playerCards, List<DeckOfCards.Card> casinoCards);
+    public Gamble play(List<DeckOfCards.Card> playerCards, List<DeckOfCards.Card> casinoCards, int availableAmount);
 
 }
