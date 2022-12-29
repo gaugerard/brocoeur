@@ -1,6 +1,7 @@
 package brocoeur.example.common.poker.direct;
 
 import brocoeur.example.common.DeckOfCards;
+import brocoeur.example.common.Gamble;
 import brocoeur.example.common.GameStrategy;
 import brocoeur.example.common.poker.PokerPlay;
 
@@ -12,18 +13,24 @@ import static brocoeur.example.common.poker.PokerPlay.CHECK;
 
 public class RandomPoker implements GameStrategy {
     @Override
-    public PokerPlay play() {
-        return Arrays.stream(PokerPlay.values()).toList().get(new Random().nextInt(PokerPlay.values().length));
+    public Gamble play(int availableAmount) {
+        final PokerPlay pokerPlay = Arrays.stream(PokerPlay.values()).toList().get(new Random().nextInt(PokerPlay.values().length));
+        return new Gamble(pokerPlay, availableAmount);
     }
 
     @Override
-    public PokerPlay play(List<DeckOfCards.Card> playerCards) {
+    public Gamble playSingleOrMultiple(int availableAmount) {
         return null;
     }
 
     @Override
-    public PokerPlay play(List<DeckOfCards.Card> playerCards, List<DeckOfCards.Card> casinoCards) {
-        return CHECK;
+    public Gamble play(List<DeckOfCards.Card> playerCards, int availableAmount) {
+        return null;
+    }
+
+    @Override
+    public Gamble play(List<DeckOfCards.Card> playerCards, List<DeckOfCards.Card> casinoCards, int availableAmount) {
+        return new Gamble(CHECK, 0);
     }
 
     @Override

@@ -1,12 +1,12 @@
 package brocoeur.example.games.service.cointoss;
 
 
+import brocoeur.example.common.Gamble;
 import brocoeur.example.common.GamePlay;
 import brocoeur.example.common.cointoss.CoinTossPlay;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import brocoeur.example.common.request.ServiceRequest;
-import brocoeur.example.games.service.GameRound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,36 +16,39 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-public class CoinTossService implements GameRound {
+public class CoinTossService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoinTossService.class);
 
-    @Override
     public GamePlay play() {
         return Arrays.stream(CoinTossPlay.values()).toList().get(new Random().nextInt(CoinTossPlay.values().length));
     }
 
     public PlayerResponse play(final PlayerRequest player) {
-        final GamePlay userPlay = player.getGameStrategyTypes().getGameStrategy().play();
+        final int availableAmount = player.getAmountToGamble();
+        final Gamble gamble = player.getGameStrategyTypes().getGameStrategy().play(availableAmount);
         final GamePlay servicePlay = play();
-        final boolean isWinner = servicePlay.equals(userPlay);
+        final boolean isWinner = servicePlay.equals(gamble.getFirstGamePlay());
+        final int amountWon = isWinner ? 2 * availableAmount : 0;
         return new PlayerResponse(
                 324,
                 Integer.parseInt(player.getUserId()),
                 isWinner,
-                player.getAmountToGamble(),
+                amountWon,
                 player.getLinkedJobId());
     }
 
     public PlayerResponse play(final PlayerRequest player, final List<Boolean> listOfIsWinner) {
-        final GamePlay userPlay = player.getOfflineGameStrategyTypes().getOfflineGameStrategy().playOffline(listOfIsWinner);
+        final int availableAmount = player.getAmountToGamble();
+        final Gamble gamble = player.getOfflineGameStrategyTypes().getOfflineGameStrategy().playOffline(availableAmount, listOfIsWinner);
         final GamePlay servicePlay = play();
-        final boolean isWinner = servicePlay.equals(userPlay);
+        final boolean isWinner = servicePlay.equals(gamble.getFirstGamePlay());
+        final int amountWon = isWinner ? 2 * availableAmount : 0;
         return new PlayerResponse(
                 324,
                 Integer.parseInt(player.getUserId()),
                 isWinner,
-                player.getAmountToGamble(),
+                amountWon,
                 player.getLinkedJobId());
     }
 

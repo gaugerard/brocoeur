@@ -154,16 +154,6 @@ public class ServiceRequestStatusService {
 
     }
 
-    private int getAmountOfMoneyWon(final List<Boolean> listOfIsWinner, final int amountGambled) {
-        int totalAmountWon = 0;
-        for (var i = 0; i < listOfIsWinner.size(); i++) {
-            if (Boolean.TRUE.equals(listOfIsWinner.get(i))) {
-                totalAmountWon += amountGambled * WIN_MULTIPLIER;
-            }
-        }
-        return totalAmountWon;
-    }
-
     /**
      * <p>This method update the status of the selected 'serviceRequestStatus' line in Cassandra and give money to the user if he/she won the game.</p>
      * <p>For now, when a user wins a game round, the amount gambled is <b>DOUBLED</b> for the said round.</p>
@@ -172,7 +162,7 @@ public class ServiceRequestStatusService {
      * @param listOfIsWinner
      * @param amountGambled
      */
-    public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
+    public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final int totalAmountWon) {
         final ServiceRequestStatus serviceRequestStatus = serviceRequestStatusRepository.findById(jobId).block();
 
         if (serviceRequestStatus == null) {
@@ -184,7 +174,6 @@ public class ServiceRequestStatusService {
         serviceRequestStatus.setAckTimeMilliSecond(randomService.getCurrentTimeInMilliseconds());
 
         final int amountBlocked = serviceRequestStatus.getAmountBlocked();
-        final int totalAmountWon = getAmountOfMoneyWon(listOfIsWinner, amountGambled);
 
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
 

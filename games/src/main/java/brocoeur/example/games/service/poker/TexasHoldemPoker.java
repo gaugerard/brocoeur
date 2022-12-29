@@ -1,7 +1,7 @@
 package brocoeur.example.games.service.poker;
 
 import brocoeur.example.common.DeckOfCards;
-import brocoeur.example.common.poker.PokerPlay;
+import brocoeur.example.common.Gamble;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import org.slf4j.Logger;
@@ -27,12 +27,12 @@ public class TexasHoldemPoker {
 
         final List<DeckOfCards.Card> cardCasino = List.of(deckOfCards.getCard(), deckOfCards.getCard(), deckOfCards.getCard());
 
-        final PokerPlay pokerPlayPlayer1 = (PokerPlay) player1.getGameStrategyTypes().getGameStrategy().play(cardPlayer1, cardCasino);
-        LOGGER.info("Player1 executes : {}", pokerPlayPlayer1);
-        final PokerPlay pokerPlayPlayer2 = (PokerPlay) player2.getGameStrategyTypes().getGameStrategy().play(cardPlayer2, cardCasino);
-        LOGGER.info("Player2 executes : {}", pokerPlayPlayer2);
-        final PokerPlay pokerPlayPlayer3 = (PokerPlay) player3.getGameStrategyTypes().getGameStrategy().play(cardPlayer3, cardCasino);
-        LOGGER.info("Player3 executes : {}", pokerPlayPlayer3);
+        final Gamble gamblePlayer1 = player1.getGameStrategyTypes().getGameStrategy().play(cardPlayer1, cardCasino, player1.getAmountToGamble());
+        LOGGER.info("Player1 executes : {}", gamblePlayer1.getFirstGamePlay());
+        final Gamble gamblePlayer2 = player2.getGameStrategyTypes().getGameStrategy().play(cardPlayer2, cardCasino, player2.getAmountToGamble());
+        LOGGER.info("Player2 executes : {}", gamblePlayer2.getFirstGamePlay());
+        final Gamble gamblePlayer3 = player3.getGameStrategyTypes().getGameStrategy().play(cardPlayer3, cardCasino, player3.getAmountToGamble());
+        LOGGER.info("Player3 executes : {}", gamblePlayer3.getFirstGamePlay());
 
         final Map<String, Object> infoPlayers = Map.of(
                 "player1", player1, "cardPlayer1", cardPlayer1,

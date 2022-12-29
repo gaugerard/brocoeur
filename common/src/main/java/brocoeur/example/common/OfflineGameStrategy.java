@@ -9,5 +9,7 @@ public interface OfflineGameStrategy {
      *
      * @return GamePlay
      */
-    public GamePlay playOffline(List<Boolean> listOfPreviousIsWinner);
+    public Gamble playOffline(int availableAmount, List<Boolean> listOfPreviousIsWinner);
+
+    public Gamble playSingleOrMultiple(int availableAmount, List<Boolean> listOfPreviousIsWinner);
 }
