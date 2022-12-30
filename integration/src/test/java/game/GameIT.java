@@ -21,10 +21,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
+import static brocoeur.example.common.GameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
-import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
-import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
+import static brocoeur.example.common.ServiceRequestTypes.SINGLE_PLAYER;
 import static org.awaitility.Awaitility.await;
 
 @EnableRabbit
@@ -81,8 +80,8 @@ class GameIT {
         startRabbitListener();
 
         var userId = "8";
-        var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, 354561);
-        var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+        var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, 5, 354561);
+        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, null);
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", serviceRequest);
 
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
@@ -93,8 +92,8 @@ class GameIT {
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
         Assertions.assertEquals(123, playerResponse.getGameId());
         Assertions.assertEquals(8, playerResponse.getUserId());
-        Assertions.assertEquals(1, playerResponse.getListOfIsWinner().size());
-        Assertions.assertEquals(5, playerResponse.getAmount());
+        Assertions.assertEquals(1, playerResponse.getInitialAmount());
+        Assertions.assertEquals(5, playerResponse.getFinalAmount());
         Assertions.assertEquals(354561, playerResponse.getLinkedJobId());
     }
 
@@ -102,8 +101,8 @@ class GameIT {
     void shouldFetchOfflineServiceRequestFromMyQ1AndSendToMyAnalyticInputQueue() throws InterruptedException {
         startRabbitListener();
 
-        var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, 156478);
-        var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, 3);
+        var playerRequest = new PlayerRequest("8", OFFLINE_COIN_TOSS_RANDOM, 50, 156478);
+        var offlineServiceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 3);
 
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", offlineServiceRequest);
 
@@ -115,8 +114,8 @@ class GameIT {
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
         Assertions.assertEquals(324, playerResponse.getGameId());
         Assertions.assertEquals(8, playerResponse.getUserId());
-        Assertions.assertEquals(3, playerResponse.getListOfIsWinner().size());
-        Assertions.assertEquals(50, playerResponse.getAmount());
+        Assertions.assertEquals(3, playerResponse.getInitialAmount());
+        Assertions.assertEquals(50, playerResponse.getFinalAmount());
         Assertions.assertEquals(156478, playerResponse.getLinkedJobId());
     }
 
