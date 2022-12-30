@@ -93,7 +93,6 @@ class GameIT {
         Assertions.assertEquals(123, playerResponse.getGameId());
         Assertions.assertEquals(8, playerResponse.getUserId());
         Assertions.assertEquals(5, playerResponse.getInitialAmount());
-        Assertions.assertEquals(5, playerResponse.getFinalAmount());
         Assertions.assertEquals(354561, playerResponse.getLinkedJobId());
     }
 
@@ -115,7 +114,6 @@ class GameIT {
         Assertions.assertEquals(324, playerResponse.getGameId());
         Assertions.assertEquals(8, playerResponse.getUserId());
         Assertions.assertEquals(50, playerResponse.getInitialAmount());
-        Assertions.assertEquals(40, playerResponse.getFinalAmount());
         Assertions.assertEquals(156478, playerResponse.getLinkedJobId());
     }
 
