@@ -81,7 +81,7 @@ class GameIT {
 
         var userId = "8";
         var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, 5, 354561);
-        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, null);
+        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
         rabbitAdmin.getRabbitTemplate().convertAndSend("myexchange1", "MyQ1", serviceRequest);
 
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
@@ -114,7 +114,7 @@ class GameIT {
         Assertions.assertEquals(MONEY_MANAGEMENT, analyticServiceRequestPresentInQueue.getAnalyticServiceRequestTypes());
         Assertions.assertEquals(324, playerResponse.getGameId());
         Assertions.assertEquals(8, playerResponse.getUserId());
-        Assertions.assertEquals(3, playerResponse.getInitialAmount());
+        Assertions.assertEquals(50, playerResponse.getInitialAmount());
         Assertions.assertEquals(50, playerResponse.getFinalAmount());
         Assertions.assertEquals(156478, playerResponse.getLinkedJobId());
     }
