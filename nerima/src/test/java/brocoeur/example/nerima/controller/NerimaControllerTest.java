@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.stream.Stream;
 
 import static brocoeur.example.common.GameStrategyTypes.*;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 
 @ExtendWith(MockitoExtension.class)
 class NerimaControllerTest {
@@ -47,14 +46,14 @@ class NerimaControllerTest {
     @MethodSource("getInputForRoulette")
     void shouldPostDirectPlayAndGetHttpStatusOK(final String testName, final GameStrategyTypes gameStrategyTypes) {
         // Given
-        var playerRequest = new PlayerRequest("8", gameStrategyTypes, null, 5, null);
-        var serviceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, playerRequest, 1);
+        var playerRequest = new PlayerRequest("8", gameStrategyTypes, 5, null);
+        var serviceRequest = new ServiceRequest(ServiceRequestTypes.SINGLE_PLAYER, playerRequest, 1);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
         Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
 
         // When
-        var actualServiceResponse = nerimaController.postDirectGamblePlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postSinglePlayerGamblePlay(serviceRequest);
 
         // Then
         Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);
@@ -64,14 +63,14 @@ class NerimaControllerTest {
     @Test
     void shouldPostOfflinePlayAndGetHttpStatusOK() {
         // Given
-        var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 5, null);
-        var serviceRequest = new ServiceRequest(ServiceRequestTypes.OFFLINE, playerRequest, 3);
+        var playerRequest = new PlayerRequest("8", OFFLINE_COIN_TOSS_RANDOM, 5, null);
+        var serviceRequest = new ServiceRequest(ServiceRequestTypes.SINGLE_PLAYER, playerRequest, 3);
 
         Mockito.when(nerimaConfigPropertiesMock.getRpcExchange()).thenReturn("A1DirectExchange");
         Mockito.when(nerimaConfigPropertiesMock.getRpcMessageQueue()).thenReturn("MyA1");
 
         // When
-        var actualServiceResponse = nerimaController.postOfflineGamblePlay(serviceRequest);
+        var actualServiceResponse = nerimaController.postSinglePlayerGamblePlay(serviceRequest);
 
         // Then
         Mockito.verify(rabbitTemplateMock).convertAndSend("A1DirectExchange", "MyA1", serviceRequest);

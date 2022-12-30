@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
-import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
-
 @RestController
 public class NerimaController {
 
@@ -27,24 +24,14 @@ public class NerimaController {
     private RabbitTemplate rabbitTemplate;
 
     @PostMapping("/api/nerima/gamble")
-    public ResponseEntity<ServiceRequest> postDirectGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
+    public ResponseEntity<ServiceRequest> postSinglePlayerGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
         final ServiceRequest directGambleServiceRequest = new ServiceRequest(serviceRequest);
+
+        serviceRequest.setTimeToLive(Integer.min(serviceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
 
         post(directGambleServiceRequest);
 
         return new ResponseEntity<>(directGambleServiceRequest, HttpStatus.OK);
-    }
-
-    @PostMapping("/api/nerima/offline/gamble")
-    public ResponseEntity<ServiceRequest> postOfflineGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
-        final ServiceRequest offlineGambleServiceRequest = new ServiceRequest(serviceRequest);
-
-        // normalize
-        offlineGambleServiceRequest.setTimeToLive(Integer.min(offlineGambleServiceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
-
-        post(offlineGambleServiceRequest);
-
-        return new ResponseEntity<>(offlineGambleServiceRequest, HttpStatus.OK);
     }
 
     private void post(final ServiceRequest serviceRequest) {
