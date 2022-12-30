@@ -57,7 +57,7 @@ class NerimaIT {
     void shouldSendDirectRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
         var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, 5, null);
-        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, null);
+        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
 
         nerimaController.postSinglePlayerGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
@@ -74,7 +74,7 @@ class NerimaIT {
     void shouldSendOfflineRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
         var playerRequest = new PlayerRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 100, null);
-        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 15);
+        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 5);
 
         nerimaController.postSinglePlayerGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
