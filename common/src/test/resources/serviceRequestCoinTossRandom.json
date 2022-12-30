@@ -1,13 +1,12 @@
 {
-  "serviceRequestTypes": "DIRECT",
+  "serviceRequestTypes": "SINGLE_PLAYER",
   "playerRequestList": [
     {
       "userId": "8",
       "gameStrategyTypes": "COIN_TOSS_RANDOM",
-      "offlineGameStrategyTypes": null,
       "amountToGamble": "50",
       "linkedJobId": "345543"
     }
   ],
-  "timeToLive": null
+  "timeToLive": 1
 }

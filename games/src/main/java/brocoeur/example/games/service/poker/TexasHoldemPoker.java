@@ -1,7 +1,8 @@
 package brocoeur.example.games.service.poker;
 
 import brocoeur.example.common.DeckOfCards;
-import brocoeur.example.common.poker.PokerPlay;
+import brocoeur.example.common.Gamble;
+import brocoeur.example.common.PokerGameStrategy;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import org.slf4j.Logger;
@@ -27,11 +28,14 @@ public class TexasHoldemPoker {
 
         final List<DeckOfCards.Card> cardCasino = List.of(deckOfCards.getCard(), deckOfCards.getCard(), deckOfCards.getCard());
 
-        final PokerPlay pokerPlayPlayer1 = (PokerPlay) player1.getGameStrategyTypes().getGameStrategy().play(cardPlayer1, cardCasino);
+        final PokerGameStrategy pokerGameStrategyPlayer1 = (PokerGameStrategy) player1.getGameStrategyTypes().getGameStrategy();
+        final Gamble pokerPlayPlayer1 = pokerGameStrategyPlayer1.play(player1.getAmountToGamble(), cardPlayer1, cardCasino);
         LOGGER.info("Player1 executes : {}", pokerPlayPlayer1);
-        final PokerPlay pokerPlayPlayer2 = (PokerPlay) player2.getGameStrategyTypes().getGameStrategy().play(cardPlayer2, cardCasino);
+        final PokerGameStrategy pokerGameStrategyPlayer2 = (PokerGameStrategy) player2.getGameStrategyTypes().getGameStrategy();
+        final Gamble pokerPlayPlayer2 = pokerGameStrategyPlayer2.play(player2.getAmountToGamble(), cardPlayer2, cardCasino);
         LOGGER.info("Player2 executes : {}", pokerPlayPlayer2);
-        final PokerPlay pokerPlayPlayer3 = (PokerPlay) player3.getGameStrategyTypes().getGameStrategy().play(cardPlayer3, cardCasino);
+        final PokerGameStrategy pokerGameStrategyPlayer3 = (PokerGameStrategy) player3.getGameStrategyTypes().getGameStrategy();
+        final Gamble pokerPlayPlayer3 = pokerGameStrategyPlayer3.play(player3.getAmountToGamble(), cardPlayer3, cardCasino);
         LOGGER.info("Player3 executes : {}", pokerPlayPlayer3);
 
         final Map<String, Object> infoPlayers = Map.of(
@@ -51,9 +55,9 @@ public class TexasHoldemPoker {
             final PlayerRequest player2,
             final PlayerRequest player3) {
 
-        final PlayerResponse playerResponse1 = new PlayerResponse(420, Integer.parseInt(player1.getUserId()), winnerId.equals(player1.getUserId()), player1.getAmountToGamble(), player1.getLinkedJobId());
-        final PlayerResponse playerResponse2 = new PlayerResponse(420, Integer.parseInt(player2.getUserId()), winnerId.equals(player2.getUserId()), player2.getAmountToGamble(), player2.getLinkedJobId());
-        final PlayerResponse playerResponse3 = new PlayerResponse(420, Integer.parseInt(player3.getUserId()), winnerId.equals(player3.getUserId()), player3.getAmountToGamble(), player3.getLinkedJobId());
+        final PlayerResponse playerResponse1 = new PlayerResponse(420, Integer.parseInt(player1.getUserId()), player1.getAmountToGamble(), player1.getAmountToGamble(), player1.getLinkedJobId());
+        final PlayerResponse playerResponse2 = new PlayerResponse(420, Integer.parseInt(player2.getUserId()), player1.getAmountToGamble(), player2.getAmountToGamble(), player2.getLinkedJobId());
+        final PlayerResponse playerResponse3 = new PlayerResponse(420, Integer.parseInt(player3.getUserId()), player1.getAmountToGamble(), player3.getAmountToGamble(), player3.getLinkedJobId());
 
         return List.of(playerResponse1, playerResponse2, playerResponse3);
     }

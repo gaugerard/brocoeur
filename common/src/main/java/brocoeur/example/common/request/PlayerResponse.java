@@ -3,15 +3,14 @@ package brocoeur.example.common.request;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 @Component
 public class PlayerResponse implements Serializable {
     private int gameId;
     private int userId;
-    private List<Boolean> listOfIsWinner;
-    private int amount;
+    private int initialAmount;
+    private int finalAmount;
     private int linkedJobId;
 
     public PlayerResponse() {
@@ -19,25 +18,13 @@ public class PlayerResponse implements Serializable {
 
     public PlayerResponse(final int gameId,
                           final int userId,
-                          final List<Boolean> listOfIsWinner,
-                          final int amount,
+                          final int initialAmount,
+                          final int finalAmount,
                           final int linkedJobId) {
         this.gameId = gameId;
         this.userId = userId;
-        this.listOfIsWinner = listOfIsWinner;
-        this.amount = amount;
-        this.linkedJobId = linkedJobId;
-    }
-
-    public PlayerResponse(final int gameId,
-                          final int userId,
-                          final Boolean isWinner,
-                          final int amount,
-                          final int linkedJobId) {
-        this.gameId = gameId;
-        this.userId = userId;
-        this.listOfIsWinner = List.of(isWinner);
-        this.amount = amount;
+        this.initialAmount = initialAmount;
+        this.finalAmount = finalAmount;
         this.linkedJobId = linkedJobId;
     }
 
@@ -57,20 +44,20 @@ public class PlayerResponse implements Serializable {
         this.userId = userId;
     }
 
-    public List<Boolean> getListOfIsWinner() {
-        return listOfIsWinner;
+    public int getInitialAmount() {
+        return initialAmount;
     }
 
-    public void setListOfIsWinner(List<Boolean> listOfIsWinner) {
-        this.listOfIsWinner = listOfIsWinner;
+    public void setInitialAmount(int initialAmount) {
+        this.initialAmount = initialAmount;
     }
 
-    public int getAmount() {
-        return amount;
+    public int getFinalAmount() {
+        return finalAmount;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setFinalAmount(int finalAmount) {
+        this.finalAmount = finalAmount;
     }
 
     public int getLinkedJobId() {
@@ -86,8 +73,8 @@ public class PlayerResponse implements Serializable {
         return "PlayerResponse{" +
                 "gameId=" + gameId +
                 ", userId=" + userId +
-                ", listOfIsWinner=" + listOfIsWinner +
-                ", amount=" + amount +
+                ", initialAmount=" + initialAmount +
+                ", finalAmount=" + finalAmount +
                 ", linkedJobId=" + linkedJobId +
                 '}';
     }
@@ -106,8 +93,8 @@ public class PlayerResponse implements Serializable {
 
         return Objects.equals(gameId, c.gameId) &&
                 Objects.equals(userId, c.userId) &&
-                Objects.equals(listOfIsWinner, c.listOfIsWinner) &&
-                Objects.equals(amount, c.amount) &&
+                Objects.equals(initialAmount, c.initialAmount) &&
+                Objects.equals(finalAmount, c.finalAmount) &&
                 Objects.equals(linkedJobId, c.linkedJobId);
     }
 }

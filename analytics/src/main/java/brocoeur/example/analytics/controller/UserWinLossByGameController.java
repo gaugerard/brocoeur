@@ -42,20 +42,20 @@ public class UserWinLossByGameController {
         String poker = "Poker";
 
         List<UserWinLossByGame> userWinLossByGameServices = new ArrayList<>();
-        userWinLossByGameServices.add(new UserWinLossByGame(123, 5, roulette, user5Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(324, 5, coinToss, user5Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(666, 5, blackJack, user5Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(420, 5, poker, user5Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(123, 5, roulette, user5Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(324, 5, coinToss, user5Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(666, 5, blackJack, user5Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(420, 5, poker, user5Name, 0));
 
-        userWinLossByGameServices.add(new UserWinLossByGame(123, 8, roulette, user8Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(324, 8, coinToss, user8Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(666, 8, blackJack, user8Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(420, 8, poker, user8Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(123, 8, roulette, user8Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(324, 8, coinToss, user8Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(666, 8, blackJack, user8Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(420, 8, poker, user8Name, 0));
 
-        userWinLossByGameServices.add(new UserWinLossByGame(123, 11, roulette, user11Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(324, 11, coinToss, user11Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(666, 11, blackJack, user11Name, 0, 0));
-        userWinLossByGameServices.add(new UserWinLossByGame(420, 11, poker, user11Name, 0, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(123, 11, roulette, user11Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(324, 11, coinToss, user11Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(666, 11, blackJack, user11Name, 0));
+        userWinLossByGameServices.add(new UserWinLossByGame(420, 11, poker, user11Name, 0));
 
         userWinLossByGameService.initializeUserWinLossByGame(userWinLossByGameServices);
     }

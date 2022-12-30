@@ -21,9 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static brocoeur.example.common.GameStrategyTypes.*;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_HEAD_ONLY;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_ROULETTE_GREEN_ONLY;
-import static brocoeur.example.common.ServiceRequestTypes.*;
+import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
+import static brocoeur.example.common.ServiceRequestTypes.SINGLE_PLAYER;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
@@ -48,17 +47,17 @@ class GameServiceTest {
         @Test
         void shouldTestPlayDirectGameRoulette() {
             // Given
-            var playerRequest = new PlayerRequest("8", ROULETTE_RISKY, null, 25, 1);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
-            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
+            var playerRequest = new PlayerRequest("8", ROULETTE_RISKY, 25, 1);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
+            var playerResponseList = List.of(new PlayerResponse(123, 8, 100, 25, 1));
 
-            when(rouletteServiceMock.playRouletteGame(serviceRequest)).thenReturn(playerResponseList);
+            when(rouletteServiceMock.play(playerRequest, 1)).thenReturn(playerResponseList);
 
             // When
-            var actualPlayerResponseList = gameService.playDirectGame(serviceRequest);
+            var actualPlayerResponseList = gameService.playGame(serviceRequest);
 
             // Then
-            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, 100, 25, 1));
             MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
             Mockito.verifyNoMoreInteractions(rouletteServiceMock);
             Mockito.verifyNoInteractions(coinTossServiceMock);
@@ -69,17 +68,17 @@ class GameServiceTest {
         @Test
         void shouldTestPlayDirectGameCoinToss() {
             // Given
-            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 35, 1);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
-            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, 35, 1);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
+            var playerResponseList = List.of(new PlayerResponse(123, 8, 100, 35, 1));
 
-            when(coinTossServiceMock.playCoinTossGame(serviceRequest)).thenReturn(playerResponseList);
+            when(coinTossServiceMock.play(playerRequest, 1)).thenReturn(playerResponseList);
 
             // When
-            var actualPlayerResponseList = gameService.playDirectGame(serviceRequest);
+            var actualPlayerResponseList = gameService.playGame(serviceRequest);
 
             // Then
-            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, 100, 35, 1));
             MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
             Mockito.verifyNoMoreInteractions(coinTossServiceMock);
             Mockito.verifyNoInteractions(rouletteServiceMock);
@@ -90,17 +89,17 @@ class GameServiceTest {
         @Test
         void shouldTestPlayDirectGameBlackJack() {
             // Given
-            var playerRequest = new PlayerRequest("8", BLACK_JACK_SAFE, null, 50, 1);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
-            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 50, 1));
+            var playerRequest = new PlayerRequest("8", BLACK_JACK_SAFE, 50, 1);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
+            var playerResponseList = List.of(new PlayerResponse(123, 8, 100, 50, 1));
 
-            when(blackJackServiceMock.playBlackJackGame(serviceRequest)).thenReturn(playerResponseList);
+            when(blackJackServiceMock.playBlackJackGame(playerRequest, 1)).thenReturn(playerResponseList);
 
             // When
-            var actualPlayerResponseList = gameService.playDirectGame(serviceRequest);
+            var actualPlayerResponseList = gameService.playGame(serviceRequest);
 
             // Then
-            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 50, 1));
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, 100, 50, 1));
             MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
             Mockito.verifyNoMoreInteractions(blackJackServiceMock);
             Mockito.verifyNoInteractions(rouletteServiceMock);
@@ -111,11 +110,11 @@ class GameServiceTest {
         @Test
         void shouldTestPlayDirectGamePoker() {
             // Given
-            var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 60, 1);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", POKER_RANDOM, 60, 1);
+            var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
 
             // When
-            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playDirectGame(serviceRequest));
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playGame(serviceRequest));
 
             Assertions.assertEquals("Poker should not be managed here.", exception.getMessage());
 
@@ -129,11 +128,11 @@ class GameServiceTest {
         @Test
         void shouldTestPlayDirectGameForMissingMandatoryElement() {
             // Given
-            var playerRequest = new PlayerRequest("8", null, null, 60, 1);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", null, 60, 1);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, null);
 
             // When
-            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playDirectGame(serviceRequest));
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playGame(serviceRequest));
 
             Assertions.assertEquals("Missing mandatory 'GameStrategyTypes'.", exception.getMessage());
 
@@ -148,43 +147,22 @@ class GameServiceTest {
     @Nested
     @DisplayName("Tests for OFFLINE service Request")
     class OfflineGameServiceTest {
-        @Test
-        void shouldTestPlayOfflineGameRoulette() {
-            // Given
-            var playerRequest = new PlayerRequest("8", null, OFFLINE_ROULETTE_GREEN_ONLY, 25, 1);
-            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, null);
-            List<Boolean> listOfIsWinner = List.of();
-            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
-
-            when(rouletteServiceMock.playRouletteGame(serviceRequest, listOfIsWinner)).thenReturn(playerResponseList);
-
-            // When
-            var actualPlayerResponseList = gameService.playOfflineGame(serviceRequest, listOfIsWinner);
-
-            // Then
-            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 25, 1));
-            MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
-            Mockito.verifyNoMoreInteractions(rouletteServiceMock);
-            Mockito.verifyNoInteractions(coinTossServiceMock);
-            Mockito.verifyNoInteractions(blackJackServiceMock);
-            Mockito.verifyNoInteractions(pokerServiceMock);
-        }
 
         @Test
         void shouldTestPlayOfflineGameCoinToss() {
             // Given
-            var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_HEAD_ONLY, 35, 1);
-            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", OFFLINE_COIN_TOSS_HEAD_ONLY, 35, 1);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
             List<Boolean> listOfIsWinner = List.of();
-            var playerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+            var playerResponseList = List.of(new PlayerResponse(123, 8, 100, 35, 1));
 
-            when(coinTossServiceMock.playCoinTossGame(serviceRequest, listOfIsWinner)).thenReturn(playerResponseList);
+            when(coinTossServiceMock.play(playerRequest, 1)).thenReturn(playerResponseList);
 
             // When
-            var actualPlayerResponseList = gameService.playOfflineGame(serviceRequest, listOfIsWinner);
+            var actualPlayerResponseList = gameService.playGame(serviceRequest);
 
             // Then
-            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, true, 35, 1));
+            var expectedPlayerResponseList = List.of(new PlayerResponse(123, 8, 100, 35, 1));
             MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
             Mockito.verifyNoMoreInteractions(coinTossServiceMock);
             Mockito.verifyNoInteractions(rouletteServiceMock);
@@ -196,14 +174,14 @@ class GameServiceTest {
         @Test
         void shouldTestPlayOfflineGameForMissingMandatoryElement() {
             // Given
-            var playerRequest = new PlayerRequest("8", null, null, 70, 1);
-            var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", null, 70, 1);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, null);
             List<Boolean> listOfIsWinner = List.of();
 
             // When
-            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playOfflineGame(serviceRequest, listOfIsWinner));
+            var exception = Assertions.assertThrows(IllegalStateException.class, () -> gameService.playGame(serviceRequest));
 
-            Assertions.assertEquals("Missing mandatory 'OfflineGameStrategyTypes'.", exception.getMessage());
+            Assertions.assertEquals("Missing mandatory 'GameStrategyTypes'.", exception.getMessage());
 
             // Then
             Mockito.verifyNoInteractions(coinTossServiceMock);
@@ -219,13 +197,13 @@ class GameServiceTest {
         @Test
         void shouldTestPlayMultiplayerGameRoulette() {
             // Given
-            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, null, 43, 1);
-            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, null, 43, 2);
-            var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, null, 43, 3);
+            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, 43, 1);
+            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, 43, 2);
+            var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, 43, 3);
             var serviceRequest = new ServiceRequest(MULTIPLAYER, List.of(playerRequest1, playerRequest2, playerRequest3), null);
-            var playerResponse1 = new PlayerResponse(420, 8, false, 43, 1);
-            var playerResponse2 = new PlayerResponse(420, 9, true, 43, 2);
-            var playerResponse3 = new PlayerResponse(420, 10, false, 43, 3);
+            var playerResponse1 = new PlayerResponse(420, 8, 100, 43, 1);
+            var playerResponse2 = new PlayerResponse(420, 9, 100, 43, 2);
+            var playerResponse3 = new PlayerResponse(420, 10, 100, 43, 3);
             var playerResponseList = List.of(playerResponse1, playerResponse2, playerResponse3);
 
             when(pokerServiceMock.playPokerGame(serviceRequest)).thenReturn(playerResponseList);
@@ -234,9 +212,9 @@ class GameServiceTest {
             var actualPlayerResponseList = gameService.playMultiplayerGame(serviceRequest);
 
             // Then
-            var expectedPlayerResponse1 = new PlayerResponse(420, 8, false, 43, 1);
-            var expectedPlayerResponse2 = new PlayerResponse(420, 9, true, 43, 2);
-            var expectedPlayerResponse3 = new PlayerResponse(420, 10, false, 43, 3);
+            var expectedPlayerResponse1 = new PlayerResponse(420, 8, 100, 43, 1);
+            var expectedPlayerResponse2 = new PlayerResponse(420, 9, 100, 43, 2);
+            var expectedPlayerResponse3 = new PlayerResponse(420, 10, 100, 43, 3);
             var expectedPlayerResponseList = List.of(expectedPlayerResponse1, expectedPlayerResponse2, expectedPlayerResponse3);
             MatcherAssert.assertThat(actualPlayerResponseList, equalTo(expectedPlayerResponseList));
             Mockito.verifyNoMoreInteractions(pokerServiceMock);
@@ -248,7 +226,7 @@ class GameServiceTest {
         @Test
         void shouldTestPlayMultiplayerGameForMissingMandatoryElement() {
             // Given
-            var playerRequest = new PlayerRequest("8", null, null, 60, 1);
+            var playerRequest = new PlayerRequest("8", null, 60, 1);
             var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
 
             // When

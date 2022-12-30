@@ -3,7 +3,6 @@ package brocoeur.example.games.service.poker;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
 import brocoeur.example.common.request.ServiceRequest;
-import brocoeur.example.games.controller.GamesController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

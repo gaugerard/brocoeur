@@ -4,5 +4,6 @@ import brocoeur.example.common.GamePlay;
 
 public enum BlackJackPlay implements GamePlay {
     STOP,
-    MORE
+    HIT,
+    DOUBLE
 }

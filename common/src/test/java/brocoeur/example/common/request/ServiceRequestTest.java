@@ -22,8 +22,8 @@ class ServiceRequestTest {
     void shouldCreateJsonFromServiceRequest() throws IOException {
         // Given
         var objectMapper = new ObjectMapper();
-        var playerRequest = new PlayerRequest("12345", GameStrategyTypes.ROULETTE_RISKY, null, 5, null);
-        var serviceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, playerRequest, null);
+        var playerRequest = new PlayerRequest("12345", GameStrategyTypes.ROULETTE_RISKY, 5, null);
+        var serviceRequest = new ServiceRequest(ServiceRequestTypes.SINGLE_PLAYER, playerRequest, 1);
         var serviceRequestFile = new File(tempDir, "serviceRequest.json");
 
         // When
@@ -42,8 +42,8 @@ class ServiceRequestTest {
         var actual = objectMapper.readValue(new File("src/test/resources/serviceRequestCoinTossRandom.json"), ServiceRequest.class);
 
         // Then
-        var expectedPlayerRequest = new PlayerRequest("8", GameStrategyTypes.COIN_TOSS_RANDOM, null, 50, 345543);
-        var expectedServiceRequest = new ServiceRequest(ServiceRequestTypes.DIRECT, expectedPlayerRequest, null);
+        var expectedPlayerRequest = new PlayerRequest("8", GameStrategyTypes.COIN_TOSS_RANDOM, 50, 345543);
+        var expectedServiceRequest = new ServiceRequest(ServiceRequestTypes.SINGLE_PLAYER, expectedPlayerRequest, 1);
         Assertions.assertEquals(actual, expectedServiceRequest);
     }
 }

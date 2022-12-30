@@ -48,9 +48,9 @@ class PokerScheduledTaskTest {
         pokerScheduledTask.executeScheduledTask();
 
         // Then
-        var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, null, 10, 1);
-        var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, null, 15, 2);
-        var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, null, 20, 3);
+        var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, 10, 1);
+        var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, 15, 2);
+        var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, 20, 3);
         var playerRequestList = List.of(playerRequest1, playerRequest2, playerRequest3);
 
         var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequestList, null);

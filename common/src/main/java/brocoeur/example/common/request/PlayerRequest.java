@@ -1,7 +1,6 @@
 package brocoeur.example.common.request;
 
 import brocoeur.example.common.GameStrategyTypes;
-import brocoeur.example.common.OfflineGameStrategyTypes;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -11,7 +10,6 @@ import java.util.Objects;
 public class PlayerRequest implements Serializable {
     private String userId;
     private GameStrategyTypes gameStrategyTypes;
-    private OfflineGameStrategyTypes offlineGameStrategyTypes;
     private int amountToGamble;
     private Integer linkedJobId;
 
@@ -20,12 +18,10 @@ public class PlayerRequest implements Serializable {
 
     public PlayerRequest(final String userId,
                          final GameStrategyTypes gameStrategyTypes,
-                         final OfflineGameStrategyTypes offlineGameStrategyTypes,
                          final int amountToGamble,
                          final Integer linkedJobId) {
         this.userId = userId;
         this.gameStrategyTypes = gameStrategyTypes;
-        this.offlineGameStrategyTypes = offlineGameStrategyTypes;
         this.amountToGamble = amountToGamble;
         this.linkedJobId = linkedJobId;
     }
@@ -44,14 +40,6 @@ public class PlayerRequest implements Serializable {
 
     public void setGameStrategyTypes(GameStrategyTypes gameStrategyTypes) {
         this.gameStrategyTypes = gameStrategyTypes;
-    }
-
-    public OfflineGameStrategyTypes getOfflineGameStrategyTypes() {
-        return offlineGameStrategyTypes;
-    }
-
-    public void setOfflineGameStrategyTypes(OfflineGameStrategyTypes offlineGameStrategyTypes) {
-        this.offlineGameStrategyTypes = offlineGameStrategyTypes;
     }
 
     public int getAmountToGamble() {
@@ -75,7 +63,6 @@ public class PlayerRequest implements Serializable {
         return "PlayerRequest{" +
                 "userId='" + userId + '\'' +
                 ", gameStrategyTypes=" + gameStrategyTypes + '\'' +
-                ", offlineGameStrategyTypes=" + offlineGameStrategyTypes + '\'' +
                 ", amountToGamble=" + amountToGamble + '\'' +
                 ", linkedJobId=" + linkedJobId + '\'' +
                 '}';
@@ -95,7 +82,6 @@ public class PlayerRequest implements Serializable {
 
         return Objects.equals(userId, c.userId) &&
                 Objects.equals(gameStrategyTypes, c.gameStrategyTypes) &&
-                Objects.equals(offlineGameStrategyTypes, c.offlineGameStrategyTypes) &&
                 Objects.equals(amountToGamble, c.amountToGamble) &&
                 Objects.equals(linkedJobId, c.linkedJobId);
     }

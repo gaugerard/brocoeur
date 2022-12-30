@@ -19,6 +19,5 @@ public class UserWinLossByGame {
     private int userId;
     private String gameName;
     private String pseudo;
-    private int numberOfWin;
-    private int numberOfLoss;
+    private int amountOfMoneyWon;
 }

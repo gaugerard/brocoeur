@@ -1,31 +1,31 @@
 package brocoeur.example.common.blackjack.strategy;
 
+import brocoeur.example.common.BlackJackGameStrategy;
 import brocoeur.example.common.DeckOfCards;
-import brocoeur.example.common.GameStrategy;
-import brocoeur.example.common.blackjack.BlackJackPlay;
+import brocoeur.example.common.Gamble;
 import brocoeur.example.common.blackjack.BlackJackUtils;
 import lombok.ToString;
 
 import java.util.List;
 
-import static brocoeur.example.common.blackjack.BlackJackPlay.MORE;
+import static brocoeur.example.common.blackjack.BlackJackPlay.HIT;
 import static brocoeur.example.common.blackjack.BlackJackPlay.STOP;
 
 @ToString
-public class BlackJackSafe implements GameStrategy {
-    @Override
-    public BlackJackPlay play() {
-        return BlackJackPlay.STOP;
-    }
+public class BlackJackSafe implements BlackJackGameStrategy {
 
     @Override
-    public BlackJackPlay play(final List<DeckOfCards.Card> playerCards) {
+    public Gamble play(final int availableMoney, final Integer initialBet, final List<DeckOfCards.Card> playerCards) {
+        // Initial gamble.
+        if (playerCards.size() == 0) {
+            if (availableMoney - 10 >= 0) {
+                return new Gamble(HIT, 10);
+            }
+            return new Gamble(STOP, availableMoney);
+        }
+
+        // Else the player either STOP if he is above 16 or HIT if under 16.
         final int totalScore = BlackJackUtils.getTotalScore(playerCards);
-        return totalScore >= 15 ? STOP : MORE;
-    }
-
-    @Override
-    public BlackJackPlay play(List<DeckOfCards.Card> playerCards, List<DeckOfCards.Card> casinoCards) {
-        return null;
+        return totalScore >= 16 ? new Gamble(STOP, 0) : new Gamble(HIT, 0);
     }
 }
