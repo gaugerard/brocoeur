@@ -66,7 +66,7 @@ class NerimaIT {
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
         var expectedPlayerRequest = new PlayerRequest(userId, ROULETTE_RISKY, 5, null);
-        var expectedServiceRequest = new ServiceRequest(SINGLE_PLAYER, expectedPlayerRequest, null);
+        var expectedServiceRequest = new ServiceRequest(SINGLE_PLAYER, expectedPlayerRequest, 1);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
 
