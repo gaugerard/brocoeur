@@ -51,27 +51,18 @@ public class UserWinLossByGameService {
             throw new IllegalStateException("UserWinLossByGame with gameId : " + gameId + " and userId : " + userId + " do not exists.");
         }
 
-        final List<Boolean> listOfIsWinner = playerResponse.getListOfIsWinner();
-
-        int updatedNumberOfWin = userWinLossByGame.getNumberOfWin();
-        int updatedNumberOfLoss = userWinLossByGame.getNumberOfLoss();
-        for (Boolean aBoolean : listOfIsWinner) {
-            if (Boolean.TRUE.equals(aBoolean)) {
-                updatedNumberOfWin += 1;
-            } else {
-                updatedNumberOfLoss += 1;
-            }
-        }
+        final int amountOfMoneyWon = playerResponse.getFinalAmount() - playerResponse.getInitialAmount();
+        final int totalAmountOfMoneyWon = userWinLossByGame.getAmountOfMoneyWon();
+        final int newTotalAmountOfMoneyWon = totalAmountOfMoneyWon + amountOfMoneyWon;
 
         final UserWinLossByGame newUserWinLossByGame = new UserWinLossByGame(
                 gameId,
                 userId,
                 userWinLossByGame.getGameName(),
                 userWinLossByGame.getPseudo(),
-                updatedNumberOfWin,
-                updatedNumberOfLoss);
+                newTotalAmountOfMoneyWon);
 
         userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("Updated : {}", updated));
-        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), listOfIsWinner, playerResponse.getAmount());
+        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), playerResponse.getFinalAmount());
     }
 }
