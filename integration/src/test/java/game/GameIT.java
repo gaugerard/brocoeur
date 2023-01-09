@@ -51,7 +51,7 @@ class GameIT {
         rabbitAdmin.declareExchange(testTopicExchange);
         rabbitAdmin.declareBinding(testBinding);
 
-        final Queue testQueue2 = new Queue("analyticInputQueue", false, false, true);
+        final Queue testQueue2 = new Queue("AnalyticInputQueue", false, false, true);
         final TopicExchange testTopicExchange2 = new TopicExchange("analyticDirectExchange");
         final Binding testBinding2 = BindingBuilder.bind(testQueue2).to(testTopicExchange2).with("AnalyticInputQueue");
 

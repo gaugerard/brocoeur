@@ -16,6 +16,7 @@ public class AnalyticsConfigProperties {
 
     private String analyticInputQueueName;
     private String nerimaToAnalyticsQueueName;
+    private String serviceRequestQueueName;
 
     public String getBlockedRequestRate(){
         return (blockedRequestRate != null ) ? blockedRequestRate : "30000";

@@ -28,7 +28,8 @@ public class ConfigRabbitAdmin {
 
     @Bean
     Queue msgQueue() {
-        return new Queue(nerimaConfigProperties.getServiceRequestQueueName(), false, false, true);
+        //Somehow all the value from the configuration work but serviceRequestQueueName gives null every time wtf ??
+        return new Queue("ServiceRequestQueue", false, false, true);
     }
 
     @Bean
