@@ -86,7 +86,7 @@ class ServiceRequestStatusServiceTest {
             verifyNoMoreInteractions(userMoneyRepositoryMock);
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
             verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
-            verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedDirectServiceRequest);
+            verify(rabbitTemplateMock).convertAndSend("myexchange1", "ServiceRequestQueue", expectedDirectServiceRequest);
             verifyNoMoreInteractions(rabbitTemplateMock);
         }
 
@@ -285,7 +285,7 @@ class ServiceRequestStatusServiceTest {
             verifyNoMoreInteractions(userMoneyRepositoryMock);
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatus);
             verifyNoMoreInteractions(serviceRequestStatusRepositoryMock);
-            verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", expectedOfflineServiceRequest);
+            verify(rabbitTemplateMock).convertAndSend("myexchange1", "ServiceRequestQueue", expectedOfflineServiceRequest);
             verifyNoMoreInteractions(rabbitTemplateMock);
         }
     }
@@ -353,7 +353,7 @@ class ServiceRequestStatusServiceTest {
 
             // Then
             verify(serviceRequestStatusRepositoryMock).save(serviceRequestStatusUpdated);
-            verify(rabbitTemplateMock).convertAndSend("myexchange1", "MyQ1", serviceRequest);
+            verify(rabbitTemplateMock).convertAndSend("myexchange1", "ServiceRequestQueue", serviceRequest);
 
         }
     }

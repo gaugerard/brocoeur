@@ -1,5 +1,6 @@
 package brocoeur.example.analytics.controller;
 
+import brocoeur.example.analytics.AnalyticsConfigProperties;
 import brocoeur.example.analytics.model.UserWinLossByGame;
 import brocoeur.example.analytics.service.UserWinLossByGameService;
 import brocoeur.example.common.request.AnalyticServiceRequest;
@@ -26,6 +27,8 @@ public class UserWinLossByGameController {
     private UserWinLossByGameService userWinLossByGameService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private AnalyticsConfigProperties analyticsConfigProperties;
 
     @PostConstruct
     public void saveUsers() {
@@ -60,7 +63,7 @@ public class UserWinLossByGameController {
         userWinLossByGameService.initializeUserWinLossByGame(userWinLossByGameServices);
     }
 
-    @RabbitListener(queues = "analyticInput")
+    @RabbitListener(queues = "#{analyticsConfigProperties.getAnalyticInputQueueName()}")
     public void getMsg(final AnalyticServiceRequest analyticServiceRequest) {
         userWinLossByGameService.manageAnalyticAccordingToWinOrLoss(analyticServiceRequest);
     }

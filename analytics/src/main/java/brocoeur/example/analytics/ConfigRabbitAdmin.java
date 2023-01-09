@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 public class ConfigRabbitAdmin {
 
     private final ConnectionFactory connectionFactory;
+    @Autowired
+    private AnalyticsConfigProperties analyticsConfigProperties;
 
     @Bean
     public RabbitAdmin admin() {
@@ -25,7 +28,7 @@ public class ConfigRabbitAdmin {
 
     @Bean
     Queue msgQueue() {
-        return new Queue("analyticInput", false, false, true);
+        return new Queue(analyticsConfigProperties.getAnalyticInputQueueName(), false, false, true);
     }
 
     @Bean
@@ -35,12 +38,12 @@ public class ConfigRabbitAdmin {
 
     @Bean
     Binding msgBinding() {
-        return BindingBuilder.bind(msgQueue()).to(exchange()).with("analyticInput");
+        return BindingBuilder.bind(msgQueue()).to(exchange()).with(analyticsConfigProperties.getAnalyticInputQueueName());
     }
 
     @Bean
     Queue msgAQueue() {
-        return new Queue("MyA1", false, false, true);
+        return new Queue(analyticsConfigProperties.getNerimaToAnalyticsQueueName(), false, false, true);
     }
 
     @Bean
@@ -50,7 +53,7 @@ public class ConfigRabbitAdmin {
 
     @Bean
     Binding msgBindingA() {
-        return BindingBuilder.bind(msgAQueue()).to(exchangeA()).with("MyA1");
+        return BindingBuilder.bind(msgAQueue()).to(exchangeA()).with(analyticsConfigProperties.getNerimaToAnalyticsQueueName());
     }
 
     @Bean

@@ -35,9 +35,9 @@ class NerimaIT {
 
     @BeforeAll
     void beforeAll() {
-        final Queue testQueue = new Queue("MyA1", false, false, true);
+        final Queue testQueue = new Queue("NerimaToAnalyticsQueue", false, false, true);
         final TopicExchange testTopicExchange = new TopicExchange("A1DirectExchange");
-        final Binding testBinding = BindingBuilder.bind(testQueue).to(testTopicExchange).with("MyA1");
+        final Binding testBinding = BindingBuilder.bind(testQueue).to(testTopicExchange).with("NerimaToAnalyticsQueue");
         rabbitAdmin.declareQueue(testQueue);
         rabbitAdmin.declareExchange(testTopicExchange);
         rabbitAdmin.declareBinding(testBinding);
@@ -45,17 +45,17 @@ class NerimaIT {
 
     @AfterEach
     void afterEach() {
-        rabbitAdmin.purgeQueue("MyA1");
+        rabbitAdmin.purgeQueue("NerimaToAnalyticsQueue");
     }
 
     @AfterAll
     void afterAll() {
-        rabbitAdmin.deleteQueue("MyA1");
+        rabbitAdmin.deleteQueue("NerimaToAnalyticsQueue");
         rabbitAdmin.deleteExchange("A1DirectExchange");
     }
 
     @Test
-    void shouldSendDirectRequestToMyA1Queue() throws InterruptedException {
+    void shouldSendDirectRequestToNerimaToAnalyticsQueue() throws InterruptedException {
         var userId = "8";
         var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, null);
         var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
@@ -64,7 +64,7 @@ class NerimaIT {
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
 
-        var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
+        var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("NerimaToAnalyticsQueue");
 
         var expectedPlayerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, null);
         var expectedServiceRequest = new ServiceRequest(DIRECT, expectedPlayerRequest, null);
@@ -72,7 +72,7 @@ class NerimaIT {
     }
 
     @Test
-    void shouldSendOfflineRequestToMyA1Queue() throws InterruptedException {
+    void shouldSendOfflineRequestToNerimaToAnalyticsQueue() throws InterruptedException {
         var userId = "8";
         var playerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, 100, null);
         var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, 15);
@@ -80,7 +80,7 @@ class NerimaIT {
         nerimaController.postOfflineGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
-        var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
+        var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("NerimaToAnalyticsQueue");
 
         var expectedPlayerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, 100, null);
         var expectedServiceRequest = new ServiceRequest(OFFLINE, expectedPlayerRequest, 5);
@@ -91,7 +91,7 @@ class NerimaIT {
         return new Callable<Boolean>() {
             public Boolean call() {
                 // check the condition that must be fulfilled.
-                var queueInfo = rabbitAdmin.getQueueInfo("MyA1");
+                var queueInfo = rabbitAdmin.getQueueInfo("NerimaToAnalyticsQueue");
                 return queueInfo.getMessageCount() == 1;
             }
         };
