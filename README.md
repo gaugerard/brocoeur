@@ -15,7 +15,7 @@ In order to test the application features using a real RabbitMq queueing system,
 #### SINGLE_PLAYER ServiceRequest
 ```json
 {
-  "serviceRequestTypes": "DIRECT",
+  "serviceRequestTypes": "SINGLE_PLAYER",
   "playerRequestList": [
     {
       "userId": "8",

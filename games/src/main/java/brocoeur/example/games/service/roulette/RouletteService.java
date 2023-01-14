@@ -81,6 +81,7 @@ public class RouletteService {
     }
 
     private RoulettePlay playServiceRoulette() {
-        return Arrays.stream(RoulettePlay.values()).filter(value -> !COLOR_TO_EXCLUDE.contains(value)).toList().get(new Random().nextInt(RoulettePlay.values().length));
+        final List<RoulettePlay> availableRoulettePlay = Arrays.stream(RoulettePlay.values()).filter(value -> !COLOR_TO_EXCLUDE.contains(value)).toList();
+        return availableRoulettePlay.get(new Random().nextInt(availableRoulettePlay.size()));
     }
 }
