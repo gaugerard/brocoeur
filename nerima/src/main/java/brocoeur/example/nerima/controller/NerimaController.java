@@ -25,13 +25,13 @@ public class NerimaController {
 
     @PostMapping("/api/nerima/gamble")
     public ResponseEntity<ServiceRequest> postSinglePlayerGamblePlay(@RequestBody final ServiceRequest serviceRequest) {
-        final ServiceRequest directGambleServiceRequest = new ServiceRequest(serviceRequest);
+        final ServiceRequest singlePlayerServiceRequest = new ServiceRequest(serviceRequest);
 
-        serviceRequest.setTimeToLive(Integer.min(serviceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
+        singlePlayerServiceRequest.setTimeToLive(Integer.min(singlePlayerServiceRequest.getTimeToLive(), MAXIMUM_ALLOWED_TTL));
 
-        post(directGambleServiceRequest);
+        post(singlePlayerServiceRequest);
 
-        return new ResponseEntity<>(directGambleServiceRequest, HttpStatus.OK);
+        return new ResponseEntity<>(singlePlayerServiceRequest, HttpStatus.OK);
     }
 
     private void post(final ServiceRequest serviceRequest) {

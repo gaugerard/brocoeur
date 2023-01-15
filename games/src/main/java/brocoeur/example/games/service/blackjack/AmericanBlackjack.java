@@ -5,6 +5,8 @@ import brocoeur.example.common.DeckOfCards;
 import brocoeur.example.common.Gamble;
 import brocoeur.example.common.blackjack.BlackJackPlay;
 import brocoeur.example.common.request.PlayerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,12 +16,15 @@ import java.util.List;
 @Component
 public class AmericanBlackjack {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AmericanBlackjack.class);
+
     @Autowired
     private DeckOfCards deckOfCards;
 
     public int play(final PlayerRequest playerRequest, final int ttl) {
         int availableMoney = playerRequest.getAmountToGamble();
         final BlackJackGameStrategy blackJackGameStrategy = (BlackJackGameStrategy) playerRequest.getGameStrategyTypes().getGameStrategy();
+        LOGGER.info("Game of American Blackjack started with availableMoney : {}, strategy : {}, ttl :{}", availableMoney, blackJackGameStrategy, ttl);
 
         for (int i = 0; i < ttl; i++) {
             // Player section.
@@ -54,18 +59,22 @@ public class AmericanBlackjack {
                     isGameOver = true;
                 }
             }
+            LOGGER.info("Player actions for ttl id : {}, actions : {}, cards : {}", i, gambleList, cardPlayer);
 
             // Casino section (STOP when >= 17).
             final List<DeckOfCards.Card> cardCasino = new ArrayList<>();
             while (getTotalScore(cardCasino) < 17) {
                 cardCasino.add(deckOfCards.getCard());
             }
+            LOGGER.info("Casino cards for ttl id : {}, cards : {}", i, cardCasino);
 
             final boolean isWinner = isPlayerWinner(cardPlayer, cardCasino);
             final int amountWon = getAmountWon(gambleList, isWinner, getTotalScore(cardPlayer));
             availableMoney += amountWon;
+            LOGGER.info("Player amount won and new available money for ttl id : {}, amountWon : {}, availableMoney : {}", i, amountWon, availableMoney);
         }
 
+        LOGGER.info("Game of American Blackjack ended with availableMoney : {}, strategy : {}, ttl :{}", availableMoney, blackJackGameStrategy, ttl);
         return availableMoney;
     }
 

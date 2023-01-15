@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -23,8 +22,7 @@ public class UserWinLossByGameService {
     private ServiceRequestStatusService serviceRequestStatusService;
 
     public void initializeUserWinLossByGame(List<UserWinLossByGame> userWinLossByGames) {
-        Flux<UserWinLossByGame> savedUserWinLossByGame = userWinLossByGameRepository.saveAll(userWinLossByGames);
-        savedUserWinLossByGame.subscribe();
+        userWinLossByGameRepository.saveAll(userWinLossByGames).subscribe(updated -> LOGGER.info("Initializing : {}", updated));
     }
 
     public void deleteAllWinLossByGame() {

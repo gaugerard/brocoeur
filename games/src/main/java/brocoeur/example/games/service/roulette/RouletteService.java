@@ -26,12 +26,11 @@ public class RouletteService {
      * For both DIRECT and OFFLINE (DIRECT is OFFLINE with TTL of 1).
      */
     public List<PlayerResponse> play(final PlayerRequest playerRequest, final int ttl) {
-        LOGGER.info("Game of roulette started for playerRequest: {} with ttl of: {}", playerRequest, ttl);
-
         final List<RoulettePlay> previousRoulettePlay = new ArrayList<>();
 
         int availableMoney = playerRequest.getAmountToGamble();
         final RouletteGameStrategy rouletteGameStrategy = (RouletteGameStrategy) playerRequest.getGameStrategyTypes().getGameStrategy();
+        LOGGER.info("Game of roulette started with availableMoney: {}, strategy : {}, ttl :{}", availableMoney, rouletteGameStrategy, ttl);
 
         for (var i = 0; i < ttl; i++) {
             final List<Gamble> gambleList = rouletteGameStrategy.play(availableMoney, previousRoulettePlay);
@@ -42,6 +41,9 @@ public class RouletteService {
 
             final int amountWon = getAmountWon(gambleList, servicePlay);
             availableMoney += amountWon;
+            LOGGER.info("Player actions for ttl id : {}, actions : {}, game result (with previous results) : {}", i, gambleList, previousRoulettePlay);
+            LOGGER.info("Player amount won and new available money for ttl id : {}, amountWon : {}, availableMoney : {}", i, amountWon, availableMoney);
+
         }
         final PlayerResponse playerResponse = new PlayerResponse(
                 123,

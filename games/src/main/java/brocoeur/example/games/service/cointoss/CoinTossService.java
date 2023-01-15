@@ -25,12 +25,11 @@ public class CoinTossService {
      * For both DIRECT and OFFLINE (DIRECT is OFFLINE with TTL of 1).
      */
     public List<PlayerResponse> play(final PlayerRequest playerRequest, final int ttl) {
-        LOGGER.info("Game of coin-toss started for playerRequest: {} with ttl of: {}", playerRequest, ttl);
-
         final List<CoinTossPlay> previousCoinTossPlay = new ArrayList<>();
 
         int availableMoney = playerRequest.getAmountToGamble();
         final CoinTossGameStrategy coinTossGameStrategy = (CoinTossGameStrategy) playerRequest.getGameStrategyTypes().getGameStrategy();
+        LOGGER.info("Game of coin-toss started with availableMoney: {}, strategy : {}, ttl :{}", availableMoney, coinTossGameStrategy, ttl);
 
         for (var i = 0; i < ttl; i++) {
             final Gamble gamble = coinTossGameStrategy.play(availableMoney, previousCoinTossPlay);
@@ -41,7 +40,11 @@ public class CoinTossService {
 
             final int amountWon = getAmountWon(gamble, servicePlay);
             availableMoney += amountWon;
+            LOGGER.info("Player actions for ttl id : {}, actions : {}, game result (with previous results) : {}", i, gamble, previousCoinTossPlay);
+            LOGGER.info("Player amount won and new available money for ttl id : {}, amountWon : {}, availableMoney : {}", i, amountWon, availableMoney);
         }
+        LOGGER.info("Game of coin-toss ended with availableMoney: {}, strategy : {}, ttl :{}", availableMoney, coinTossGameStrategy, ttl);
+
         final PlayerResponse playerResponse = new PlayerResponse(
                 324,
                 Integer.parseInt(playerRequest.getUserId()),
