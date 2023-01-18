@@ -17,10 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static brocoeur.example.common.GameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
 import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
-import static brocoeur.example.common.ServiceRequestTypes.DIRECT;
-import static brocoeur.example.common.ServiceRequestTypes.OFFLINE;
+import static brocoeur.example.common.ServiceRequestTypes.SINGLE_PLAYER;
 import static org.awaitility.Awaitility.await;
 
 @SpringBootTest(classes = Main.class)
@@ -57,33 +56,33 @@ class NerimaIT {
     @Test
     void shouldSendDirectRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
-        var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, null);
-        var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+        var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, 5, null);
+        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
 
-        nerimaController.postDirectGamblePlay(serviceRequest);
+        nerimaController.postSinglePlayerGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
 
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
-        var expectedPlayerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, 5, null);
-        var expectedServiceRequest = new ServiceRequest(DIRECT, expectedPlayerRequest, null);
+        var expectedPlayerRequest = new PlayerRequest(userId, ROULETTE_RISKY, 5, null);
+        var expectedServiceRequest = new ServiceRequest(SINGLE_PLAYER, expectedPlayerRequest, 1);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
 
     @Test
     void shouldSendOfflineRequestToMyA1Queue() throws InterruptedException {
         var userId = "8";
-        var playerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, 100, null);
-        var serviceRequest = new ServiceRequest(OFFLINE, playerRequest, 15);
+        var playerRequest = new PlayerRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 100, null);
+        var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 5);
 
-        nerimaController.postOfflineGamblePlay(serviceRequest);
+        nerimaController.postSinglePlayerGamblePlay(serviceRequest);
         await().atMost(2, TimeUnit.SECONDS).until(messageIsProcessedAndSentToQueue());
 
         var serviceRequestPresentInQueue = rabbitAdmin.getRabbitTemplate().receiveAndConvert("MyA1");
 
-        var expectedPlayerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, 100, null);
-        var expectedServiceRequest = new ServiceRequest(OFFLINE, expectedPlayerRequest, 5);
+        var expectedPlayerRequest = new PlayerRequest(userId, OFFLINE_COIN_TOSS_RANDOM, 100, null);
+        var expectedServiceRequest = new ServiceRequest(SINGLE_PLAYER, expectedPlayerRequest, 5);
         Assertions.assertEquals(expectedServiceRequest, serviceRequestPresentInQueue);
     }
 

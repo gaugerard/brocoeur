@@ -13,8 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,16 +31,15 @@ class UserWinLossByGameServiceTest {
         // Given
         var gameId = 123;
         var userId = 8;
-        var listOfIsWinner = List.of(true, false, false);
         var amount = 100;
         var linkedJobId = 789456;
-        var playerResponse = new PlayerResponse(gameId, userId, listOfIsWinner, amount, linkedJobId);
+        var playerResponse = new PlayerResponse(gameId, userId, 50, amount, linkedJobId);
         var analyticServiceRequest = new AnalyticServiceRequest(
                 AnalyticServiceRequestTypes.MONEY_MANAGEMENT,
                 playerResponse);
 
-        var userWinLossByGame = new UserWinLossByGame(gameId, userId, "Roulette", "Baba", 0, 0);
-        var userWinLossByGameUpdated = new UserWinLossByGame(gameId, userId, "Roulette", "Baba", 1, 2);
+        var userWinLossByGame = new UserWinLossByGame(gameId, userId, "Roulette", "Baba", 0);
+        var userWinLossByGameUpdated = new UserWinLossByGame(gameId, userId, "Roulette", "Baba", 50);
 
         var monoFindByGameIdAndUserId = Mono.just(userWinLossByGame);
         var monoSave = Mono.just(userWinLossByGame);
@@ -55,7 +52,7 @@ class UserWinLossByGameServiceTest {
         // Then
         verify(userWinLossByGameRepositoryMock).save(userWinLossByGameUpdated);
         verifyNoMoreInteractions(userWinLossByGameRepositoryMock);
-        verify(serviceRequestStatusServiceMock).updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(linkedJobId, listOfIsWinner, amount);
+        verify(serviceRequestStatusServiceMock).updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(linkedJobId, amount);
         verifyNoMoreInteractions(serviceRequestStatusServiceMock);
     }
 
@@ -64,10 +61,9 @@ class UserWinLossByGameServiceTest {
         // Given
         var gameId = 123;
         var userId = 8;
-        var listOfIsWinner = List.of(true, false, false);
         var amount = 100;
         var linkedJobId = 789456;
-        var playerResponse = new PlayerResponse(gameId, userId, listOfIsWinner, amount, linkedJobId);
+        var playerResponse = new PlayerResponse(gameId, userId, 50, amount, linkedJobId);
         var analyticServiceRequest = new AnalyticServiceRequest(
                 AnalyticServiceRequestTypes.MONEY_MANAGEMENT,
                 playerResponse);

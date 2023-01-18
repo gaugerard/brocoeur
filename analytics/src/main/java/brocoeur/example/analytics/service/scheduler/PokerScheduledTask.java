@@ -3,7 +3,6 @@ package brocoeur.example.analytics.service.scheduler;
 import brocoeur.example.analytics.model.ServiceRequestStatus;
 import brocoeur.example.analytics.service.ServiceRequestStatusService;
 import brocoeur.example.common.GameStrategyTypes;
-import brocoeur.example.common.OfflineGameStrategyTypes;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.ServiceRequest;
 import org.slf4j.Logger;
@@ -84,7 +83,6 @@ public class PokerScheduledTask {
 
             final String strategy = serviceRequestStatus.getStrategy();
             final GameStrategyTypes gameStrategyTypes = GameStrategyTypes.getGameStrategyTypesFromName(strategy);
-            final OfflineGameStrategyTypes offlineGameStrategyTypes = OfflineGameStrategyTypes.getOfflineGameStrategyTypesFromName(strategy);
 
             final int amountToGamble = serviceRequestStatus.getAmountBlocked();
             final int linkedJobId = serviceRequestStatus.getJobId();
@@ -92,7 +90,6 @@ public class PokerScheduledTask {
             final PlayerRequest playerRequest = new PlayerRequest(
                     userId,
                     gameStrategyTypes,
-                    offlineGameStrategyTypes,
                     amountToGamble,
                     linkedJobId);
             playerRequestList.add(playerRequest);

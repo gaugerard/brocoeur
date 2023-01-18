@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -23,8 +22,7 @@ public class UserWinLossByGameService {
     private ServiceRequestStatusService serviceRequestStatusService;
 
     public void initializeUserWinLossByGame(List<UserWinLossByGame> userWinLossByGames) {
-        Flux<UserWinLossByGame> savedUserWinLossByGame = userWinLossByGameRepository.saveAll(userWinLossByGames);
-        savedUserWinLossByGame.subscribe();
+        userWinLossByGameRepository.saveAll(userWinLossByGames).subscribe(updated -> LOGGER.info("Initializing : {}", updated));
     }
 
     public void deleteAllWinLossByGame() {
@@ -51,27 +49,18 @@ public class UserWinLossByGameService {
             throw new IllegalStateException("UserWinLossByGame with gameId : " + gameId + " and userId : " + userId + " do not exists.");
         }
 
-        final List<Boolean> listOfIsWinner = playerResponse.getListOfIsWinner();
-
-        int updatedNumberOfWin = userWinLossByGame.getNumberOfWin();
-        int updatedNumberOfLoss = userWinLossByGame.getNumberOfLoss();
-        for (Boolean aBoolean : listOfIsWinner) {
-            if (Boolean.TRUE.equals(aBoolean)) {
-                updatedNumberOfWin += 1;
-            } else {
-                updatedNumberOfLoss += 1;
-            }
-        }
+        final int amountOfMoneyWon = playerResponse.getFinalAmount() - playerResponse.getInitialAmount();
+        final int totalAmountOfMoneyWon = userWinLossByGame.getAmountOfMoneyWon();
+        final int newTotalAmountOfMoneyWon = totalAmountOfMoneyWon + amountOfMoneyWon;
 
         final UserWinLossByGame newUserWinLossByGame = new UserWinLossByGame(
                 gameId,
                 userId,
                 userWinLossByGame.getGameName(),
                 userWinLossByGame.getPseudo(),
-                updatedNumberOfWin,
-                updatedNumberOfLoss);
+                newTotalAmountOfMoneyWon);
 
         userWinLossByGameRepository.save(newUserWinLossByGame).subscribe(updated -> LOGGER.info("Updated : {}", updated));
-        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), listOfIsWinner, playerResponse.getAmount());
+        serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(playerResponse.getLinkedJobId(), playerResponse.getFinalAmount());
     }
 }

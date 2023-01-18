@@ -13,7 +13,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
@@ -34,8 +33,7 @@ public class GamesController {
     public void getMsg(final ServiceRequest serviceRequest) {
         final ServiceRequestTypes serviceRequestType = serviceRequest.getServiceRequestTypes();
         switch (serviceRequestType) {
-            case DIRECT -> processDirectMsg(serviceRequest);
-            case OFFLINE -> processOfflineMsg(serviceRequest);
+            case SINGLE_PLAYER -> processMsg(serviceRequest);
             case MULTIPLAYER -> processMultiplayerMsg(serviceRequest);
         }
     }
@@ -55,43 +53,14 @@ public class GamesController {
                 analyticServiceRequest);
     }
 
-    private void processDirectMsg(final ServiceRequest serviceRequest) {
-        LOGGER.info("[DIRECT] - request : {}", serviceRequest);
+    private void processMsg(final ServiceRequest serviceRequest) {
+        LOGGER.info("[SINGLE_PLAYER] - request : {}", serviceRequest);
 
         if (serviceRequest.getPlayerRequestList().size() != 1) {
             throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
         }
-        final List<PlayerResponse> playerResponseList = gameService.playDirectGame(serviceRequest);
+        final List<PlayerResponse> playerResponseList = gameService.playGame(serviceRequest);
         final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponseList);
-
-        rabbitTemplate.convertAndSend(
-                gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
-                analyticServiceRequest);
-    }
-
-    private void processOfflineMsg(final ServiceRequest offlineServiceRequest) {
-        LOGGER.info("[OFFLINE] - request : {}", offlineServiceRequest);
-
-        if (offlineServiceRequest.getPlayerRequestList().size() != 1) {
-            throw new IllegalStateException("ServiceRequest.PlayerRequestList must be of size 1.");
-        }
-
-        List<Boolean> listOfIsWinner = new ArrayList<>();
-        List<PlayerResponse> playerResponseList = null;
-        final int repetition = offlineServiceRequest.getTimeToLive();
-
-        for (var i = 0; i < repetition; i++) {
-            playerResponseList = gameService.playOfflineGame(offlineServiceRequest, listOfIsWinner);
-            final boolean isWinner = playerResponseList.get(0).getListOfIsWinner().get(0);
-            listOfIsWinner.add(isWinner);
-        }
-
-        // Update last 'playerResponseList' object to contain the list of win/loss.
-        final PlayerResponse playerResponse = playerResponseList.get(0);
-        playerResponse.setListOfIsWinner(listOfIsWinner);
-
-        final AnalyticServiceRequest analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
 
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),

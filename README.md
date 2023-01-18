@@ -12,39 +12,38 @@ In order to test the application features using a real RabbitMq queueing system,
 4) Go on `http://localhost:15672/` to see information about rabbitMq (which is available when the docker container for rabbitMq is up and running thanks to the docker-compose up command).
 5) Using `PostMan` you can post `ServiceRequest` to the following endpoint : `http://localhost:9080/api/nerima/gamble`.
 
-#### DIRECT ServiceRequest
+#### SINGLE_PLAYER ServiceRequest
 ```json
 {
-  "serviceRequestTypes": "DIRECT",
+  "serviceRequestTypes": "SINGLE_PLAYER",
   "playerRequestList": [
     {
       "userId": "8",
       "gameStrategyTypes": "COIN_TOSS_RANDOM",
-      "offlineGameStrategyTypes": null,
       "amountToGamble": "50",
       "linkedJobId": null
     }
   ],
-  "timeToLive": null
+  "timeToLive": 1
 }
 ```
-
-#### OFFLINE ServiceRequest
+- timeToLive: must have a value between 1 and 5.
+#### MULTIPLAYER ServiceRequest
 ```json
 {
-  "serviceRequestTypes": "OFFLINE",
+  "serviceRequestTypes": "MULTIPLAYER",
   "playerRequestList": [
     {
       "userId": "8",
-      "gameStrategyTypes": null,
-      "offlineGameStrategyTypes": "OFFLINE_COIN_TOSS_RANDOM",
+      "gameStrategyTypes": "POKER_RANDOM",
       "amountToGamble": "100",
       "linkedJobId": null
     }
   ],
-  "timeToLive": 3
+  "timeToLive": 1
 }
 ```
+- timeToLive: must have a value of 1.
 
 6) You can see that the `ServiceRequest` is correctly send from `nerima` to `games` and you can also see if the specified user won or lost in the logs of the services.
 
@@ -58,7 +57,7 @@ For Cassandra:
 5) Run `cqlsh> USE brocoeurkeyspace ;`.
 6) Run `cqlsh:brocoeurkeyspace> CREATE TABLE Game( gameid int PRIMARY KEY, gamename text);`.
 7) Run `cqlsh:brocoeurkeyspace> CREATE TABLE User( userid int PRIMARY KEY, pseudo text);`.
-8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserWinLossByGame( game_id int, user_id int, gamename text, pseudo text, numberofwin int, numberofloss int, PRIMARY KEY ((game_id, user_id)));`.
+8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserWinLossByGame( game_id int, user_id int, gamename text, pseudo text, amountofmoneywon int, PRIMARY KEY ((game_id, user_id)));`.
 8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE UserMoney( userId int PRIMARY KEY, money int);`.
 8) Run `cqlsh:brocoeurkeyspace> CREATE TABLE ServiceRequestStatus( jobId int PRIMARY KEY, status text, amountBlocked int, userId int, strategy text, insertionTimeMilliSecond bigint, ackTimeMilliSecond bigint);`.
 9) Run `analytics` main method using a mvn configuration (analytics will add dummy data in Cassandra (TODO: Make keyspace and table creation automatic)).
