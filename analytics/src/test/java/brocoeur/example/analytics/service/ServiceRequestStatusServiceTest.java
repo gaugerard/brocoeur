@@ -19,12 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
-import static brocoeur.example.common.GameStrategyTypes.COIN_TOSS_RANDOM;
-import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
-import static brocoeur.example.common.ServiceRequestTypes.*;
+import static brocoeur.example.common.GameStrategyTypes.*;
+import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
+import static brocoeur.example.common.ServiceRequestTypes.SINGLE_PLAYER;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,8 +48,8 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000L;
-            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 50, null);
-            var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, 50, null);
+            var directServiceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
 
             var userMoney = new UserMoney(8, 1000);
             var userMoneyUpdated = new UserMoney(8, 950);
@@ -79,8 +76,8 @@ class ServiceRequestStatusServiceTest {
             serviceRequestStatusService.addServiceRequestStatus(directServiceRequest);
 
             // Then
-            var expectedPlayerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 50, jobId);
-            var expectedDirectServiceRequest = new ServiceRequest(DIRECT, expectedPlayerRequest, null);
+            var expectedPlayerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, 50, jobId);
+            var expectedDirectServiceRequest = new ServiceRequest(SINGLE_PLAYER, expectedPlayerRequest, 1);
 
             verify(userMoneyRepositoryMock).save(userMoneyUpdated);
             verifyNoMoreInteractions(userMoneyRepositoryMock);
@@ -95,8 +92,8 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000L;
-            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, null, 800, null);
-            var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", COIN_TOSS_RANDOM, 800, null);
+            var directServiceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
 
             var userMoney = new UserMoney(8, 150);
             var serviceRequestStatus = new ServiceRequestStatus(
@@ -130,8 +127,8 @@ class ServiceRequestStatusServiceTest {
         void shouldThrowIllegalStateExceptionWhenAddServiceRequestStatusUserIdDoesNotExists() {
             // Given
             var jobId = 156478;
-            var playerRequest = new PlayerRequest("10", COIN_TOSS_RANDOM, null, 800, null);
-            var directServiceRequest = new ServiceRequest(DIRECT, playerRequest, null);
+            var playerRequest = new PlayerRequest("10", COIN_TOSS_RANDOM, 800, null);
+            var directServiceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
 
             when(randomServiceMock.getRandomJobId()).thenReturn(jobId);
             when(userMoneyRepositoryMock.findById(10)).thenReturn(Mono.empty());
@@ -154,7 +151,6 @@ class ServiceRequestStatusServiceTest {
         void shouldUpdateServiceRequestStatusByJobIdAndUpdatePlayerMoney() {
             // Given
             var jobId = 135445;
-            var listOfIsWinner = List.of(true);
             var amountGambled = 80;
             var userId = 8;
 
@@ -167,16 +163,16 @@ class ServiceRequestStatusServiceTest {
             var monoFindByIdUser = Mono.just(userMoney);
             when(userMoneyRepositoryMock.findById(userId)).thenReturn(monoFindByIdUser);
 
-            var userMoneySave = new UserMoney(userId, 260);
+            var userMoneySave = new UserMoney(userId, 180);
             var monoSaveUpdated = Mono.just(userMoney);
             when(userMoneyRepositoryMock.save(userMoneySave)).thenReturn(monoSaveUpdated);
 
-            var serviceRequestStatusDoneWin = new ServiceRequestStatus(jobId, "DONE_WIN", 80, userId, COIN_TOSS_RANDOM.toString(), 12340, 13245);
+            var serviceRequestStatusDoneWin = new ServiceRequestStatus(jobId, "DONE_LOSS", 80, userId, COIN_TOSS_RANDOM.toString(), 12340, 13245);
             var monoSaveDoneWin = Mono.just(serviceRequestStatus);
             when(serviceRequestStatusRepositoryMock.save(serviceRequestStatusDoneWin)).thenReturn(monoSaveDoneWin);
 
             // When
-            serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, listOfIsWinner, amountGambled);
+            serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, amountGambled);
 
             // Then
             verify(userMoneyRepositoryMock).save(userMoneySave);
@@ -191,14 +187,13 @@ class ServiceRequestStatusServiceTest {
         void shouldThrowIllegalStateExceptionWhenUpdateServiceRequestStatusIsNull() {
             // Given
             var jobId = 333333;
-            var listOfIsWinner = List.of(true);
             var amountGambled = 80;
 
             when(serviceRequestStatusRepositoryMock.findById(jobId)).thenReturn(Mono.empty());
 
             // When
             var exception = Assertions.assertThrows(IllegalStateException.class, () -> {
-                serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, listOfIsWinner, amountGambled);
+                serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, amountGambled);
             });
 
             Assertions.assertEquals("ServiceRequestStatus for jobId 333333 do not exists.", exception.getMessage());
@@ -214,7 +209,6 @@ class ServiceRequestStatusServiceTest {
         void shouldThrowIllegalStateExceptionWhenUserMoneyIsNull() {
             // Given
             var jobId = 135445;
-            var listOfIsWinner = List.of(true);
             var amountGambled = 80;
             var userId = 12;
 
@@ -227,7 +221,7 @@ class ServiceRequestStatusServiceTest {
 
             // When
             var exception = Assertions.assertThrows(IllegalStateException.class, () -> {
-                serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, listOfIsWinner, amountGambled);
+                serviceRequestStatusService.updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(jobId, amountGambled);
             });
 
             Assertions.assertEquals("UserMoney for userId 12 do not exists.", exception.getMessage());
@@ -249,15 +243,15 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000L;
-            var playerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, null);
-            var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, 3);
+            var playerRequest = new PlayerRequest("8", OFFLINE_COIN_TOSS_RANDOM, 50, null);
+            var offlineServiceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 3);
 
             var userMoney = new UserMoney(8, 1000);
-            var userMoneyUpdated = new UserMoney(8, 850);
+            var userMoneyUpdated = new UserMoney(8, 950);
             var serviceRequestStatus = new ServiceRequestStatus(
                     jobId,
                     "IN_PROGRESS",
-                    150,
+                    50,
                     8,
                     OFFLINE_COIN_TOSS_RANDOM.toString(),
                     currentTimeInSeconds,
@@ -278,8 +272,8 @@ class ServiceRequestStatusServiceTest {
             serviceRequestStatusService.addServiceRequestStatus(offlineServiceRequest);
 
             // Then
-            var expectedPlayerRequest = new PlayerRequest("8", null, OFFLINE_COIN_TOSS_RANDOM, 50, jobId);
-            var expectedOfflineServiceRequest = new ServiceRequest(OFFLINE, expectedPlayerRequest, 3);
+            var expectedPlayerRequest = new PlayerRequest("8", OFFLINE_COIN_TOSS_RANDOM, 50, jobId);
+            var expectedOfflineServiceRequest = new ServiceRequest(SINGLE_PLAYER, expectedPlayerRequest, 3);
 
             verify(userMoneyRepositoryMock).save(userMoneyUpdated);
             verifyNoMoreInteractions(userMoneyRepositoryMock);
@@ -299,8 +293,8 @@ class ServiceRequestStatusServiceTest {
             // Given
             var jobId = 156478;
             var currentTimeInSeconds = 1400000L;
-            var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 50, null);
-            var directServiceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", POKER_RANDOM, 50, null);
+            var directServiceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, 1);
 
             var userMoney = new UserMoney(8, 1000);
             var userMoneyUpdated = new UserMoney(8, 950);
@@ -337,8 +331,8 @@ class ServiceRequestStatusServiceTest {
         @Test
         void shouldSendMultiplayerServiceRequest() {
             // Given
-            var playerRequest = new PlayerRequest("8", POKER_RANDOM, null, 30, 1);
-            var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, null);
+            var playerRequest = new PlayerRequest("8", POKER_RANDOM, 30, 1);
+            var serviceRequest = new ServiceRequest(MULTIPLAYER, playerRequest, 1);
             var serviceRequestStatus = new ServiceRequestStatus(1, "TODO", 30, 8, "POKER_RANDOM", 1234567, 0);
             var monoFindById = Mono.just(serviceRequestStatus);
             var serviceRequestStatusUpdated = new ServiceRequestStatus(1, "IN_PROGRESS", 30, 8, "POKER_RANDOM", 1234567, 0);

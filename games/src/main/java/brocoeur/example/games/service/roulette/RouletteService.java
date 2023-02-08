@@ -1,83 +1,89 @@
 package brocoeur.example.games.service.roulette;
 
-import brocoeur.example.common.GamePlay;
-import brocoeur.example.common.GameStrategy;
+import brocoeur.example.common.Gamble;
+import brocoeur.example.common.RouletteGameStrategy;
 import brocoeur.example.common.request.PlayerRequest;
 import brocoeur.example.common.request.PlayerResponse;
-import brocoeur.example.common.request.ServiceRequest;
 import brocoeur.example.common.roulette.RoulettePlay;
-import brocoeur.example.games.service.GameRound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 @Component
-public class RouletteService implements GameRound {
-
+public class RouletteService {
+    private static final List<RoulettePlay> COLOR_TO_EXCLUDE = List.of(
+            RoulettePlay.RED,
+            RoulettePlay.BLACK);
     private static final Logger LOGGER = LoggerFactory.getLogger(RouletteService.class);
 
-    @Override
-    public GamePlay play() {
-        return Arrays.stream(RoulettePlay.values()).toList().get(new Random().nextInt(RoulettePlay.values().length));
-    }
-
-    public GamePlay play(GameStrategy gameStrategy) {
-        return gameStrategy.play();
-    }
-
-    public PlayerResponse play(final PlayerRequest player) {
-        final GamePlay userPlay = player.getGameStrategyTypes().getGameStrategy().play();
-        final GamePlay servicePlay = play();
-        final boolean isWinner = servicePlay.equals(userPlay);
-        return new PlayerResponse(
-                123,
-                Integer.parseInt(player.getUserId()),
-                isWinner,
-                player.getAmountToGamble(),
-                player.getLinkedJobId());
-    }
-
-    public PlayerResponse play(final PlayerRequest player, final List<Boolean> listOfIsWinner) {
-        final GamePlay userPlay = player.getOfflineGameStrategyTypes().getOfflineGameStrategy().playOffline(listOfIsWinner);
-        final GamePlay servicePlay = play();
-        final boolean isWinner = servicePlay.equals(userPlay);
-        return new PlayerResponse(
-                123,
-                Integer.parseInt(player.getUserId()),
-                isWinner,
-                player.getAmountToGamble(),
-                player.getLinkedJobId());
-    }
-
     /**
-     * Use for <b>Direct</b> play.
+     * Roulette 2.0 better gambling management (BGM)
+     * For both DIRECT and OFFLINE (DIRECT is OFFLINE with TTL of 1).
      */
-    public List<PlayerResponse> playRouletteGame(final ServiceRequest serviceRequest) {
-        LOGGER.info("Game of roulette started for : {}", serviceRequest);
+    public List<PlayerResponse> play(final PlayerRequest playerRequest, final int ttl) {
+        final List<RoulettePlay> previousRoulettePlay = new ArrayList<>();
 
-        final PlayerRequest playerRequest = serviceRequest.getPlayerRequestList().get(0);
-        final PlayerResponse playerResponse = play(playerRequest);
+        int availableMoney = playerRequest.getAmountToGamble();
+        final RouletteGameStrategy rouletteGameStrategy = (RouletteGameStrategy) playerRequest.getGameStrategyTypes().getGameStrategy();
+        LOGGER.info("Game of roulette started with availableMoney: {}, strategy : {}, ttl :{}", availableMoney, rouletteGameStrategy, ttl);
 
-        LOGGER.info("Game of roulette ended with response : {}", playerResponse);
+        for (var i = 0; i < ttl; i++) {
+            final List<Gamble> gambleList = rouletteGameStrategy.play(availableMoney, previousRoulettePlay);
+            availableMoney -= gambleList.stream().mapToInt(Gamble::amount).sum();
+
+            final RoulettePlay servicePlay = playServiceRoulette();
+            previousRoulettePlay.add(servicePlay);
+
+            final int amountWon = getAmountWon(gambleList, servicePlay);
+            availableMoney += amountWon;
+            LOGGER.info("Player actions for ttl id : {}, actions : {}, game result (with previous results) : {}", i, gambleList, previousRoulettePlay);
+            LOGGER.info("Player amount won and new available money for ttl id : {}, amountWon : {}, availableMoney : {}", i, amountWon, availableMoney);
+
+        }
+        final PlayerResponse playerResponse = new PlayerResponse(
+                123,
+                Integer.parseInt(playerRequest.getUserId()),
+                playerRequest.getAmountToGamble(),
+                availableMoney,
+                playerRequest.getLinkedJobId()
+        );
+
+        LOGGER.info("Game of roulette ended with response: {}", playerResponse);
 
         return List.of(playerResponse);
     }
 
-    /**
-     * Use for <b>Offline</b> play.
-     */
-    public List<PlayerResponse> playRouletteGame(final ServiceRequest serviceRequest, final List<Boolean> listOfIsWinner) {
-        LOGGER.info("Game of roulette started for : {}", serviceRequest);
+    private int getAmountWon(final List<Gamble> gambleList, final RoulettePlay servicePlay) {
+        int amountWon = 0;
 
-        final PlayerRequest playerRequest = serviceRequest.getPlayerRequestList().get(0);
-        final PlayerResponse playerResponse = play(playerRequest, listOfIsWinner);
+        for (Gamble gamble : gambleList) {
+            final RoulettePlay roulettePlay = (RoulettePlay) gamble.gamePlay();
+            final int amount = gamble.amount();
 
-        LOGGER.info("Game of roulette ended with response : {}", playerResponse);
+            // If player played a color.
+            if (roulettePlay.equals(RoulettePlay.RED) || roulettePlay.equals(RoulettePlay.BLACK)) {
+                if (roulettePlay.getColor().equals(servicePlay.getColor())) {
+                    amountWon += roulettePlay.getMultiplier() * amount;
+                }
+            }
 
-        return List.of(playerResponse);
+            // If player played a number.
+            else {
+                if (roulettePlay.equals(servicePlay)) {
+                    amountWon += roulettePlay.getMultiplier() * amount;
+                }
+            }
+        }
+        return amountWon;
+    }
+
+    private RoulettePlay playServiceRoulette() {
+        final List<RoulettePlay> availableRoulettePlay = Arrays.stream(RoulettePlay.values()).filter(value -> !COLOR_TO_EXCLUDE.contains(value)).toList();
+        return availableRoulettePlay.get(new Random().nextInt(availableRoulettePlay.size()));
     }
 }

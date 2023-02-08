@@ -16,14 +16,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import java.util.Collections;
 import java.util.List;
 
 import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
-import static brocoeur.example.common.GameStrategyTypes.POKER_RANDOM;
-import static brocoeur.example.common.GameStrategyTypes.ROULETTE_RISKY;
-import static brocoeur.example.common.OfflineGameStrategyTypes.OFFLINE_COIN_TOSS_RANDOM;
-import static brocoeur.example.common.ServiceRequestTypes.*;
+import static brocoeur.example.common.GameStrategyTypes.*;
+import static brocoeur.example.common.ServiceRequestTypes.MULTIPLAYER;
+import static brocoeur.example.common.ServiceRequestTypes.SINGLE_PLAYER;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -52,11 +50,11 @@ class GamesControllerTest {
             var userId = "12345";
             var amountToGamble = 5;
             var linkedJobId = 123456;
-            var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, amountToGamble, linkedJobId);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
-            var playerResponseList = List.of(new PlayerResponse(123, 12345, true, amountToGamble, linkedJobId));
+            var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, amountToGamble, linkedJobId);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
+            var playerResponseList = List.of(new PlayerResponse(123, 12345, 100, amountToGamble, linkedJobId));
 
-            Mockito.when(gameServiceMock.playDirectGame(serviceRequest)).thenReturn(playerResponseList);
+            Mockito.when(gameServiceMock.playGame(serviceRequest)).thenReturn(playerResponseList);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
@@ -67,7 +65,7 @@ class GamesControllerTest {
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInputQueue"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var playerResponse = new PlayerResponse(123, 12345, true, amountToGamble, linkedJobId);
+            var playerResponse = new PlayerResponse(123, 12345, 100, amountToGamble, linkedJobId);
             var analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
         }
@@ -78,11 +76,11 @@ class GamesControllerTest {
             var userId = "12345";
             var amountToGamble = 8;
             var linkedJobId = 123456;
-            var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, null, amountToGamble, linkedJobId);
-            var serviceRequest = new ServiceRequest(DIRECT, playerRequest, null);
-            var playerResponseList = List.of(new PlayerResponse(123, 12345, false, amountToGamble, linkedJobId));
+            var playerRequest = new PlayerRequest(userId, ROULETTE_RISKY, amountToGamble, linkedJobId);
+            var serviceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, 1);
+            var playerResponseList = List.of(new PlayerResponse(123, 12345, 100, amountToGamble, linkedJobId));
 
-            Mockito.when(gameServiceMock.playDirectGame(serviceRequest)).thenReturn(playerResponseList);
+            Mockito.when(gameServiceMock.playGame(serviceRequest)).thenReturn(playerResponseList);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
@@ -93,7 +91,7 @@ class GamesControllerTest {
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInputQueue"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var playerResponse = new PlayerResponse(123, 12345, false, amountToGamble, linkedJobId);
+            var playerResponse = new PlayerResponse(123, 12345, 100, amountToGamble, linkedJobId);
             var analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
         }
@@ -109,18 +107,11 @@ class GamesControllerTest {
             var timeToLive = 3;
             var amountToGamble = 8;
             var linkedJobId = 123456;
-            var playerRequest = new PlayerRequest(userId, null, OFFLINE_COIN_TOSS_RANDOM, amountToGamble, linkedJobId);
-            var offlineServiceRequest = new ServiceRequest(OFFLINE, playerRequest, timeToLive);
-            var playerResponseList1 = List.of(new PlayerResponse(324, 12345, true, amountToGamble, linkedJobId));
-            var playerResponseList2 = List.of(new PlayerResponse(324, 12345, false, amountToGamble, linkedJobId));
-            var playerResponseList3 = List.of(new PlayerResponse(324, 12345, true, amountToGamble, linkedJobId));
+            var playerRequest = new PlayerRequest(userId, OFFLINE_COIN_TOSS_RANDOM, amountToGamble, linkedJobId);
+            var offlineServiceRequest = new ServiceRequest(SINGLE_PLAYER, playerRequest, timeToLive);
+            var playerResponseList1 = List.of(new PlayerResponse(324, 12345, 100, amountToGamble, linkedJobId));
 
-            Mockito.when(gameServiceMock.playOfflineGame(offlineServiceRequest, Collections.emptyList()))
-                    .thenReturn(playerResponseList1);
-            Mockito.when(gameServiceMock.playOfflineGame(offlineServiceRequest, List.of(true)))
-                    .thenReturn(playerResponseList2);
-            Mockito.when(gameServiceMock.playOfflineGame(offlineServiceRequest, List.of(true, false)))
-                    .thenReturn(playerResponseList3);
+            Mockito.when(gameServiceMock.playGame(offlineServiceRequest)).thenReturn(playerResponseList1);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
             Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
@@ -131,7 +122,7 @@ class GamesControllerTest {
             Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInputQueue"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
-            var playerResponse = new PlayerResponse(324, 12345, List.of(true, false, true), amountToGamble, linkedJobId);
+            var playerResponse = new PlayerResponse(324, 12345, 100, amountToGamble, linkedJobId);
             var analyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, playerResponse);
             MatcherAssert.assertThat(analyticServiceRequestCaptor.getValue(), equalTo(analyticServiceRequest));
         }
@@ -143,14 +134,14 @@ class GamesControllerTest {
         @Test
         void shouldProcessMultiplayerMsg() {
             // Given
-            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, null, 20, 1);
-            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, null, 25, 2);
-            var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, null, 30, 3);
+            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, 20, 1);
+            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, 25, 2);
+            var playerRequest3 = new PlayerRequest("10", POKER_RANDOM, 30, 3);
             var serviceRequest = new ServiceRequest(MULTIPLAYER, List.of(playerRequest1, playerRequest2, playerRequest3), null);
 
-            var playerResponse1 = new PlayerResponse(420, 8, false, 20, 1);
-            var playerResponse2 = new PlayerResponse(420, 9, true, 25, 2);
-            var playerResponse3 = new PlayerResponse(420, 10, false, 30, 3);
+            var playerResponse1 = new PlayerResponse(420, 8, 100, 20, 1);
+            var playerResponse2 = new PlayerResponse(420, 9, 100, 25, 2);
+            var playerResponse3 = new PlayerResponse(420, 10, 100, 30, 3);
 
             Mockito.when(gameServiceMock.playMultiplayerGame(serviceRequest)).thenReturn(List.of(playerResponse1, playerResponse2, playerResponse3));
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
@@ -168,8 +159,8 @@ class GamesControllerTest {
         @Test
         void shouldNotProcessMultiplayerMsgWhenPlayerCountIsLowerThan3() {
             // Given
-            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, null, 20, 1);
-            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, null, 25, 2);
+            var playerRequest1 = new PlayerRequest("8", POKER_RANDOM, 20, 1);
+            var playerRequest2 = new PlayerRequest("9", POKER_RANDOM, 25, 2);
             var serviceRequest = new ServiceRequest(MULTIPLAYER, List.of(playerRequest1, playerRequest2), null);
 
             // When

@@ -32,5 +32,12 @@ public class DeckOfCards {
         public int getValue() {
             return value;
         }
+
+        @Override
+        public String toString() {
+            return "Card{" +
+                    "value=" + value +
+                    '}';
+        }
     }
 }

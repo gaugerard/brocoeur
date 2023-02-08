@@ -25,8 +25,6 @@ public class ServiceRequestStatusService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRequestStatusService.class);
 
-    private static final int WIN_MULTIPLIER = 2;
-
     @Autowired
     private ServiceRequestStatusRepository serviceRequestStatusRepository;
     @Autowired
@@ -41,32 +39,7 @@ public class ServiceRequestStatusService {
     }
 
     /**
-     * <p>We only manage fixed amount gambles. This means that each game round, the same amount of money will be gambled.</p>
-     * <p>In the case of 'Offline' game, we need to multiply the amount of money to be blocked by the number of games the user wants to take part in.</p>
-     *
-     * @param serviceRequestType
-     * @param timeToLive
-     * @param amountToGamble
-     * @return
-     */
-    private int getAmountOfMoneyToBlock(final ServiceRequestTypes serviceRequestType, final Integer timeToLive, final int amountToGamble) {
-        return switch (serviceRequestType) {
-            case DIRECT, MULTIPLAYER -> amountToGamble;
-            case OFFLINE -> amountToGamble * timeToLive;
-        };
-    }
-
-    private String getGameStrategyTypes(final ServiceRequestTypes serviceRequestTypes, final PlayerRequest playerRequest) {
-        return switch (serviceRequestTypes) {
-            case DIRECT, MULTIPLAYER -> playerRequest.getGameStrategyTypes().toString();
-            case OFFLINE -> playerRequest.getOfflineGameStrategyTypes().toString();
-        };
-    }
-
-    /**
      * Sets poker serviceRequest to IN_PROGRESS and sends the poker ServiceRequest.
-     *
-     * @param serviceRequest
      */
     public void sendMultiplayerServiceRequest(final ServiceRequest serviceRequest) {
         // Update status of the 3 poker request.
@@ -87,8 +60,6 @@ public class ServiceRequestStatusService {
      *     <li>If YES: It blocks the requested amount of money from the user, add a line in 'serviceRequestStatus' Cassandra table (with status <b>IN_PROGRESS</b>) and sends the 'ServiceRequest'.</li>
      *     <li>If NO: It only add a line in 'serviceRequestStatus' Cassandra table (with status <b>REJECTED</b>).</li>
      * </ul>
-     *
-     * @param serviceRequest
      */
     public void addServiceRequestStatus(final ServiceRequest serviceRequest) {
         final int jobId = randomService.getRandomJobId();
@@ -105,12 +76,11 @@ public class ServiceRequestStatusService {
             throw new IllegalStateException("UserMoney for userId " + userId + " do not exists.");
         }
 
-        final int amountToGamble = playerRequest.getAmountToGamble();
+        final int amountOfMoneyToBlock = playerRequest.getAmountToGamble();
         final ServiceRequestTypes serviceRequestTypes = serviceRequest.getServiceRequestTypes();
-        final int amountOfMoneyToBlock = getAmountOfMoneyToBlock(serviceRequestTypes, serviceRequest.getTimeToLive(), amountToGamble);
         final int totalAmountOfMoneyAvailable = userMoney.getMoney();
         final long currentTimeInMilliseconds = randomService.getCurrentTimeInMilliseconds();
-        final String gameStrategyTypes = getGameStrategyTypes(serviceRequestTypes, playerRequest);
+        final String gameStrategyTypes = playerRequest.getGameStrategyTypes().toString();
 
         if (amountOfMoneyToBlock <= totalAmountOfMoneyAvailable) {
 
@@ -155,25 +125,11 @@ public class ServiceRequestStatusService {
 
     }
 
-    private int getAmountOfMoneyWon(final List<Boolean> listOfIsWinner, final int amountGambled) {
-        int totalAmountWon = 0;
-        for (var i = 0; i < listOfIsWinner.size(); i++) {
-            if (Boolean.TRUE.equals(listOfIsWinner.get(i))) {
-                totalAmountWon += amountGambled * WIN_MULTIPLIER;
-            }
-        }
-        return totalAmountWon;
-    }
-
     /**
      * <p>This method update the status of the selected 'serviceRequestStatus' line in Cassandra and give money to the user if he/she won the game.</p>
      * <p>For now, when a user wins a game round, the amount gambled is <b>DOUBLED</b> for the said round.</p>
-     *
-     * @param jobId
-     * @param listOfIsWinner
-     * @param amountGambled
      */
-    public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final List<Boolean> listOfIsWinner, final int amountGambled) {
+    public void updateServiceRequestStatusByJobIdAndUpdatePlayerMoney(final int jobId, final int totalAmountWon) {
         final ServiceRequestStatus serviceRequestStatus = serviceRequestStatusRepository.findById(jobId).block();
 
         if (serviceRequestStatus == null) {
@@ -185,7 +141,6 @@ public class ServiceRequestStatusService {
         serviceRequestStatus.setAckTimeMilliSecond(randomService.getCurrentTimeInMilliseconds());
 
         final int amountBlocked = serviceRequestStatus.getAmountBlocked();
-        final int totalAmountWon = getAmountOfMoneyWon(listOfIsWinner, amountGambled);
 
         final UserMoney userMoney = userMoneyRepository.findById(userId).block();
 
