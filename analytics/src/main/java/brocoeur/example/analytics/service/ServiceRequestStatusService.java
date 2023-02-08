@@ -1,5 +1,6 @@
 package brocoeur.example.analytics.service;
 
+import brocoeur.example.analytics.AnalyticsConfigProperties;
 import brocoeur.example.analytics.model.ServiceRequestStatus;
 import brocoeur.example.analytics.model.UserMoney;
 import brocoeur.example.analytics.repository.ServiceRequestStatusRepository;
@@ -50,7 +51,7 @@ public class ServiceRequestStatusService {
         }
 
         // Sends the poker request to 'Game' module.
-        rabbitTemplate.convertAndSend("myexchange1", "MyQ1", serviceRequest);
+        rabbitTemplate.convertAndSend("myexchange1", "ServiceRequestQueue", serviceRequest);
     }
 
     /**
@@ -107,7 +108,7 @@ public class ServiceRequestStatusService {
             } else {
                 // Send 'ServiceRequest' to Game module.
                 playerRequest.setLinkedJobId(jobId);
-                rabbitTemplate.convertAndSend("myexchange1", "MyQ1", serviceRequest);
+                rabbitTemplate.convertAndSend("myexchange1", "ServiceRequestQueue", serviceRequest);
             }
         } else {
             final ServiceRequestStatus serviceRequestStatus = new ServiceRequestStatus(

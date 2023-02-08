@@ -56,13 +56,13 @@ class GamesControllerTest {
 
             Mockito.when(gameServiceMock.playGame(serviceRequest)).thenReturn(playerResponseList);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
-            Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
             // When
             gamesController.getMsg(serviceRequest);
 
             // Then
-            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
+            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInputQueue"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
             var playerResponse = new PlayerResponse(123, 12345, 100, amountToGamble, linkedJobId);
@@ -82,13 +82,13 @@ class GamesControllerTest {
 
             Mockito.when(gameServiceMock.playGame(serviceRequest)).thenReturn(playerResponseList);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
-            Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
             // When
             gamesController.getMsg(serviceRequest);
 
             // Then
-            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
+            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInputQueue"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
             var playerResponse = new PlayerResponse(123, 12345, 100, amountToGamble, linkedJobId);
@@ -113,13 +113,13 @@ class GamesControllerTest {
 
             Mockito.when(gameServiceMock.playGame(offlineServiceRequest)).thenReturn(playerResponseList1);
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
-            Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
             // When
             gamesController.getMsg(offlineServiceRequest);
 
             // Then
-            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInput"), analyticServiceRequestCaptor.capture());
+            Mockito.verify(rabbitTemplateMock).convertAndSend(eq("analyticDirectExchange"), eq("analyticInputQueue"), analyticServiceRequestCaptor.capture());
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
 
             var playerResponse = new PlayerResponse(324, 12345, 100, amountToGamble, linkedJobId);
@@ -145,14 +145,14 @@ class GamesControllerTest {
 
             Mockito.when(gameServiceMock.playMultiplayerGame(serviceRequest)).thenReturn(List.of(playerResponse1, playerResponse2, playerResponse3));
             Mockito.when(gamesConfigPropertiesMock.getRpcExchange()).thenReturn("analyticDirectExchange");
-            Mockito.when(gamesConfigPropertiesMock.getRpcReplyMessageQueue()).thenReturn("analyticInput");
+            Mockito.when(gamesConfigPropertiesMock.getAnalyticInputQueueName()).thenReturn("analyticInputQueue");
 
             // When
             gamesController.getMsg(serviceRequest);
 
             // Then
             var expectedAnalyticServiceRequest = new AnalyticServiceRequest(MONEY_MANAGEMENT, List.of(playerResponse1, playerResponse2, playerResponse3));
-            Mockito.verify(rabbitTemplateMock).convertAndSend("analyticDirectExchange", "analyticInput", expectedAnalyticServiceRequest);
+            Mockito.verify(rabbitTemplateMock).convertAndSend("analyticDirectExchange", "analyticInputQueue", expectedAnalyticServiceRequest);
             Mockito.verifyNoMoreInteractions(rabbitTemplateMock);
         }
 

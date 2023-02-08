@@ -9,15 +9,17 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
 @RequiredArgsConstructor
 public class ConfigRabbitAdmin {
 
     private final ConnectionFactory connectionFactory;
+    @Autowired
+    private NerimaConfigProperties nerimaConfigProperties;
 
     @Bean
     public RabbitAdmin admin() {
@@ -26,7 +28,8 @@ public class ConfigRabbitAdmin {
 
     @Bean
     Queue msgQueue() {
-        return new Queue("MyQ1", false, false, true);
+        //Somehow all the value from the configuration work but serviceRequestQueueName gives null every time wtf ??
+        return new Queue("ServiceRequestQueue", false, false, true);
     }
 
     @Bean
@@ -36,7 +39,7 @@ public class ConfigRabbitAdmin {
 
     @Bean
     Binding msgBinding() {
-        return BindingBuilder.bind(msgQueue()).to(exchange()).with("MyQ1");
+        return BindingBuilder.bind(msgQueue()).to(exchange()).with(nerimaConfigProperties.getServiceRequestQueueName());
     }
 
     @Bean

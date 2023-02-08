@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static brocoeur.example.common.AnalyticServiceRequestTypes.MONEY_MANAGEMENT;
@@ -33,7 +34,8 @@ public class GamesController {
     public void getMsg(final ServiceRequest serviceRequest) {
         final ServiceRequestTypes serviceRequestType = serviceRequest.getServiceRequestTypes();
         switch (serviceRequestType) {
-            case SINGLE_PLAYER -> processMsg(serviceRequest);
+            case DIRECT -> processDirectMsg(serviceRequest);
+            case OFFLINE -> processOfflineMsg(serviceRequest);
             case MULTIPLAYER -> processMultiplayerMsg(serviceRequest);
         }
     }
@@ -49,7 +51,7 @@ public class GamesController {
 
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
+                gamesConfigProperties.getAnalyticInputQueueName(),
                 analyticServiceRequest);
     }
 
@@ -64,7 +66,7 @@ public class GamesController {
 
         rabbitTemplate.convertAndSend(
                 gamesConfigProperties.getRpcExchange(),
-                gamesConfigProperties.getRpcReplyMessageQueue(),
+                gamesConfigProperties.getAnalyticInputQueueName(),
                 analyticServiceRequest);
     }
 }
